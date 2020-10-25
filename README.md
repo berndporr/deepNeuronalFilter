@@ -2,10 +2,7 @@
 A closed-loop deep neural network (DNN) is used to filter 
 the noise from the Delta and Alpha regions of EEG signals.
 The EEG signals were obtained from 12 subjects using a 
-novel smart 3D printed electrode consisting of a central and a ring electrodes, Fig. A).
-
-
-![Figure 1](./fig.png)
+novel smart 3D printed electrode consisting of a central and a ring electrodes.
 
 ## Prerequisites Libraries and packages:
 1) Install the Fir1 library from _https://github.com/berndporr/fir1_ by running:
@@ -75,7 +72,3 @@ Use the Esc key on the interactive window to close the program safely and avoid 
 ## Final results
 The output data will be saved in the `cppData` folder for all subjects.
 You can then use the provided python scripts to plot and analyse the final results.
-
-
-
-
