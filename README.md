@@ -72,3 +72,8 @@ Use the Esc key on the interactive window to close the program safely and avoid 
 ## Final results
 The output data will be saved in the `cppData` folder for all subjects.
 You can then use the provided python scripts to plot and analyse the final results.
+
+
+
+[![DOI](https://zenodo.org/badge/306690603.svg)](https://zenodo.org/badge/latestdoi/306690603)
+
