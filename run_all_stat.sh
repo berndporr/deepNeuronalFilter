@@ -12,5 +12,4 @@ echo "Successfully created the cpp folders"
 
 cmake .
 make
-./run_eeg_filter
-
+./eeg_filter

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.1)
+cmake_minimum_required(VERSION 3.1.0)
 project(eeg_filter)
 set(CMAKE_CXX_STANDARD 14)
 add_subdirectory(DNF)
