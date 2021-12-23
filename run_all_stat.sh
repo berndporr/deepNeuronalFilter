@@ -2,14 +2,16 @@
 
 mkdir -p cppData
 n=1;
-max=12;
+max=20;
 while [ "$n" -le "$max" ]; do
-  mkdir -p "cppData/subject$n"
+  rm -rf "results/subject$n"
+  mkdir -p "results/subject$n"
   n=`expr "$n" + 1`;
 done
 
-echo "Successfully created the cpp folders"
+echo "Successfully created the results folders"
 
 cmake .
 make
-./eeg_filter
+./eeg_filter -a
+

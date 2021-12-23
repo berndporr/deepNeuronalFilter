@@ -41,14 +41,20 @@ dynaPlots::dynaPlots(cv::Mat &_frame, int _plotW, int _plotH) {
 }
 dynaPlots::~dynaPlots() = default;
 
-void dynaPlots::plotMainSignals(std::vector<double> outer_raw, std::vector<double> outer, std::vector<double> outer_end,
-                                std::vector<double> inner_raw, std::vector<double> inner,
-                                std::vector<double> remover, std::vector<double> fnn,
-                                std::vector<double> l1_plot, const std::vector<double>& l2_plot, const std::vector<double>& l3_plot,
+void dynaPlots::plotMainSignals(std::vector<double> outer_raw,
+				std::vector<double> outer,
+				std::vector<double> outer_end,
+                                std::vector<double> inner_raw,
+				std::vector<double> inner,
+                                std::vector<double> remover,
+				std::vector<double> fnn,
+                                std::vector<double> l1_plot,
+				const std::vector<double>& l2_plot,
+				const std::vector<double>& l3_plot,
                                 std::vector<double> lms_output,
                                 int _positionOPEN){
 
-    int graphX = gapX + _positionOPEN * (plotW/2);
+    int graphX = gapX;
 
     double outer_min = *min_element(outer.begin(), outer.end());
     double outer_max = *max_element(outer.begin(), outer.end());
@@ -82,16 +88,11 @@ void dynaPlots::plotMainSignals(std::vector<double> outer_raw, std::vector<doubl
     cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", remover_min, remover_max, remover_v);
     step ++;
     cvui::sparkline(frame, fnn,       graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
-    cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "feedback / neural network");
+    cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "DNF output");
     cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", fnn_min, fnn_max, fnn_v);
     step ++;
     cvui::sparkline(frame, lms_output, graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "LMS output");
-//    cvui::sparkline(frame, l1_plot,   graphX, graphY * step + topOffset, graphDX, 2 * graphDY + 1 * gapY, 0xffffff); //white
-//    cvui::sparkline(frame, l2_plot,   graphX, graphY * step + topOffset, graphDX, 2 * graphDY + 1 * gapY, 0x7d7d7d); //grey
-//    cvui::sparkline(frame, l3_plot,   graphX, graphY * step + topOffset, graphDX, 2 * graphDY + 1 * gapY, 0x000000); //black
-//    cvui::text(     frame,            graphX, graphY * step + topOffset + 2 * graphDY + 1 * gapY,             "Weights: first(w), deeper(g->b)");
-//    cvui::printf(   frame,            graphX, graphY * step + topOffset + 2 * graphDY + 1 * gapY + lineEnter, "l1: min: %+.5lf max: %+.5lf",l1_min, l1_max);
 }
 
 void dynaPlots::plotVariables(){
@@ -125,7 +126,7 @@ void dynaPlots::plotVariables(){
 
 }
 
-void dynaPlots::plotTitle(int count, int duration){
-    cvui::printf(frame, gapX,           titleY, "Sample number: %d , Duration: %d [min] %d [s]",
-                 count, int(duration/60) , duration % 60);
+void dynaPlots::plotTitle(std::string title, long count, int duration){
+    cvui::printf(frame, gapX,           titleY, "Subject %s -- Sample number: %ld , Duration: %d [min] %d [s]",
+                 title.c_str(),count, int(duration/60) , duration % 60);
 }
