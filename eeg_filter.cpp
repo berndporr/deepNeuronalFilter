@@ -35,36 +35,6 @@ const std::string outpPrefix = "results";
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
-boost::circular_buffer<double> oc_raw_buf(bufferLength);
-boost::circular_buffer<double> oc_buf(bufferLength);
-boost::circular_buffer<double> oc_end_buf(bufferLength);
-boost::circular_buffer<double> ic_buf(bufferLength);
-boost::circular_buffer<double> ic_raw_buf(bufferLength);
-boost::circular_buffer<double> oo_raw_buf(bufferLength);
-boost::circular_buffer<double> oo_buf(bufferLength);
-boost::circular_buffer<double> oo_end_buf(bufferLength);
-boost::circular_buffer<double> io_buf(bufferLength);
-boost::circular_buffer<double> io_raw_buf(bufferLength);
-#ifdef DoDeepLearning
-boost::circular_buffer<double> ro_buf(bufferLength);
-boost::circular_buffer<double> rc_buf(bufferLength);
-boost::circular_buffer<double> f_nnc_buf(bufferLength);
-boost::circular_buffer<double> f_nno_buf(bufferLength);
-boost::circular_buffer<double> l1_c_buf(bufferLength);
-boost::circular_buffer<double> l2_c_buf(bufferLength);
-boost::circular_buffer<double> l3_c_buf(bufferLength);
-boost::circular_buffer<double> l1_o_buf(bufferLength);
-boost::circular_buffer<double> l2_o_buf(bufferLength);
-boost::circular_buffer<double> l3_o_buf(bufferLength);
-#endif
-//LMS
-boost::circular_buffer<double> lms_c_buf(bufferLength);
-boost::circular_buffer<double> lms_o_buf(bufferLength);
-
-//adding delay line for the noise
-double outer_p300_delayLine[outerDelayLineLength] ={0.0};
-boost::circular_buffer<double> inner_p300trigger_delayLine(innerDelayLineLength);
-boost::circular_buffer<double> inner_p300_delayLine(innerDelayLineLength);
 
 #ifdef doOuterDelayLine
 int num_inputs = outerDelayLineLength;
@@ -75,60 +45,36 @@ int num_inputs = 1;
 // PLOT
 #ifdef DoShowPlots
 #define WINDOW "Deep Neuronal Filter"
-dynaPlots* plots;
-int plotW = 1200/2;
-int plotH = 720;
+const int plotW = 1200/2;
+const int plotH = 720;
 #endif
 
 //NEURAL NETWORK
 #ifdef DoDeepLearning
 int nNeurons[NLAYERS]={N10, N9, N8, N7, N6, N5, N4, N3, N2, N1, N0};
 int* numNeuronsP = nNeurons;
-Net* NNO = new Net(NLAYERS, numNeuronsP, num_inputs, 0, "P300");
-double w_eta_p300 = 0;
-double b_eta_p300 = 0;
+double w_eta = 0;
+double b_eta = 0;
 #endif
-
-//FILTERS
-Fir1 *outer_filter;
-Fir1 *inner_filter;
-Fir1 *lms_filter_p300 = nullptr;
-
-
-//SIGNALS
-double inner_p300_raw_data, outer_p300_raw_data, p300trigger;
 
 // GAINS
-double outer_p300_gain = 1;
-double inner_p300_gain = 1;
+double outer_gain = 1;
+double inner_gain = 1;
 #ifdef DoDeepLearning
-double remover_p300_gain = 0;
-double feedback_p300_gain = 0;
+double remover_gain = 0;
+double feedback_gain = 0;
 #endif
-// FILES
-#ifdef DoDeepLearning
-fstream nn_file;
-fstream remover_file;
-fstream weight_p300_file;
-#endif
-fstream inner_file;
-fstream outer_file;
-fstream params_file;
-fstream lms_file;
-fstream lms_remover_file;
-fstream laplace_file;
-ifstream p300_infile;
 
-void saveParam(){
+void saveParam(fstream &params_file){
 	params_file << "Gains: "    << "\n"
-		    << outer_p300_gain << "\n"
-		    << inner_p300_gain << "\n"
+		    << outer_gain << "\n"
+		    << inner_gain << "\n"
 #ifdef DoDeepLearning
-		    << remover_p300_gain << "\n"
-		    << feedback_p300_gain << "\n"
+		    << remover_gain << "\n"
+		    << feedback_gain << "\n"
 		    << "Etas: " << "\n"
-		    << w_eta_p300 << "\n"
-		    << b_eta_p300 << "\n"
+		    << w_eta << "\n"
+		    << b_eta << "\n"
 		    << "Network: " << "\n"
 		    << NLAYERS << "\n"
 		    << N10 << "\n"
@@ -165,60 +111,72 @@ void saveParam(){
 #endif
 }
 
-void freeMemory(){
-#ifdef DoShowPlots
-	delete plots;
-#endif
-#ifdef DoDeepLearning
-	delete NNO;
-#endif
-#ifdef doOuterPreFilter
-	delete outer_filter;
-#endif
-#ifdef doInnerPreFilter
-	delete inner_filter;
-#endif
-	delete lms_filter_p300;
-}
-
-void handleFiles(){
-	params_file.close();
-#ifdef DoDeepLearnig
-	weight_p300_file.close();
-	remover_file.close();
-	nn_file.close();
-#endif
-	inner_file.close();
-	outer_file.close();
-	lms_file.close();
-	laplace_file.close();
-	lms_remover_file.close();
-}
-
-
-void tidyUp() {
-	saveParam();
-	handleFiles();
-	p300_infile.close();
-	freeMemory();
-}
-
 
 void processOneSubject(int subjIndex) {
 	std::srand(1);
-	long count = 0;
+
+        //SIGNALS
+	double inner_raw_data, outer_raw_data, p300trigger;
+
+	boost::circular_buffer<double> oc_raw_buf(bufferLength);
+	boost::circular_buffer<double> oc_buf(bufferLength);
+	boost::circular_buffer<double> oc_end_buf(bufferLength);
+	boost::circular_buffer<double> ic_buf(bufferLength);
+	boost::circular_buffer<double> ic_raw_buf(bufferLength);
+	boost::circular_buffer<double> oo_raw_buf(bufferLength);
+	boost::circular_buffer<double> oo_buf(bufferLength);
+	boost::circular_buffer<double> oo_end_buf(bufferLength);
+	boost::circular_buffer<double> io_buf(bufferLength);
+	boost::circular_buffer<double> io_raw_buf(bufferLength);
+#ifdef DoDeepLearning
+	boost::circular_buffer<double> ro_buf(bufferLength);
+	boost::circular_buffer<double> rc_buf(bufferLength);
+	boost::circular_buffer<double> f_nnc_buf(bufferLength);
+	boost::circular_buffer<double> f_nno_buf(bufferLength);
+	boost::circular_buffer<double> l1_c_buf(bufferLength);
+	boost::circular_buffer<double> l2_c_buf(bufferLength);
+	boost::circular_buffer<double> l3_c_buf(bufferLength);
+	boost::circular_buffer<double> l1_o_buf(bufferLength);
+	boost::circular_buffer<double> l2_o_buf(bufferLength);
+	boost::circular_buffer<double> l3_o_buf(bufferLength);
+#endif
+//LMS
+	boost::circular_buffer<double> lms_c_buf(bufferLength);
+	boost::circular_buffer<double> lms_o_buf(bufferLength);
+	
+//adding delay line for the noise
+	double outer_delayLine[outerDelayLineLength] ={0.0};
+	boost::circular_buffer<double> innertrigger_delayLine(innerDelayLineLength);
+	boost::circular_buffer<double> inner_delayLine(innerDelayLineLength);
+	
+// FILES
+#ifdef DoDeepLearning
+	fstream nn_file;
+	fstream remover_file;
+	fstream weight_file;
+#endif
+	fstream inner_file;
+	fstream outer_file;
+	fstream params_file;
+	fstream lms_file;
+	fstream lms_remover_file;
+	fstream laplace_file;
+	ifstream p300_infile;
+
+long count = 0;
 	//setting up the interactive window and the dynamic plot class
 #ifdef DoShowPlots
 	auto frame = cv::Mat(cv::Size(plotW, plotH), CV_8UC3);
 	cvui::init(WINDOW, 1);
-	plots = new dynaPlots(frame, plotW, plotH);
+	dynaPlots plots(frame, plotW, plotH);
 #endif
 	//create files for saving the data and parameters
 	string sbjct = std::to_string(subjIndex);
 #ifdef DoDeepLearning
+	Net NNO(NLAYERS, numNeuronsP, num_inputs, 0, "P300");
 	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
 	remover_file.open(outpPrefix+"/subject" + sbjct + "/remover.tsv", fstream::out);
-	weight_p300_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
+	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
 #endif
 	inner_file.open(outpPrefix+"/subject" + sbjct + "/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/subject" + sbjct + "/outer.tsv", fstream::out);
@@ -242,12 +200,12 @@ void processOneSubject(int subjIndex) {
 	
 	//setting up all the filters required
 #ifdef doOuterPreFilter
-	outer_filter= new Fir1("./pyFiles/forOuter.dat");
-	outer_filter->reset();
+	Fir1 outer_filter("./pyFiles/forOuter.dat");
+	outer_filter.reset();
 #endif
 #ifdef doInnerPreFilter
-	inner_filter= new Fir1("./pyFiles/forInner.dat");
-	inner_filter->reset();
+	Fir1 inner_filter("./pyFiles/forInner.dat");
+	inner_filter.reset();
 #endif
 #ifdef doOuterPreFilter
 	int waitOutFilterDelay = maxFilterLength;
@@ -259,141 +217,141 @@ void processOneSubject(int subjIndex) {
 #endif
 #endif
 	
-	lms_filter_p300 = new Fir1(LMS_COEFF);
-	lms_filter_p300->setLearningRate(LMS_LEARNING_RATE);
+	Fir1 lms_filter(LMS_COEFF);
+	lms_filter.setLearningRate(LMS_LEARNING_RATE);
 	
-	double corrLMS_p300 = 0;
-	double lms_output_p300 = 0;
+	double corrLMS = 0;
+	double lms_output = 0;
 
 	//setting up the neural networks
 #ifdef DoDeepLearning
-	NNO->initNetwork(Neuron::W_RANDOM, Neuron::B_RANDOM, Neuron::Act_Sigmoid);
+	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_RANDOM, Neuron::Act_Sigmoid);
 #endif
 
 	// main loop processsing sample by sample
 	while (!p300_infile.eof()) {
 		count++;
 		//get the data from .tsv files:
-		p300_infile >> inner_p300_raw_data >> outer_p300_raw_data >> p300trigger;
+		p300_infile >> inner_raw_data >> outer_raw_data >> p300trigger;
 		// GET ALL GAINS:
 #ifdef DoDeepLearning
 #ifdef DoShowPlots
-		inner_p300_gain = plots->get_inner_gain(1);
-		outer_p300_gain = plots->get_outer_gain(1);
-		remover_p300_gain = plots->get_remover_gain(1);
-		feedback_p300_gain = plots->get_feedback_gain(1);
+		inner_gain = plots.get_inner_gain(1);
+		outer_gain = plots.get_outer_gain(1);
+		remover_gain = plots.get_remover_gain(1);
+		feedback_gain = plots.get_feedback_gain(1);
 #else
-		inner_p300_gain = 100;
-		outer_p300_gain = 100;
-		remover_p300_gain = 10;
-		feedback_p300_gain = 1;
+		inner_gain = 100;
+		outer_gain = 100;
+		remover_gain = 10;
+		feedback_gain = 1;
 #endif
 #endif
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY
-		double inner_p300_raw = inner_p300_gain * inner_p300_raw_data;
+		double inner_raw = inner_gain * inner_raw_data;
 #ifdef doInnerPreFilter
-		double inner_p300_filtered = inner_filter->filter(inner_p300_raw);
+		double inner_filtered = inner_filter.filter(inner_raw);
 #else
-		double inner_p300_filtered = inner_p300_raw;
+		double inner_filtered = inner_raw;
 #endif
 		//3) DELAY
 #ifdef doInnerDelay
-		inner_p300_delayLine.push_back(inner_p300_filtered);
-		double inner_p300 = inner_p300_delayLine[0];
+		inner_delayLine.push_back(inner_filtered);
+		double inner = inner_delayLine[0];
 		
-		inner_p300trigger_delayLine.push_back(p300trigger);
-		double delayedp300trigger = inner_p300trigger_delayLine[0];
+		innertrigger_delayLine.push_back(p300trigger);
+		double delayedp300trigger = innertrigger_delayLine[0];
 #else
-		double inner_p300 = inner_p300_filtered;
+		double inner = inner_filtered;
 #endif
 		//B) OUTER ELECTRODE:
 		//1) ADJUST & AMPLIFY
-		double outer_p300_raw = outer_p300_gain * outer_p300_raw_data;
+		double outer_raw = outer_gain * outer_raw_data;
 #ifdef doOuterPreFilter
-		double outer_p300 = outer_filter->filter(outer_p300_raw);
+		double outer = outer_filter.filter(outer_raw);
 #else
-		double outer_p300 = outer_p300_raw;
+		double outer = outer_raw;
 #endif
 		//3) DELAY LINE
 		for (int i = outerDelayLineLength-1 ; i > 0; i--) {
-			outer_p300_delayLine[i] = outer_p300_delayLine[i-1];
+			outer_delayLine[i] = outer_delayLine[i-1];
 			
 		}
-		outer_p300_delayLine[0] = outer_p300;
-		double* outer_p300_delayed = &outer_p300_delayLine[0];
+		outer_delayLine[0] = outer;
+		double* outer_delayed = &outer_delayLine[0];
 		
 		// OUTER INPUT TO NETWORK
 #ifdef DoDeepLearning
-		NNO->setInputs(outer_p300_delayed);
-		NNO->propInputs();
+		NNO.setInputs(outer_delayed);
+		NNO.propInputs();
 		
 		// REMOVER OUTPUT FROM NETWORK
-		double remover_p300 = NNO->getOutput(0) * remover_p300_gain;
-		double f_nn_p300 = (inner_p300 - remover_p300) * feedback_p300_gain;
+		double remover = NNO.getOutput(0) * remover_gain;
+		double f_nn = (inner - remover) * feedback_gain;
 		
 		// FEEDBACK TO THE NETWORK 
-		NNO->setErrorCoeff(0, 1, 0, 0, 0, 0); //global, back, mid, forward, local, echo error
-		NNO->setBackwardError(f_nn_p300);
-		NNO->propErrorBackward();
+		NNO.setErrorCoeff(0, 1, 0, 0, 0, 0); //global, back, mid, forward, local, echo error
+		NNO.setBackwardError(f_nn);
+		NNO.propErrorBackward();
 #endif
 		
 		// LEARN
 #ifdef DoDeepLearning
 #ifdef DoShowPlots
-		w_eta_p300 = plots->get_wEta(1);
-		b_eta_p300 = plots->get_bEta(1);
+		w_eta = plots.get_wEta(1);
+		b_eta = plots.get_bEta(1);
 #else
-		w_eta_p300 = 1;
-		b_eta_p300 = 2;
+		w_eta = 1;
+		b_eta = 2;
 #endif
 #endif
 
 #ifdef DoDeepLearning
-		NNO->setLearningRate(w_eta_p300, b_eta_p300);
+		NNO.setLearningRate(w_eta, b_eta);
 		if (count > maxFilterLength+outerDelayLineLength){
-			NNO->updateWeights();
+			NNO.updateWeights();
 		}
 		// SAVE WEIGHTS
 		for (int i = 0; i < NLAYERS; i++) {
-			weight_p300_file << NNO->getLayerWeightDistance(i) << " ";
+			weight_file << NNO.getLayerWeightDistance(i) << " ";
 		}
-		weight_p300_file << NNO->getWeightDistance() << "\n";
-		NNO->snapWeights(outpPrefix, "p300", subjIndex);
-		double l1_o = NNO->getLayerWeightDistance(0);
-		double l2_o = NNO->getLayerWeightDistance(1);
-		double l3_o = NNO->getLayerWeightDistance(2);
+		weight_file << NNO.getWeightDistance() << "\n";
+		NNO.snapWeights(outpPrefix, "p300", subjIndex);
+		double l1_o = NNO.getLayerWeightDistance(0);
+		double l2_o = NNO.getLayerWeightDistance(1);
+		double l3_o = NNO.getLayerWeightDistance(2);
 #endif
 
 		// Do Laplace filter
-		double laplace_p300 = inner_p300 - outer_p300;
+		double laplace = inner - outer;
 
 
 		// Do LMS filter
-		corrLMS_p300 += lms_filter_p300->filter(outer_p300);
-		lms_output_p300 = inner_p300 - corrLMS_p300;
-		lms_filter_p300->lms_update(lms_output_p300);
+		corrLMS += lms_filter.filter(outer);
+		lms_output = inner - corrLMS;
+		lms_filter.lms_update(lms_output);
 		
 		// SAVE SIGNALS INTO FILES
-		laplace_file << laplace_p300 << "\t" << delayedp300trigger << endl;
-		inner_file << inner_p300 << endl;
+		laplace_file << laplace << "\t" << delayedp300trigger << endl;
+		inner_file << inner << endl;
 #ifdef DoDeepLearning
-		remover_file << remover_p300 << endl;
-		nn_file << f_nn_p300 << "\t" << delayedp300trigger << endl;
+		remover_file << remover << endl;
+		nn_file << f_nn << "\t" << delayedp300trigger << endl;
 #endif
-		lms_file << lms_output_p300 << "\t" << delayedp300trigger << endl;
-		lms_remover_file << corrLMS_p300 << endl;
+		lms_file << lms_output << "\t" << delayedp300trigger << endl;
+		lms_remover_file << corrLMS << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
-		oo_buf.push_back(outer_p300_delayLine[0]);
-		oo_end_buf.push_back(outer_p300_delayLine[outerDelayLineLength-1]);
-		oo_raw_buf.push_back(outer_p300_raw);
-		io_buf.push_back(inner_p300);
-		io_raw_buf.push_back(inner_p300_raw);
+		oo_buf.push_back(outer_delayLine[0]);
+		oo_end_buf.push_back(outer_delayLine[outerDelayLineLength-1]);
+		oo_raw_buf.push_back(outer_raw);
+		io_buf.push_back(inner);
+		io_raw_buf.push_back(inner_raw);
 #ifdef DoDeepLearning
-		ro_buf.push_back(remover_p300);
-		f_nno_buf.push_back(f_nn_p300);
+		ro_buf.push_back(remover);
+		f_nno_buf.push_back(f_nn);
 #endif
 		// 2) LAYER WEIGHTS
 #ifdef DoDeepLearning
@@ -403,7 +361,7 @@ void processOneSubject(int subjIndex) {
 #endif
 
 		// 3) LMS outputs
-		lms_o_buf.push_back(lms_output_p300);
+		lms_o_buf.push_back(lms_output);
 		
 		// PUTTING BUFFERS IN VECTORS FOR PLOTS
 		// 1) MAIN SIGNALS
@@ -434,7 +392,7 @@ void processOneSubject(int subjIndex) {
 		std::vector<double> l3_o_plot = {0};
 #endif
 		if (0 == (count % 10)) {
-			plots->plotMainSignals(oo_raw_plot,
+			plots.plotMainSignals(oo_raw_plot,
 					       oo_plot,
 					       oo_end_plot,
 					       io_raw_plot,
@@ -445,22 +403,35 @@ void processOneSubject(int subjIndex) {
 					       l2_o_plot,
 					       l3_o_plot,
 					       lms_o_plot, 1);
-			plots->plotVariables();
-			plots->plotTitle(sbjct, count, round(count / fs));
+			plots.plotVariables();
+			plots.plotTitle(sbjct, count, round(count / fs));
 			cvui::update();
 			cv::imshow(WINDOW, frame);
 
 			if (cv::waitKey(1) == ESC_key) {
-#ifdef DoDeepLearning
-				NNO->snapWeights(outpPrefix, "p300", subjIndex);
-#endif
-				tidyUp();
-				exit(0);
+				break;
 			}
 		}
 #endif
 	}
-	tidyUp();
+#ifdef DoDeepLearning
+	NNO.snapWeights(outpPrefix, "p300", subjIndex);
+#endif
+	saveParam(params_file);
+
+	p300_infile.close();
+	params_file.close();
+#ifdef DoDeepLearnig
+	weight_file.close();
+	remover_file.close();
+	nn_file.close();
+#endif
+	inner_file.close();
+	outer_file.close();
+	lms_file.close();
+	laplace_file.close();
+	lms_remover_file.close();
+	
 	cout << "The program has reached the end of the input file" << endl;
 }
 

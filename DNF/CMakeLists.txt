@@ -10,3 +10,7 @@ add_library(CLDL
         lib/Neuron.cpp)
 
 target_include_directories(CLDL PUBLIC include)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
