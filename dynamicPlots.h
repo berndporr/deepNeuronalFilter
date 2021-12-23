@@ -31,29 +31,28 @@ public:
                          std::vector<double> l1_plot, const std::vector<double>& l2_plot, const std::vector<double>& l3_plot,
                          std::vector<double> lms_output,
                          int _positionOPEN);
-    void plotVariables(int closed_or_open);
+    void plotVariables();
 
     void plotTitle(int count, int duration);
 
-    inline double get_wEta(int closed_or_open) {return (wEta[closed_or_open] * pow(10, wEtaPower[closed_or_open]));}
-    inline double get_bEta(int closed_or_open) {return (bEta[closed_or_open] * pow(10, bEtaPower[closed_or_open]));}
-    inline double get_outer_gain(int closed_or_open) {return outer_gain[closed_or_open];}
-    inline double get_inner_gain(int closed_or_open) {return inner_gain[closed_or_open];}
-    inline double get_remover_gain(int closed_or_open) {return remover_gain[closed_or_open];}
-    inline double get_feedback_gain(int closed_or_open) {return feedback_gain[closed_or_open];}
+    inline double get_wEta(int closed_or_open) {return (wEta * pow(10, wEtaPower));}
+    inline double get_bEta(int closed_or_open) {return (bEta * pow(10, bEtaPower));}
+    inline double get_outer_gain(int closed_or_open) {return outer_gain;}
+    inline double get_inner_gain(int closed_or_open) {return inner_gain;}
+    inline double get_remover_gain(int closed_or_open) {return remover_gain;}
+    inline double get_feedback_gain(int closed_or_open) {return feedback_gain;}
 
 private:
     cv::Mat frame;
 
-    // variable          {closed, open}
-    double outer_gain[2]    = {100, 100};
-    double inner_gain[2]    = {100, 100};
-    double remover_gain[2]  = {10, 10};
-    double feedback_gain[2] = {1, 1};
-    double wEta[2]          = {1, 1};
-    double wEtaPower[2]     = {0, 0};
-    double bEta[2]          = {2, 2};
-    double bEtaPower[2]     = {0, 0};
+    double outer_gain    = 100;
+    double inner_gain    = 100;
+    double remover_gain  = 10;
+    double feedback_gain = 1;
+    double wEta          = 1;
+    double wEtaPower     = 0;
+    double bEta          = 2;
+    double bEtaPower     = 0;
 
     double gainStart = 0.0;
     double gainEnd = 20.0;

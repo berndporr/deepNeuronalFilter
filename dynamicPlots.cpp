@@ -94,44 +94,38 @@ void dynaPlots::plotMainSignals(std::vector<double> outer_raw, std::vector<doubl
 //    cvui::printf(   frame,            graphX, graphY * step + topOffset + 2 * graphDY + 1 * gapY + lineEnter, "l1: min: %+.5lf max: %+.5lf",l1_min, l1_max);
 }
 
-void dynaPlots::plotVariables(int closed_or_open){
-    int graphX = gapX + closed_or_open * (plotW/2);
-    int barX = graphDX + graphX + gapX;
+void dynaPlots::plotVariables(){
+	int graphX = gapX;
+	int barX = graphDX + graphX + gapX;
 
-    int step = 0;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "outer gain");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &outer_gain[closed_or_open],  (double)gainStart, (double)gainEnd);
-    step ++;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "inner gain");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &inner_gain[closed_or_open],  (double)gainStart, (double)gainEnd);
-    step ++;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "remover gain");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &remover_gain[closed_or_open], (double)gainStart, (double)gainEnd);
-    step ++;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "feedback gain");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &feedback_gain[closed_or_open],  (double)gainStart, (double)gainEnd);
-    step ++;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "weight Eta");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &wEta[closed_or_open],       (double)1.,   (double)10.);
-    step ++;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "w power");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &wEtaPower[closed_or_open],  (double)-3.,  (double)3.);
-    step ++;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "bias Eta");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &bEta[closed_or_open],       (double)1.,   (double)10.);
-    step ++;
-    cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "b power");
-    cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &bEtaPower[closed_or_open],  (double)-3.,  (double)3.);
+	int step = 0;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "outer gain");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &outer_gain,  (double)gainStart, (double)gainEnd);
+	step ++;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "inner gain");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &inner_gain,  (double)gainStart, (double)gainEnd);
+	step ++;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "remover gain");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &remover_gain, (double)gainStart, (double)gainEnd);
+	step ++;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "feedback gain");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &feedback_gain,  (double)gainStart, (double)gainEnd);
+	step ++;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "weight Eta");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &wEta,       (double)1.,   (double)10.);
+	step ++;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "w power");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &wEtaPower,  (double)-3.,  (double)3.);
+	step ++;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "bias Eta");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &bEta,       (double)1.,   (double)10.);
+	step ++;
+	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "b power");
+	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &bEtaPower,  (double)-3.,  (double)3.);
 
 }
 
 void dynaPlots::plotTitle(int count, int duration){
     cvui::printf(frame, gapX,           titleY, "Sample number: %d , Duration: %d [min] %d [s]",
                  count, int(duration/60) , duration % 60);
-
-    cvui::text(frame,   gapX,           titleY + lineEnter, "EYES CLOSED DATA:");
-    cvui::text(frame,   gapX + plotW/2, titleY + lineEnter, "EYES OPEN DATA:");
 }
-
-
-
