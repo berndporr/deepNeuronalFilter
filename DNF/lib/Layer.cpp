@@ -349,11 +349,11 @@ void Layer::saveWeights(){
     }
 }
 
-void Layer::snapWeights(string _where, string _trial, int _subject){
+void Layer::snapWeights(string prefix, string _trial, int _subject){
     subject = _subject;
     trial = _trial;
     std::fstream wfile;
-    string name = "./cppData/subject" + std::to_string(subject) + "/grayLayer" + std::to_string(myLayerIndex+1) + "_" + trial + "_subject" + std::to_string(subject) + ".csv";
+    string name = prefix+"/subject" + std::to_string(subject) + "/grayLayer" + std::to_string(myLayerIndex+1) + "_" + trial + "_weights.csv";
     wfile.open(name, fstream::out);
     if (!wfile || !wfile) {
         cout << "Unable to open grayScale files";
@@ -368,11 +368,11 @@ void Layer::snapWeights(string _where, string _trial, int _subject){
     wfile.close();
 }
 
-void Layer::snapWeightsMatrixFormat(){
+void Layer::snapWeightsMatrixFormat(string prefix){
     std::ofstream wfile;
     char l = '0';
     l += myLayerIndex + 1;
-    string name = "../cppOutputFiles/subject" + std::to_string(subject) + "/greyScaleMATRIX_Layer" + l
+    string name = prefix+"/subject" + std::to_string(subject) + "/greyScaleMATRIX_Layer" + l
                   + "_Subject" + std::to_string(subject)
                   + "_" + trial;
     //name += l;

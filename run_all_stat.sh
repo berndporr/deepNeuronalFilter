@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir -p cppData
+mkdir -p results
 n=1;
 max=20;
 while [ "$n" -le "$max" ]; do

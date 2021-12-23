@@ -391,15 +391,14 @@ void Net::saveWeights(){
 }
 
 
-void Net::snapWeights(string _where, string _trial, int _subject){
-//    layers[0]->snapWeights(_where, _trial, _subject);
+void Net::snapWeights(string prefix, string _trial, int _subject){
      for (int i=0; i<nLayers; i++){
-         layers[i]->snapWeights(_where, _trial, _subject);
+         layers[i]->snapWeights(prefix, _trial, _subject);
      }
 }
 
-void Net::snapWeightsMatrixFormat(){
-    layers[0]->snapWeightsMatrixFormat();
+void Net::snapWeightsMatrixFormat(string prefix){
+    layers[0]->snapWeightsMatrixFormat(prefix);
 }
 
 void Net::printNetwork(){

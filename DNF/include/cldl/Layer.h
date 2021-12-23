@@ -291,8 +291,8 @@ public:
      * Snaps the final distribution of weights in a specific layer,
      * this is overwritten every time the function is called
      */
-    void snapWeights(string _where, string _trial, int _subject);
-    void snapWeightsMatrixFormat();
+    void snapWeights(string prefix, string _trial, int _subject);
+    void snapWeightsMatrixFormat(string prefix);
     /**
      * Prints on the console a full tree of this layer with the values of all weights and outputs for all neurons
      */

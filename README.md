@@ -70,7 +70,7 @@ novel smart 3D printed electrode consisting of a central and a ring electrodes.
 Use the Esc key on the interactive window to close the program safely and avoid corrupted files.
 
 ## Final results
-The output data will be saved in the `cppData` folder for all subjects.
+The output data will be saved in the `results` folder for all subjects.
 You can then use the provided python scripts to plot and analyse the final results.
 
 
