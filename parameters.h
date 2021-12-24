@@ -8,7 +8,7 @@
 const int nSubj = 20;
 
 // sampling rate
-const float fs = 250;
+const int fs = 250;
 
 const int filterorder = 4;
 const double highpassCutOff = 2; // Hz
@@ -28,15 +28,9 @@ const int bufferLength = 1000 ;
 
 #define maxFilterLength (fs)
 
-// NOISE:
-#define doOuterPreFilter
-// #define doOuterDelayLine
-#define outerDelayLineLength 59
+#define outerDelayLineLength (fs)
 
-// SIGNAL:
-#define doInnerPreFilter
-// #define doInnerDelay
-#define innerDelayLineLength 59
+#define innerDelayLineLength (fs/2)
 
 //NN specifications
 #define DoDeepLearning

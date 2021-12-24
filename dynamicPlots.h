@@ -41,12 +41,12 @@ public:
 	
 	void plotTitle(std:: string title, long count, int duration);
 	
-	inline double get_wEta(int closed_or_open) {return (wEta * pow(10, wEtaPower));}
-	inline double get_bEta(int closed_or_open) {return (bEta * pow(10, bEtaPower));}
-	inline double get_outer_gain(int closed_or_open) {return outer_gain;}
-	inline double get_inner_gain(int closed_or_open) {return inner_gain;}
-	inline double get_remover_gain(int closed_or_open) {return remover_gain;}
-	inline double get_feedback_gain(int closed_or_open) {return feedback_gain;}
+	inline double get_wEta() {return (wEta * pow(10, wEtaPower));}
+	inline double get_bEta() {return (bEta * pow(10, bEtaPower));}
+	inline double get_outer_gain() {return outer_gain;}
+	inline double get_inner_gain() {return inner_gain;}
+	inline double get_remover_gain() {return remover_gain;}
+	inline double get_feedback_gain() {return feedback_gain;}
 	
 private:
 	cv::Mat frame;
