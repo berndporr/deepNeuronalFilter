@@ -10,10 +10,13 @@ const int nSubj = 20;
 // sampling rate
 const int fs = 250;
 
+// pre-filtering
 const int filterorder = 4;
-const double highpassCutOff = 2; // Hz
+const double highpassCutOff = 0.5; // Hz
 const double powerlineFrequ = 50; // Hz
 const double bsBandwidth = 2.5; // Hz
+
+const int samplesNoLearning = 2 * fs / highpassCutOff;
 
 // file path prefix for the results
 const std::string outpPrefix = "results";
@@ -25,8 +28,6 @@ const int bufferLength = 1000 ;
 #define LMS_LEARNING_RATE 0.00001
 
 #define DoShowPlots
-
-#define maxFilterLength (fs)
 
 #define outerDelayLineLength (fs)
 

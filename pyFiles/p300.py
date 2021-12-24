@@ -19,26 +19,38 @@ if len(sys.argv) > 1:
     subj = int(sys.argv[1])
 
 fs = 250
-p = "../results/subject{}/fnn.tsv".format(subj)
-d = np.loadtxt(p)
-y = d[:,0]
-tr = d[:,1]
-t = "Subject {}".format(subj)
 
-oddballs = np.argwhere(tr > 0.5)
+def calcVEP(filename):
+    p = "../results/subject{}/{}".format(subj,filename)
+    print("Loading",p)
+    d = np.loadtxt(p)
+    y = d[:,0]
+    tr = d[:,1]
+    t = "Subject {}".format(subj)
 
-navg = int(fs)
-avg = np.zeros(navg)
+    oddballs = np.argwhere(tr > 0.5)
 
-d = 0
-for [ob] in oddballs:
-    if (ob+navg) < len(y):
-        avg = avg + y[int(ob):int(ob+navg)]
-        print(ob-d)
-        d = ob
+    navg = int(fs)
+    avg = np.zeros(navg)
 
-avg = avg / len(oddballs)
+    d = 0
+    n = 0
+    for [ob] in oddballs:
+        if (ob+navg) < len(y):
+            avg = avg + y[int(ob):int(ob+navg)]
+            n = n + 1
+            print((ob-d)/fs)
+            d = ob            
+    avg = avg / n
+    return avg
 
-plt.plot(avg)
+fig, axs = plt.subplots(2)
+fig.suptitle("VEP")
+y = calcVEP("fnn.tsv")
+t = np.linspace(0,len(y)/fs,len(y)) * 1000
+axs[0].plot(t,y)
+y = calcVEP("inner.tsv")
+t = np.linspace(0,len(y)/fs,len(y)) * 1000
+axs[1].plot(t,y)
 
 plt.show()

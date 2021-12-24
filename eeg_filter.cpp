@@ -70,10 +70,6 @@ void saveParam(fstream &params_file){
 		    << "LMS" << "\n"
 		    << LMS_COEFF << "\n"
 		    << LMS_LEARNING_RATE << "\n";
-	params_file    << "didNoisePreFilter" << "\n"
-		       << maxFilterLength << "\n";
-	params_file    << "didSignalPreFilter" << "\n"
-		       << maxFilterLength << "\n";
 	params_file    << "didOuterDelayLine" << "\n"
 		       << outerDelayLineLength << "\n";
 	params_file    << "didSignalDelay" << "\n"
@@ -247,7 +243,7 @@ long count = 0;
 #endif
 
 		NNO.setLearningRate(w_eta, b_eta);
-		if (count > maxFilterLength+outerDelayLineLength){
+		if (count > (samplesNoLearning+outerDelayLineLength)){
 			NNO.updateWeights();
 		}
 		// SAVE WEIGHTS
