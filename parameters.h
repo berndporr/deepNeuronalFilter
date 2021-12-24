@@ -24,8 +24,7 @@ const std::string outpPrefix = "results";
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
-#define LMS_COEFF (int)(fs)
-#define LMS_LEARNING_RATE 0.00001
+#define LMS_LEARNING_RATE 10
 
 #define DoShowPlots
 

@@ -68,7 +68,6 @@ void saveParam(fstream &params_file){
 		    << N1 << "\n"
 		    << N0 << "\n"
 		    << "LMS" << "\n"
-		    << LMS_COEFF << "\n"
 		    << LMS_LEARNING_RATE << "\n";
 	params_file    << "didOuterDelayLine" << "\n"
 		       << outerDelayLineLength << "\n";
@@ -108,7 +107,7 @@ void processOneSubject(int subjIndex) {
 	boost::circular_buffer<double> lms_o_buf(bufferLength);
 	
 //adding delay line for the noise
-	double outer_delayLine[outerDelayLineLength] ={0.0};
+	double outer_delayLine[outerDelayLineLength] = {0.0};
 	boost::circular_buffer<double> innertrigger_delayLine(innerDelayLineLength);
 	boost::circular_buffer<double> inner_delayLine(innerDelayLineLength);
 	
@@ -133,7 +132,12 @@ long count = 0;
 #endif
 	//create files for saving the data and parameters
 	string sbjct = std::to_string(subjIndex);
+
+	//create the neural network
 	Net NNO(NLAYERS, numNeuronsP, num_inputs, 0, "P300");
+	//setting up the neural networks
+	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_RANDOM, Neuron::Act_Sigmoid);
+		
 	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
 	remover_file.open(outpPrefix+"/subject" + sbjct + "/remover.tsv", fstream::out);
 	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
@@ -167,15 +171,9 @@ long count = 0;
 	Iir::Butterworth::BandStop<filterorder> inner_filterBS;
 	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 	
-	Fir1 lms_filter(LMS_COEFF);
+	Fir1 lms_filter(outerDelayLineLength);
 	lms_filter.setLearningRate(LMS_LEARNING_RATE);
 	
-	double corrLMS = 0;
-	double lms_output = 0;
-
-	//setting up the neural networks
-	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_RANDOM, Neuron::Act_Sigmoid);
-
 	// main loop processsing sample by sample
 	while (!p300_infile.eof()) {
 		count++;
@@ -259,20 +257,21 @@ long count = 0;
 		// Do Laplace filter
 		double laplace = inner - outer;
 
-
 		// Do LMS filter
-		corrLMS += lms_filter.filter(outer);
-		lms_output = inner - corrLMS;
-		lms_filter.lms_update(lms_output);
+		double corrLMS = lms_filter.filter(outer);
+		double lms_output = inner - corrLMS;
+		if (count > (samplesNoLearning+outerDelayLineLength)){
+			lms_filter.lms_update(lms_output);
+		}
 		
 		// SAVE SIGNALS INTO FILES
 		laplace_file << laplace << "\t" << delayedp300trigger << endl;
 		// undo the gain so that the signal is again in volt
 		inner_file << inner/inner_gain << "\t" << delayedp300trigger << endl;
-		remover_file << remover << endl;
-		nn_file << f_nn << "\t" << delayedp300trigger << endl;
-		lms_file << lms_output << "\t" << delayedp300trigger << endl;
-		lms_remover_file << corrLMS << endl;
+		remover_file << remover/inner_gain << endl;
+		nn_file << f_nn/inner_gain << "\t" << delayedp300trigger << endl;
+		lms_file << lms_output/inner_gain << "\t" << delayedp300trigger << endl;
+		lms_remover_file << corrLMS/inner_gain << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
