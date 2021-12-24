@@ -267,7 +267,8 @@ long count = 0;
 		
 		// SAVE SIGNALS INTO FILES
 		laplace_file << laplace << "\t" << delayedp300trigger << endl;
-		inner_file << inner << "\t" << delayedp300trigger << endl;
+		// undo the gain so that the signal is again in volt
+		inner_file << inner/inner_gain << "\t" << delayedp300trigger << endl;
 		remover_file << remover << endl;
 		nn_file << f_nn << "\t" << delayedp300trigger << endl;
 		lms_file << lms_output << "\t" << delayedp300trigger << endl;
