@@ -24,10 +24,10 @@ using namespace std;
 //initialisation:
 //*************************************************************************************
 
-Net::Net(int _nLayers, int* _nNeurons, int _nInputs, int _subject, string _trial){
+Net::Net(const int _nLayers, const int * const _nNeurons, const int _nInputs, const int _subject, const string _trial){
     nLayers = _nLayers; //no. of layers including inputs and outputs layers
     layers= new Layer*[nLayers];
-    int* nNeuronsp = _nNeurons; //number of neurons in each layer
+    const int* nNeuronsp = _nNeurons; //number of neurons in each layer
     nInputs=_nInputs; // the no. of inputs to the network (i.e. the first layer)
     //cout << "nInputs: " << nInputs << endl;
     int nInput = 0; //temporary variable to use within the scope of for loop

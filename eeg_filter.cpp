@@ -24,23 +24,6 @@
 using namespace std;
 constexpr int ESC_key = 27;
 
-// number of subjects
-const int nSubj = 20;
-
-// sampling rate
-const float fs = 250;
-
-const int filterorder = 4;
-const double highpassCutOff = 2; // Hz
-const double powerlineFrequ = 50; // Hz
-const double bsBandwidth = 2.5; // Hz
-
-// file path prefix for the results
-const std::string outpPrefix = "results";
-
-//creat circular buffers for plotting
-const int bufferLength = 1000 ;
-
 #ifdef doOuterDelayLine
 int num_inputs = outerDelayLineLength;
 #else
@@ -56,8 +39,8 @@ const int plotH = 720;
 
 //NEURAL NETWORK
 #ifdef DoDeepLearning
-int nNeurons[NLAYERS]={N10, N9, N8, N7, N6, N5, N4, N3, N2, N1, N0};
-int* numNeuronsP = nNeurons;
+const int nNeurons[NLAYERS]={N10, N9, N8, N7, N6, N5, N4, N3, N2, N1, N0};
+const int* numNeuronsP = nNeurons;
 double w_eta = 0;
 double b_eta = 0;
 #endif

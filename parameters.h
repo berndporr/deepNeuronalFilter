@@ -4,12 +4,29 @@
 #ifndef EEGFILTER_PARAMETERS_H
 #define EEGFILTER_PARAMETERS_H
 
-#define LMS_COEFF (int)(250)
+// number of subjects
+const int nSubj = 20;
+
+// sampling rate
+const float fs = 250;
+
+const int filterorder = 4;
+const double highpassCutOff = 2; // Hz
+const double powerlineFrequ = 50; // Hz
+const double bsBandwidth = 2.5; // Hz
+
+// file path prefix for the results
+const std::string outpPrefix = "results";
+
+//creat circular buffers for plotting
+const int bufferLength = 1000 ;
+
+#define LMS_COEFF (int)(fs)
 #define LMS_LEARNING_RATE 0.00001
 
 #define DoShowPlots
 
-#define maxFilterLength 250
+#define maxFilterLength (fs)
 
 // NOISE:
 #define doOuterPreFilter

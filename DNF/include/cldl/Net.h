@@ -37,7 +37,11 @@ public:
  * neurons for all layers need to have the length of _nLayers.
  * \param _nInputs Number of Inputs to the network
  **/
-    Net(int _nLayers, int *_nNeurons, int _nInputs, int _subject, string _trial);
+    Net(const int _nLayers,
+	const int * const _nNeurons,
+	const int _nInputs,
+	const int _subject,
+	const string _trial);
 
 /**
  * Destructor
