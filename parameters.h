@@ -13,12 +13,12 @@
 
 // NOISE:
 #define doOuterPreFilter
-#define doOuterDelayLine
+// #define doOuterDelayLine
 #define outerDelayLineLength 59
 
 // SIGNAL:
 #define doInnerPreFilter
-#define doInnerDelay
+// #define doInnerDelay
 #define innerDelayLineLength 59
 
 //NN specifications

@@ -30,6 +30,11 @@ const int nSubj = 20;
 // sampling rate
 const float fs = 250;
 
+const int filterorder = 4;
+const double highpassCutOff = 2; // Hz
+const double powerlineFrequ = 50; // Hz
+const double bsBandwidth = 2.5; // Hz
+
 // file path prefix for the results
 const std::string outpPrefix = "results";
 
@@ -200,21 +205,16 @@ long count = 0;
 	
 	//setting up all the filters required
 #ifdef doOuterPreFilter
-	Fir1 outer_filter("./pyFiles/forOuter.dat");
-	outer_filter.reset();
+	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
+	outer_filterHP.setup(fs,highpassCutOff);
+	Iir::Butterworth::BandStop<filterorder> outer_filterBS;
+	outer_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 #endif
 #ifdef doInnerPreFilter
-	Fir1 inner_filter("./pyFiles/forInner.dat");
-	inner_filter.reset();
-#endif
-#ifdef doOuterPreFilter
-	int waitOutFilterDelay = maxFilterLength;
-#else
-#ifdef doInnerPreFilter
-	int waitOutFilterDelay = maxFilterLength;
-#else
-	int waitOutFilterDelay = 1;
-#endif
+	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
+	inner_filterHP.setup(fs,highpassCutOff);
+	Iir::Butterworth::BandStop<filterorder> inner_filterBS;
+	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 #endif
 	
 	Fir1 lms_filter(LMS_COEFF);
@@ -251,7 +251,8 @@ long count = 0;
 		//1) ADJUST & AMPLIFY
 		double inner_raw = inner_gain * inner_raw_data;
 #ifdef doInnerPreFilter
-		double inner_filtered = inner_filter.filter(inner_raw);
+		double inner_filtered = inner_filterHP.filter(inner_raw);
+		inner_filtered = inner_filterBS.filter(inner_filtered);
 #else
 		double inner_filtered = inner_raw;
 #endif
@@ -264,12 +265,14 @@ long count = 0;
 		double delayedp300trigger = innertrigger_delayLine[0];
 #else
 		double inner = inner_filtered;
+		double delayedp300trigger = p300trigger;
 #endif
 		//B) OUTER ELECTRODE:
 		//1) ADJUST & AMPLIFY
 		double outer_raw = outer_gain * outer_raw_data;
 #ifdef doOuterPreFilter
-		double outer = outer_filter.filter(outer_raw);
+		double outer = outer_filterHP.filter(outer_raw);
+		outer = outer_filterBS.filter(outer);
 #else
 		double outer = outer_raw;
 #endif
