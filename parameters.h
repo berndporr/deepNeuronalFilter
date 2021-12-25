@@ -12,11 +12,12 @@ const int fs = 250;
 
 // pre-filtering
 const int filterorder = 4;
-const double highpassCutOff = 0.5; // Hz
+const double innerHighpassCutOff = 0.5; // Hz
+const double outerHighpassCutOff = 5; // Hz
 const double powerlineFrequ = 50; // Hz
 const double bsBandwidth = 2.5; // Hz
 
-const int samplesNoLearning = 2 * fs / highpassCutOff;
+const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 
 // file path prefix for the results
 const std::string outpPrefix = "results";
@@ -24,7 +25,7 @@ const std::string outpPrefix = "results";
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
-#define LMS_LEARNING_RATE 1
+#define LMS_LEARNING_RATE 0.00001
 
 #define DoShowPlots
 

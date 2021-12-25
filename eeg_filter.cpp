@@ -135,8 +135,9 @@ long count = 0;
 
 	//create the neural network
 	Net NNO(NLAYERS, numNeuronsP, num_inputs, 0, "P300");
+	
 	//setting up the neural networks
-	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_RANDOM, Neuron::Act_Sigmoid);
+	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_Sigmoid);
 		
 	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
 	remover_file.open(outpPrefix+"/subject" + sbjct + "/remover.tsv", fstream::out);
@@ -163,11 +164,11 @@ long count = 0;
 	
 	//setting up all the filters required
 	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
-	outer_filterHP.setup(fs,highpassCutOff);
+	outer_filterHP.setup(fs,outerHighpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> outer_filterBS;
 	outer_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
-	inner_filterHP.setup(fs,highpassCutOff);
+	inner_filterHP.setup(fs,innerHighpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> inner_filterBS;
 	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 	
@@ -233,11 +234,11 @@ long count = 0;
 		
 		// LEARN
 #ifdef DoShowPlots
-		w_eta = plots.get_wEta() / 20;
-		b_eta = plots.get_bEta() / 20;
+		w_eta = plots.get_wEta() * 200000;
+		b_eta = 0; //plots.get_bEta() / 1000;
 #else
 		w_eta = 1;
-		b_eta = 2;
+		b_eta = 0;
 #endif
 
 		NNO.setLearningRate(w_eta, b_eta);
