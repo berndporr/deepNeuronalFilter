@@ -233,8 +233,8 @@ long count = 0;
 		
 		// LEARN
 #ifdef DoShowPlots
-		w_eta = plots.get_wEta() / 10;
-		b_eta = plots.get_bEta() / 10;
+		w_eta = plots.get_wEta() / 20;
+		b_eta = plots.get_bEta() / 20;
 #else
 		w_eta = 1;
 		b_eta = 2;
