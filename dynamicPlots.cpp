@@ -41,10 +41,7 @@ dynaPlots::dynaPlots(cv::Mat &_frame, int _plotW, int _plotH) {
 }
 dynaPlots::~dynaPlots() = default;
 
-void dynaPlots::plotMainSignals(std::vector<double> outer_raw,
-				std::vector<double> outer,
-				std::vector<double> outer_end,
-                                std::vector<double> inner_raw,
+void dynaPlots::plotMainSignals(std::vector<double> outer,
 				std::vector<double> inner,
                                 std::vector<double> remover,
 				std::vector<double> fnn,
@@ -72,13 +69,10 @@ void dynaPlots::plotMainSignals(std::vector<double> outer_raw,
     double l1_max = *max_element(l1_plot.begin(), l1_plot.end());
 
     int step = 0;
-    cvui::sparkline(frame, outer_raw, graphX, graphY * step + topOffset, graphDX, graphDY, 0x000000); //black
     cvui::sparkline(frame, outer,     graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
-    cvui::sparkline(frame, outer_end,     graphX, graphY * step + topOffset, graphDX, graphDY, 0x7d7d7d); //gray
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "Outer: raw(b) & filtered(w) & end(gray)");
     cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", outer_min, outer_max, outer_v);
     step ++;
-    cvui::sparkline(frame, inner_raw, graphX, graphY * step + topOffset, graphDX, graphDY, 0x000000); //black
     cvui::sparkline(frame, inner,     graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "inner: raw(b) & filtered(w)");
     cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", inner_min, inner_max, inner_v);

@@ -34,7 +34,7 @@ const int plotH = 720;
 #endif
 
 //NEURAL NETWORK
-const int nNeurons[NLAYERS]={N10, N9, N8, N7, N6, N5, N4, N3, N2, N1, N0};
+const int NLAYERS = sizeof(nNeurons) / sizeof(int);
 const int* numNeuronsP = nNeurons;
 double w_eta = 0;
 double b_eta = 0;
@@ -54,25 +54,17 @@ void saveParam(fstream &params_file){
 		    << "Etas: " << "\n"
 		    << w_eta << "\n"
 		    << b_eta << "\n"
-		    << "Network: " << "\n"
-		    << NLAYERS << "\n"
-		    << N10 << "\n"
-		    << N9 << "\n"
-		    << N8 << "\n"
-		    << N7 << "\n"
-		    << N6 << "\n"
-		    << N5 << "\n"
-		    << N4 << "\n"
-		    << N3 << "\n"
-		    << N2 << "\n"
-		    << N1 << "\n"
-		    << N0 << "\n"
 		    << "LMS" << "\n"
 		    << LMS_LEARNING_RATE << "\n";
 	params_file    << "didOuterDelayLine" << "\n"
 		       << outerDelayLineLength << "\n";
 	params_file    << "didSignalDelay" << "\n"
 		       << innerDelayLineLength << "\n";
+	params_file    << "Layers\n";
+	for(auto i:nNeurons) {
+		params_file << i << "\t";
+	}
+	params_file << "\n";
 }
 
 
@@ -82,23 +74,13 @@ void processOneSubject(int subjIndex) {
         //SIGNALS
 	double inner_raw_data, outer_raw_data, p300trigger;
 
-	boost::circular_buffer<double> oc_raw_buf(bufferLength);
 	boost::circular_buffer<double> oc_buf(bufferLength);
-	boost::circular_buffer<double> oc_end_buf(bufferLength);
 	boost::circular_buffer<double> ic_buf(bufferLength);
-	boost::circular_buffer<double> ic_raw_buf(bufferLength);
-	boost::circular_buffer<double> oo_raw_buf(bufferLength);
 	boost::circular_buffer<double> oo_buf(bufferLength);
-	boost::circular_buffer<double> oo_end_buf(bufferLength);
 	boost::circular_buffer<double> io_buf(bufferLength);
-	boost::circular_buffer<double> io_raw_buf(bufferLength);
 	boost::circular_buffer<double> ro_buf(bufferLength);
 	boost::circular_buffer<double> rc_buf(bufferLength);
-	boost::circular_buffer<double> f_nnc_buf(bufferLength);
 	boost::circular_buffer<double> f_nno_buf(bufferLength);
-	boost::circular_buffer<double> l1_c_buf(bufferLength);
-	boost::circular_buffer<double> l2_c_buf(bufferLength);
-	boost::circular_buffer<double> l3_c_buf(bufferLength);
 	boost::circular_buffer<double> l1_o_buf(bufferLength);
 	boost::circular_buffer<double> l2_o_buf(bufferLength);
 	boost::circular_buffer<double> l3_o_buf(bufferLength);
@@ -163,11 +145,11 @@ long count = 0;
 	}
 	
 	//setting up all the filters required
-	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
+	Iir::Butterworth::HighPass<2> outer_filterHP;
 	outer_filterHP.setup(fs,outerHighpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> outer_filterBS;
 	outer_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
-	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
+	Iir::Butterworth::HighPass<2> inner_filterHP;
 	inner_filterHP.setup(fs,innerHighpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> inner_filterBS;
 	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
@@ -182,8 +164,8 @@ long count = 0;
 		p300_infile >> inner_raw_data >> outer_raw_data >> p300trigger;
 		// GET ALL GAINS:
 #ifdef DoShowPlots
-		inner_gain = plots.get_inner_gain();
-		outer_gain = plots.get_outer_gain();
+		inner_gain = plots.get_inner_gain() * 10;
+		outer_gain = plots.get_outer_gain() * 10;
 		remover_gain = plots.get_remover_gain();
 		feedback_gain = plots.get_feedback_gain();
 #else
@@ -234,7 +216,7 @@ long count = 0;
 		
 		// LEARN
 #ifdef DoShowPlots
-		w_eta = plots.get_wEta() * 200000;
+		w_eta = plots.get_wEta() * 1000;
 		b_eta = 0; //plots.get_bEta() / 1000;
 #else
 		w_eta = 1;
@@ -276,11 +258,8 @@ long count = 0;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
-		oo_buf.push_back(outer_delayLine[0]);
-		oo_end_buf.push_back(outer_delayLine[outerDelayLineLength-1]);
-		oo_raw_buf.push_back(outer_raw);
+		oo_buf.push_back(outer);
 		io_buf.push_back(inner);
-		io_raw_buf.push_back(inner_raw);
 		ro_buf.push_back(remover);
 		f_nno_buf.push_back(f_nn);
 		// 2) LAYER WEIGHTS
@@ -295,10 +274,7 @@ long count = 0;
 		// 1) MAIN SIGNALS
 		//      EXERCISE EYES
 		std::vector<double> oo_plot(oo_buf.begin(), oo_buf.end());
-		std::vector<double> oo_end_plot(oo_end_buf.begin(), oo_end_buf.end());
-		std::vector<double> oo_raw_plot(oo_raw_buf.begin(), oo_raw_buf.end());
 		std::vector<double> io_plot(io_buf.begin(), io_buf.end());
-		std::vector<double> io_raw_plot(io_raw_buf.begin(), io_raw_buf.end());
 		std::vector<double> ro_plot(ro_buf.begin(), ro_buf.end());
 		std::vector<double> f_nno_plot(f_nno_buf.begin(), f_nno_buf.end());
 		// 2) LAYER WEIGHTS
@@ -311,17 +287,14 @@ long count = 0;
 #ifdef DoShowPlots
 		frame = cv::Scalar(60, 60, 60);
 		if (0 == (count % 10)) {
-			plots.plotMainSignals(oo_raw_plot,
-					       oo_plot,
-					       oo_end_plot,
-					       io_raw_plot,
-					       io_plot,
-					       ro_plot,
-					       f_nno_plot,
-					       l1_o_plot,
-					       l2_o_plot,
-					       l3_o_plot,
-					       lms_o_plot, 1);
+			plots.plotMainSignals(oo_plot,
+					      io_plot,
+					      ro_plot,
+					      f_nno_plot,
+					      l1_o_plot,
+					      l2_o_plot,
+					      l3_o_plot,
+					      lms_o_plot, 1);
 			plots.plotVariables();
 			plots.plotTitle(sbjct, count, round(count / fs));
 			cvui::update();

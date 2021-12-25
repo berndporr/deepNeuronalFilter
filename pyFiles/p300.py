@@ -13,8 +13,9 @@ def calcVEP(filename,ax):
     p = "../results/subject{}/{}".format(subj,filename)
     print("Loading",p)
     d = np.loadtxt(p)
-    y = d[:,0] * 1E6
-    tr = d[:,1]
+    ll = fs * 60
+    y = d[ll:,0] * 1E6
+    tr = d[ll:,1]
     t = "Subject {}".format(subj)
 
     oddballs = np.argwhere(tr > 0.5)

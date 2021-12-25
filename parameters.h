@@ -13,7 +13,7 @@ const int fs = 250;
 // pre-filtering
 const int filterorder = 4;
 const double innerHighpassCutOff = 0.5; // Hz
-const double outerHighpassCutOff = 5; // Hz
+const double outerHighpassCutOff = 10; // Hz
 const double powerlineFrequ = 50; // Hz
 const double bsBandwidth = 2.5; // Hz
 
@@ -25,27 +25,16 @@ const std::string outpPrefix = "results";
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
-#define LMS_LEARNING_RATE 0.00001
+#define LMS_LEARNING_RATE 0.0001
 
 #define DoShowPlots
 
-#define outerDelayLineLength (fs)
-
-#define innerDelayLineLength (fs/2)
+const int outerDelayLineLength = fs / outerHighpassCutOff * 2;
+const int innerDelayLineLength = outerDelayLineLength / 2;
 
 //NN specifications
 #define DoDeepLearning
-#define NLAYERS 11
-#define N10 29 //10
-#define N9 23 //9
-#define N8 19 //8
-#define N7 17 //7
-#define N6 13 //6
-#define N5 11 //5
-#define N4 7 //4
-#define N3 5 //3
-#define N2 3 //2
-#define N1 2 //1
-#define N0 1 //this has to always be 1
+
+const int nNeurons[]={29, 17, 11, 5, 3, 2, 1};
 
 #endif //EEGFILTER_PARAMETERS_H

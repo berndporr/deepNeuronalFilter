@@ -25,10 +25,7 @@ public:
 	dynaPlots(cv::Mat &_learningFrame, int _plotW, int _plotH);
 	~dynaPlots();
 	
-	void plotMainSignals(std::vector<double> outer_raw,
-			     std::vector<double> outer,
-			     std::vector<double> outer_end,
-			     std::vector<double> inner_raw,
+	void plotMainSignals(std::vector<double> outer,
 			     std::vector<double> inner,
 			     std::vector<double> remover,
 			     std::vector<double> fnn,
