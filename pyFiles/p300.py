@@ -2,19 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
-subj = 1
 
-if len(sys.argv) > 1:
-    subj = int(sys.argv[1])
-
-fs = 250
-
-def calcVEP(filename,ax):
+def calcVEP(subj,filename,startSec=60,fs=250):
     p = "../results/subject{}/{}".format(subj,filename)
     print("Loading",p)
     d = np.loadtxt(p)
-    ll = fs * 60
-    y = d[ll:,0] * 1E6
+    ll = fs * startSec
+    y = d[ll:,0]
     tr = d[ll:,1]
     t = "Subject {}".format(subj)
 
@@ -32,15 +26,29 @@ def calcVEP(filename,ax):
             print((ob-d)/fs)
             d = ob            
     avg = avg / n
+    return avg
+
+    
+def plotVEP(subj,filename,ax,fs=250):
+    avg = calcVEP(subj,filename) * 1E6
+    navg = len(avg)
     t = np.linspace(0,navg/fs,navg) * 1000
     ax.plot(t,avg)
     ax.set_title(filename)
     ax.set_xlabel("t/ms")
     ax.set_ylabel("P300/uV")
 
-fig, axs = plt.subplots(2)
-fig.suptitle("P300")
-calcVEP("fnn.tsv",axs[0])
-calcVEP("inner.tsv",axs[1])
 
-plt.show()
+# check if we run this as a main program
+if __name__ == "__main__":
+    subj = 1
+
+    if len(sys.argv) > 1:
+        subj = int(sys.argv[1])
+
+    fig, axs = plt.subplots(2)
+    fig.suptitle("P300")
+    plotVEP(subj,"fnn.tsv",axs[0])
+    plotVEP(subj,"inner.tsv",axs[1])
+
+    plt.show()
