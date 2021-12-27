@@ -3,9 +3,8 @@ import numpy as np
 import sys
 
 
-def calcVEP(subj,filename,startSec=60,fs=250):
+def calcVEP(subj,filename,startSec=10,fs=250):
     p = "../results/subject{}/{}".format(subj,filename)
-    print("Loading",p)
     d = np.loadtxt(p)
     ll = fs * startSec
     y = d[ll:,0]
@@ -17,14 +16,11 @@ def calcVEP(subj,filename,startSec=60,fs=250):
     navg = int(fs)
     avg = np.zeros(navg)
 
-    d = 0
     n = 0
     for [ob] in oddballs:
         if (ob+navg) < len(y):
             avg = avg + y[int(ob):int(ob+navg)]
             n = n + 1
-            print((ob-d)/fs)
-            d = ob            
     avg = avg / n
     return avg
 

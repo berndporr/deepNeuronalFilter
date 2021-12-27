@@ -5,6 +5,7 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/lexical_cast.hpp>
 #include <Iir.h>
 #include <Fir1.h>
 #include <chrono>
@@ -24,8 +25,6 @@
 using namespace std;
 constexpr int ESC_key = 27;
 
-int num_inputs = outerDelayLineLength;
-
 // PLOT
 #ifdef DoShowPlots
 #define WINDOW "Deep Neuronal Filter"
@@ -33,9 +32,6 @@ const int plotW = 1200/2;
 const int plotH = 720;
 #endif
 
-//NEURAL NETWORK
-const int NLAYERS = sizeof(nNeurons) / sizeof(int);
-const int* numNeuronsP = nNeurons;
 double w_eta = 0;
 double b_eta = 0;
 
@@ -56,10 +52,6 @@ void saveParam(fstream &params_file){
 		    << b_eta << "\n"
 		    << "LMS" << "\n"
 		    << LMS_LEARNING_RATE << "\n";
-	params_file    << "didOuterDelayLine" << "\n"
-		       << outerDelayLineLength << "\n";
-	params_file    << "didSignalDelay" << "\n"
-		       << innerDelayLineLength << "\n";
 	params_file    << "Layers\n";
 	for(auto i:nNeurons) {
 		params_file << i << "\t";
@@ -68,11 +60,34 @@ void saveParam(fstream &params_file){
 }
 
 
-void processOneSubject(int subjIndex) {
+// take from http://stackoverflow.com/a/236803/248823
+void split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+}
+
+
+
+void processOneSubject(int subjIndex, const char* filename) {
 	std::srand(1);
 
-        //SIGNALS
-	double inner_raw_data, outer_raw_data, p300trigger;
+	// file path prefix for the results
+	std::string outpPrefix = "results";
+
+	int fs = 250;
+	if (NULL != filename) {
+		fs = 500;
+		outpPrefix = filename;
+	}
+
+	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
+	
+	const int outerDelayLineLength = fs / outerHighpassCutOff * 2;
+	const int innerDelayLineLength = outerDelayLineLength / 2;
 
 	boost::circular_buffer<double> oc_buf(bufferLength);
 	boost::circular_buffer<double> ic_buf(bufferLength);
@@ -115,8 +130,12 @@ long count = 0;
 	//create files for saving the data and parameters
 	string sbjct = std::to_string(subjIndex);
 
+	//NEURAL NETWORK
+	const int NLAYERS = sizeof(nNeurons) / sizeof(int);
+	const int* numNeuronsP = nNeurons;
+
 	//create the neural network
-	Net NNO(NLAYERS, numNeuronsP, num_inputs, 0, "P300");
+	Net NNO(NLAYERS, numNeuronsP, outerDelayLineLength, 0, "P300");
 	
 	//setting up the neural networks
 	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_Sigmoid);
@@ -137,7 +156,11 @@ long count = 0;
 	}
 	
 	char tmp[256];
-	sprintf(tmp,"../noisewalls/EEG_recordings/participant%03d/rawp300.tsv",subjIndex);
+	if (NULL != filename) {
+		sprintf(tmp,"../noisewalls/EEG_recordings/participant%03d/%s.tsv",subjIndex,filename);
+	} else {
+		sprintf(tmp,"../noisewalls/EEG_recordings/participant%03d/rawp300.tsv",subjIndex);
+	}
 	p300_infile.open(tmp);
 	if (!p300_infile) {
 		cout << "Unable to open file: " << tmp << endl;
@@ -145,11 +168,11 @@ long count = 0;
 	}
 	
 	//setting up all the filters required
-	Iir::Butterworth::HighPass<2> outer_filterHP;
+	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
 	outer_filterHP.setup(fs,outerHighpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> outer_filterBS;
 	outer_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
-	Iir::Butterworth::HighPass<2> inner_filterHP;
+	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
 	inner_filterHP.setup(fs,innerHighpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> inner_filterBS;
 	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
@@ -161,7 +184,24 @@ long count = 0;
 	while (!p300_infile.eof()) {
 		count++;
 		//get the data from .tsv files:
-		p300_infile >> inner_raw_data >> outer_raw_data >> p300trigger;
+
+		//SIGNALS
+		double inner_raw_data = 0, outer_raw_data = 0, p300trigger = 0;
+		if (NULL == filename) {
+			p300_infile >> inner_raw_data >> outer_raw_data >> p300trigger;
+		} else {
+			std::string line;
+			std::getline(p300_infile, line);
+			vector<string> row_values;
+			split(line, '\t', row_values);
+			if (row_values.size()>7) {
+				inner_raw_data = boost::lexical_cast<double>(row_values[7]);
+				outer_raw_data = boost::lexical_cast<double>(row_values[8]);
+			}
+			p300trigger = 0;
+			//fprintf(stderr,"%f %f %f\n",inner_raw_data,outer_raw_data,p300trigger);
+		}
+		
 		// GET ALL GAINS:
 #ifdef DoShowPlots
 		inner_gain = plots.get_inner_gain() * 10;
@@ -251,6 +291,7 @@ long count = 0;
 		laplace_file << laplace << "\t" << delayedp300trigger << endl;
 		// undo the gain so that the signal is again in volt
 		inner_file << inner/inner_gain << "\t" << delayedp300trigger << endl;
+		outer_file << outer/outer_gain << "\t" << delayedp300trigger << endl;
 		remover_file << remover/inner_gain << endl;
 		nn_file << f_nn/inner_gain << "\t" << delayedp300trigger << endl;
 		lms_file << lms_output/inner_gain << "\t" << delayedp300trigger << endl;
@@ -332,9 +373,13 @@ int main(int argc, const char *argv[]) {
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
 		return 0;
 	}
+	const char *filename = NULL;
+	if (argc > 2) {
+		filename = argv[2];
+	}
 	if (strcmp(argv[1],"-a") == 0) {
 		for(int i = 0; i < nSubj; i++) {
-			processOneSubject(i+1);
+			processOneSubject(i+1,filename);
 		}
 		return 0;
 	}
@@ -343,6 +388,6 @@ int main(int argc, const char *argv[]) {
 		fprintf(stderr,"Subj number of out range.\n");
 		return -1;
 	}
-	processOneSubject(subj);
+	processOneSubject(subj,filename);
 	return 0;
 }

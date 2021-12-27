@@ -14,4 +14,3 @@ echo "Successfully created the results folders"
 cmake .
 make
 ./eeg_filter -a
-
