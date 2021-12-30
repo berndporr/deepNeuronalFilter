@@ -29,9 +29,6 @@ public:
 			     std::vector<double> inner,
 			     std::vector<double> remover,
 			     std::vector<double> fnn,
-			     std::vector<double> l1_plot,
-			     const std::vector<double>& l2_plot,
-			     const std::vector<double>& l3_plot,
 			     std::vector<double> lms_output,
 			     int _positionOPEN);
 	void plotVariables();

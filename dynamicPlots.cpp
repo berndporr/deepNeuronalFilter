@@ -45,9 +45,6 @@ void dynaPlots::plotMainSignals(std::vector<double> outer,
 				std::vector<double> inner,
                                 std::vector<double> remover,
 				std::vector<double> fnn,
-                                std::vector<double> l1_plot,
-				const std::vector<double>& l2_plot,
-				const std::vector<double>& l3_plot,
                                 std::vector<double> lms_output,
                                 int _positionOPEN){
 
@@ -65,8 +62,6 @@ void dynaPlots::plotMainSignals(std::vector<double> outer,
     double fnn_min = *min_element(fnn.begin(), fnn.end());
     double fnn_max = *max_element(fnn.begin(), fnn.end());
     double fnn_v = *fnn.end();
-    double l1_min = *min_element(l1_plot.begin(), l1_plot.end());
-    double l1_max = *max_element(l1_plot.begin(), l1_plot.end());
 
     int step = 0;
     cvui::sparkline(frame, outer,     graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white

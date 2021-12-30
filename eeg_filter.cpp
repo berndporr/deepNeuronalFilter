@@ -89,18 +89,11 @@ void processOneSubject(int subjIndex, const char* filename) {
 	const int outerDelayLineLength = fs / outerHighpassCutOff * 2;
 	const int innerDelayLineLength = outerDelayLineLength / 2;
 
-	boost::circular_buffer<double> oc_buf(bufferLength);
-	boost::circular_buffer<double> ic_buf(bufferLength);
 	boost::circular_buffer<double> oo_buf(bufferLength);
 	boost::circular_buffer<double> io_buf(bufferLength);
 	boost::circular_buffer<double> ro_buf(bufferLength);
-	boost::circular_buffer<double> rc_buf(bufferLength);
 	boost::circular_buffer<double> f_nno_buf(bufferLength);
-	boost::circular_buffer<double> l1_o_buf(bufferLength);
-	boost::circular_buffer<double> l2_o_buf(bufferLength);
-	boost::circular_buffer<double> l3_o_buf(bufferLength);
 //LMS
-	boost::circular_buffer<double> lms_c_buf(bufferLength);
 	boost::circular_buffer<double> lms_o_buf(bufferLength);
 	
 //adding delay line for the noise
@@ -304,10 +297,6 @@ long count = 0;
 		ro_buf.push_back(remover);
 		f_nno_buf.push_back(f_nn);
 		// 2) LAYER WEIGHTS
-		l1_o_buf.push_back(l1_o);
-		l2_o_buf.push_back(l2_o);
-		l3_o_buf.push_back(l3_o);
-
 		// 3) LMS outputs
 		lms_o_buf.push_back(lms_output);
 		
@@ -319,9 +308,6 @@ long count = 0;
 		std::vector<double> ro_plot(ro_buf.begin(), ro_buf.end());
 		std::vector<double> f_nno_plot(f_nno_buf.begin(), f_nno_buf.end());
 		// 2) LAYER WEIGHTS
-		std::vector<double> l1_o_plot(l1_o_buf.begin(), l1_o_buf.end());
-		std::vector<double> l2_o_plot(l2_o_buf.begin(), l2_o_buf.end());
-		std::vector<double> l3_o_plot(l3_o_buf.begin(), l3_o_buf.end());
 		// LMS outputs
 		std::vector<double> lms_o_plot(lms_o_buf.begin(), lms_o_buf.end());
 		
@@ -332,9 +318,6 @@ long count = 0;
 					      io_plot,
 					      ro_plot,
 					      f_nno_plot,
-					      l1_o_plot,
-					      l2_o_plot,
-					      l3_o_plot,
 					      lms_o_plot, 1);
 			plots.plotVariables();
 			plots.plotTitle(sbjct, count, round(count / fs));
