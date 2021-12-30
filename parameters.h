@@ -9,8 +9,8 @@ const int nSubj = 20;
 
 // pre-filtering
 const int filterorder = 2;
-const double innerHighpassCutOff = 0.5; // Hz
-const double outerHighpassCutOff = 10; // Hz
+const double innerHighpassCutOff = 1.0; // Hz
+const double outerHighpassCutOff = 1.0; // Hz
 const double powerlineFrequ = 50; // Hz
 const double bsBandwidth = 2.5; // Hz
 
