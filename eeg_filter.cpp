@@ -32,9 +32,6 @@ const int plotW = 1200/2;
 const int plotH = 720;
 #endif
 
-double w_eta = 0;
-double b_eta = 0;
-
 // GAINS
 double outer_gain = 1;
 double inner_gain = 1;
@@ -49,13 +46,8 @@ void saveParam(fstream &params_file){
 		    << feedback_gain << "\n"
 		    << "Etas: " << "\n"
 		    << w_eta << "\n"
-		    << b_eta << "\n"
 		    << "LMS" << "\n"
 		    << LMS_LEARNING_RATE << "\n";
-	params_file    << "Layers\n";
-	for(auto i:nNeurons) {
-		params_file << i << "\t";
-	}
 	params_file << "\n";
 }
 
@@ -86,7 +78,7 @@ void processOneSubject(int subjIndex, const char* filename) {
 
 	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 	
-	const int outerDelayLineLength = fs / outerHighpassCutOff * 2;
+	const int outerDelayLineLength = fs; //fs / outerLowpassCutOff * 1.75;
 	const int innerDelayLineLength = outerDelayLineLength / 2;
 
 	boost::circular_buffer<double> oo_buf(bufferLength);
@@ -104,7 +96,6 @@ void processOneSubject(int subjIndex, const char* filename) {
 // FILES
 	fstream nn_file;
 	fstream remover_file;
-	fstream weight_file;
 	fstream inner_file;
 	fstream outer_file;
 	fstream params_file;
@@ -112,6 +103,9 @@ void processOneSubject(int subjIndex, const char* filename) {
 	fstream lms_remover_file;
 	fstream laplace_file;
 	ifstream p300_infile;
+#ifdef SAVE_WEIGHTS
+	fstream weight_file;
+#endif
 
 long count = 0;
 	//setting up the interactive window and the dynamic plot class
@@ -123,26 +117,34 @@ long count = 0;
 	//create files for saving the data and parameters
 	string sbjct = std::to_string(subjIndex);
 
-	//NEURAL NETWORK
-	const int NLAYERS = sizeof(nNeurons) / sizeof(int);
-	const int* numNeuronsP = nNeurons;
+        //NN specifications
+	int nNeurons[NLAYERS];
+	// calc an exp reduction of the numbers always reaching 1
+	double b = exp(log(outerDelayLineLength)/(NLAYERS-1));
+	for(int i=0;i<NLAYERS;i++) {
+		nNeurons[i] = outerDelayLineLength / pow(b,i);
+		if (i == (NLAYERS-1)) nNeurons[i] = 1;
+		fprintf(stderr,"Layer %d has %d neurons.\n",i,nNeurons[i]);
+	}
 
 	//create the neural network
-	Net NNO(NLAYERS, numNeuronsP, outerDelayLineLength, 0, "P300");
+	Net NNO(NLAYERS, nNeurons, outerDelayLineLength, 0, "P300");
 	
 	//setting up the neural networks
 	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_Sigmoid);
 		
 	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
 	remover_file.open(outpPrefix+"/subject" + sbjct + "/remover.tsv", fstream::out);
-	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
 	inner_file.open(outpPrefix+"/subject" + sbjct + "/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/subject" + sbjct + "/outer.tsv", fstream::out);
-	params_file.open(outpPrefix+"/subject" + sbjct + "/cppParams.tsv", fstream::out);
 	lms_file.open(outpPrefix+"/subject" + sbjct + "/lmsOutput.tsv", fstream::out);
 	lms_remover_file.open(outpPrefix+"/subject" + sbjct + "/lmsCorrelation.tsv", fstream::out);
 	laplace_file.open(outpPrefix+"/subject" + sbjct + "/laplace.tsv", fstream::out);
+#ifdef SAVE_WEIGHTS
+	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
+#endif
 	
+	params_file.open(outpPrefix+"/subject" + sbjct + "/cppParams.tsv", fstream::out);
 	if (!params_file) {
 		cout << "Unable to create files";
 		exit(1); // terminate with error
@@ -163,6 +165,8 @@ long count = 0;
 	//setting up all the filters required
 	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
 	outer_filterHP.setup(fs,outerHighpassCutOff);
+	Iir::Butterworth::LowPass<filterorder> outer_filterLP;
+	outer_filterLP.setup(fs,outerLowpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> outer_filterBS;
 	outer_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
@@ -223,8 +227,9 @@ long count = 0;
 		//B) OUTER ELECTRODE:
 		//1) ADJUST & AMPLIFY
 		double outer_raw = outer_gain * outer_raw_data;
-		double outer = outer_filterHP.filter(outer_raw);
-		outer = outer_filterBS.filter(outer);
+		double outerhp = outer_filterHP.filter(outer_raw);
+//		double outerlp = outer_filterLP.filter(outer_raw);
+		double outer = outer_filterBS.filter(outerhp);
 
 		//3) DELAY LINE
 		for (int i = outerDelayLineLength-1 ; i > 0; i--) {
@@ -248,27 +253,18 @@ long count = 0;
 		NNO.propErrorBackward();
 		
 		// LEARN
-#ifdef DoShowPlots
-		w_eta = plots.get_wEta() * 1000;
-		b_eta = 0; //plots.get_bEta() / 1000;
-#else
-		w_eta = 1;
-		b_eta = 0;
-#endif
-
-		NNO.setLearningRate(w_eta, b_eta);
+		NNO.setLearningRate(w_eta, 0);
 		if (count > (samplesNoLearning+outerDelayLineLength)){
 			NNO.updateWeights();
 		}
+#ifdef SAVE_WEIGHTS
 		// SAVE WEIGHTS
 		for (int i = 0; i < NLAYERS; i++) {
 			weight_file << NNO.getLayerWeightDistance(i) << " ";
 		}
 		weight_file << NNO.getWeightDistance() << "\n";
 		NNO.snapWeights(outpPrefix, "p300", subjIndex);
-		double l1_o = NNO.getLayerWeightDistance(0);
-		double l2_o = NNO.getLayerWeightDistance(1);
-		double l3_o = NNO.getLayerWeightDistance(2);
+#endif
 
 		// Do Laplace filter
 		double laplace = inner - outer;
@@ -296,18 +292,15 @@ long count = 0;
 		io_buf.push_back(inner);
 		ro_buf.push_back(remover);
 		f_nno_buf.push_back(f_nn);
-		// 2) LAYER WEIGHTS
-		// 3) LMS outputs
+		// 2) LMS outputs
 		lms_o_buf.push_back(lms_output);
 		
 		// PUTTING BUFFERS IN VECTORS FOR PLOTS
-		// 1) MAIN SIGNALS
-		//      EXERCISE EYES
+		// MAIN SIGNALS
 		std::vector<double> oo_plot(oo_buf.begin(), oo_buf.end());
 		std::vector<double> io_plot(io_buf.begin(), io_buf.end());
 		std::vector<double> ro_plot(ro_buf.begin(), ro_buf.end());
 		std::vector<double> f_nno_plot(f_nno_buf.begin(), f_nno_buf.end());
-		// 2) LAYER WEIGHTS
 		// LMS outputs
 		std::vector<double> lms_o_plot(lms_o_buf.begin(), lms_o_buf.end());
 		
@@ -335,7 +328,6 @@ long count = 0;
 
 	p300_infile.close();
 	params_file.close();
-	weight_file.close();
 	remover_file.close();
 	nn_file.close();
 	inner_file.close();
@@ -343,7 +335,9 @@ long count = 0;
 	lms_file.close();
 	laplace_file.close();
 	lms_remover_file.close();
-	
+#ifdef SAVE_WEIGHTS
+	weight_file.close();
+#endif	
 	cout << "The program has reached the end of the input file" << endl;
 }
 
