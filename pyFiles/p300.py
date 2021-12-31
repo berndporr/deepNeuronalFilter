@@ -3,7 +3,7 @@ import numpy as np
 import sys
 
 
-def calcVEP(subj,filename,startSec=100,fs=250):
+def calcVEP(subj,filename,startSec=30,fs=250):
     p = "../results/subject{}/{}".format(subj,filename)
     d = np.loadtxt(p)
     ll = fs * startSec

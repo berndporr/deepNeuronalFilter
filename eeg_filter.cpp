@@ -32,19 +32,13 @@ const int plotW = 1200/2;
 const int plotH = 720;
 #endif
 
-// GAINS
-double outer_gain = 1;
-double inner_gain = 1;
-double remover_gain = 0;
-double feedback_gain = 0;
-
 void saveParam(fstream &params_file){
 	params_file << "Gains: "    << "\n"
 		    << outer_gain << "\n"
 		    << inner_gain << "\n"
 		    << remover_gain << "\n"
 		    << feedback_gain << "\n"
-		    << "Etas: " << "\n"
+		    << "Eta: " << "\n"
 		    << w_eta << "\n"
 		    << "LMS" << "\n"
 		    << LMS_LEARNING_RATE << "\n";
@@ -175,6 +169,8 @@ long count = 0;
 	Fir1 lms_filter(outerDelayLineLength);
 	lms_filter.setLearningRate(LMS_LEARNING_RATE);
 	
+	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f, feedback_gain = %f\n",inner_gain,outer_gain,remover_gain,feedback_gain);
+
 	// main loop processsing sample by sample
 	while (!p300_infile.eof()) {
 		count++;
@@ -197,18 +193,6 @@ long count = 0;
 			//fprintf(stderr,"%f %f %f\n",inner_raw_data,outer_raw_data,p300trigger);
 		}
 		
-		// GET ALL GAINS:
-#ifdef DoShowPlots
-		inner_gain = plots.get_inner_gain() * 10;
-		outer_gain = plots.get_outer_gain() * 10;
-		remover_gain = plots.get_remover_gain();
-		feedback_gain = plots.get_feedback_gain();
-#else
-		inner_gain = 100;
-		outer_gain = 100;
-		remover_gain = 10;
-		feedback_gain = 1;
-#endif
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY
 		const double inner_raw = inner_gain * inner_raw_data;
