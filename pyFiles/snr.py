@@ -12,7 +12,7 @@ def hpFilter(x,fs=250):
     return signal.lfilter(b,a,x)
 
 def calcNoisePower(subj,filename,startSec=60,fs=250):
-    p = "../sudoku/subject{}/{}".format(subj,filename)
+    p = "../results/subject{}/{}".format(subj,filename)
     d = np.loadtxt(p)
     ll = fs * startSec
     y = d[ll:,0]

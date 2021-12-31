@@ -78,7 +78,7 @@ void processOneSubject(int subjIndex, const char* filename) {
 
 	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 	
-	const int outerDelayLineLength = fs; //fs / outerLowpassCutOff * 1.75;
+	const int outerDelayLineLength = fs / outerHighpassCutOff;
 	const int innerDelayLineLength = outerDelayLineLength / 2;
 
 	boost::circular_buffer<double> oo_buf(bufferLength);
@@ -165,8 +165,6 @@ long count = 0;
 	//setting up all the filters required
 	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
 	outer_filterHP.setup(fs,outerHighpassCutOff);
-	Iir::Butterworth::LowPass<filterorder> outer_filterLP;
-	outer_filterLP.setup(fs,outerLowpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> outer_filterBS;
 	outer_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
@@ -213,23 +211,22 @@ long count = 0;
 #endif
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY
-		double inner_raw = inner_gain * inner_raw_data;
+		const double inner_raw = inner_gain * inner_raw_data;
 		double inner_filtered = inner_filterHP.filter(inner_raw);
 		inner_filtered = inner_filterBS.filter(inner_filtered);
 
 		//3) DELAY
 		inner_delayLine.push_back(inner_filtered);
-		double inner = inner_delayLine[0];
+		const double inner = inner_delayLine[0];
 		
 		innertrigger_delayLine.push_back(p300trigger);
-		double delayedp300trigger = innertrigger_delayLine[0];
+		const double delayedp300trigger = innertrigger_delayLine[0];
 
 		//B) OUTER ELECTRODE:
 		//1) ADJUST & AMPLIFY
-		double outer_raw = outer_gain * outer_raw_data;
-		double outerhp = outer_filterHP.filter(outer_raw);
-//		double outerlp = outer_filterLP.filter(outer_raw);
-		double outer = outer_filterBS.filter(outerhp);
+		const double outer_raw = outer_gain * outer_raw_data;
+		const double outerhp = outer_filterHP.filter(outer_raw);
+		const double outer = outer_filterBS.filter(outerhp);
 
 		//3) DELAY LINE
 		for (int i = outerDelayLineLength-1 ; i > 0; i--) {
