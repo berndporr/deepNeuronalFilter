@@ -28,7 +28,7 @@ const int NLAYERS = 6;
 
 const double inner_gain = 1000;
 const double outer_gain = 1000;
-const double remover_gain = 0.1;
+const double remover_gain = 0.25;
 
 #define DoShowPlots
 
