@@ -32,18 +32,6 @@ const int plotW = 1200/2;
 const int plotH = 720;
 #endif
 
-void saveParam(fstream &params_file){
-	params_file << "Gains: "    << "\n"
-		    << outer_gain << "\n"
-		    << inner_gain << "\n"
-		    << remover_gain << "\n"
-		    << "Eta: " << "\n"
-		    << w_eta << "\n"
-		    << "LMS" << "\n"
-		    << LMS_LEARNING_RATE << "\n";
-	params_file << "\n";
-}
-
 
 // take from http://stackoverflow.com/a/236803/248823
 void split(const std::string &s, char delim, std::vector<std::string> &elems) {
@@ -91,7 +79,6 @@ void processOneSubject(int subjIndex, const char* filename) {
 	fstream remover_file;
 	fstream inner_file;
 	fstream outer_file;
-	fstream params_file;
 	fstream lms_file;
 	fstream lms_remover_file;
 	fstream laplace_file;
@@ -136,12 +123,6 @@ long count = 0;
 #ifdef SAVE_WEIGHTS
 	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
 #endif
-	
-	params_file.open(outpPrefix+"/subject" + sbjct + "/cppParams.tsv", fstream::out);
-	if (!params_file) {
-		cout << "Unable to create files";
-		exit(1); // terminate with error
-	}
 	
 	char tmp[256];
 	if (NULL != filename) {
@@ -303,10 +284,7 @@ long count = 0;
 #endif
 	}
 	NNO.snapWeights(outpPrefix, "p300", subjIndex);
-	saveParam(params_file);
-
 	p300_infile.close();
-	params_file.close();
 	remover_file.close();
 	nn_file.close();
 	inner_file.close();

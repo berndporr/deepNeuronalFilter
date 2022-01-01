@@ -11,7 +11,7 @@ def hpFilter(x,fs=250):
     b,a = signal.butter(2,fc/fs*2,"highpass")
     return signal.lfilter(b,a,x)
 
-def calcNoisePower(subj,filename,startSec=60,fs=250):
+def calcNoisePower(subj,filename,startSec=10,fs=250):
     p = "../results/subject{}/{}".format(subj,filename)
     d = np.loadtxt(p)
     ll = fs * startSec
@@ -20,7 +20,7 @@ def calcNoisePower(subj,filename,startSec=60,fs=250):
     print("Noise Power:",s)
     return s
 
-def calcSNR(subj,filename,startSec=60,fs=250):
+def calcSNR(subj,filename,startSec=10,fs=250):
     NoisePwr = calcNoisePower(subj,filename,startSec,fs)
     vep = p300.calcVEP(subj,filename,startSec,fs)
     s = np.max(vep)
