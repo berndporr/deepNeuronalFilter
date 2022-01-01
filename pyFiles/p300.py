@@ -3,10 +3,10 @@ import numpy as np
 import sys
 
 
-def calcVEP(subj,filename,startSec=30,fs=250):
+def calcVEP(subj,filename,startsec=30,fs=250):
     p = "../results/subject{}/{}".format(subj,filename)
     d = np.loadtxt(p)
-    ll = fs * startSec
+    ll = fs * startsec
     y = d[ll:,0]
     tr = d[ll:,1]
     t = "Subject {}".format(subj)
@@ -24,9 +24,9 @@ def calcVEP(subj,filename,startSec=30,fs=250):
     avg = avg / n
     return avg
 
-    
-def plotVEP(subj,filename,ax,fs=250):
-    avg = calcVEP(subj,filename) * 1E6
+
+def plotVEP(subj,filename,ax,fs=250,startsec=10):
+    avg = calcVEP(subj,filename,startsec=startsec) * 1E6
     navg = len(avg)
     t = np.linspace(0,navg/fs,navg) * 1000
     ax.plot(t,avg)
@@ -42,9 +42,11 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         subj = int(sys.argv[1])
 
+    startsec = 10
+
     fig, axs = plt.subplots(2)
     fig.suptitle("P300")
-    plotVEP(subj,"fnn.tsv",axs[0])
-    plotVEP(subj,"inner.tsv",axs[1])
+    plotVEP(subj,"fnn.tsv",axs[0],startsec=startsec)
+    plotVEP(subj,"inner.tsv",axs[1],startsec=startsec)
 
     plt.show()
