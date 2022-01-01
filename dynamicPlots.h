@@ -35,27 +35,8 @@ public:
 	
 	void plotTitle(std:: string title, long count, int duration);
 	
-	inline double get_wEta() {return (wEta * pow(10, wEtaPower));}
-	inline double get_bEta() {return (bEta * pow(10, bEtaPower));}
-	inline double get_outer_gain() {return outer_gain;}
-	inline double get_inner_gain() {return inner_gain;}
-	inline double get_remover_gain() {return remover_gain;}
-	inline double get_feedback_gain() {return feedback_gain;}
-	
 private:
 	cv::Mat frame;
-	
-	double outer_gain    = 100;
-	double inner_gain    = 100;
-	double remover_gain  = 10;
-	double feedback_gain = 1;
-	double wEta          = 1;
-	double wEtaPower     = 0;
-	double bEta          = 2;
-	double bEtaPower     = 0;
-	
-	double gainStart = 0.0;
-	double gainEnd = 20.0;
 	
 	int topOffset = 30;
 	int graphDX = 360;

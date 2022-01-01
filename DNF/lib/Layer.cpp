@@ -70,16 +70,16 @@ void Layer::setlearningRate(double _w_learningRate, double _b_learningRate){
 //forward propagation of inputs:
 //*************************************************************************************
 
-void Layer::setInputs(const double* _inputs){
+void Layer::setInputs(const double* const _inputs){
     /*this is only for the first layer*/
-    inputs=_inputs;
+    const double* inputs=_inputs;
     for (int j=0; j<nInputs; j++){
         Neuron** neuronsp = neurons;//point to the 1st neuron
         /* sets a temporarily pointer to neuron-pointers
          * within the scope of this function. this is inside
          * the loop, so that it is set to the first neuron
          * everytime a new value is distributed to neurons */
-        double input= *inputs; //take this input value
+        const double input= *inputs; //take this input value
         for (int i=0; i<nNeurons; i++){
             (*neuronsp)->setInput(j,input);
             //set this input value for this neuron

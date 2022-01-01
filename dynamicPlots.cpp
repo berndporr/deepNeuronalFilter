@@ -36,6 +36,7 @@ namespace cv {
 dynaPlots::dynaPlots(cv::Mat &_frame, int _plotW, int _plotH) {
     plotH = _plotH;
     plotW = _plotW;
+    graphDX = plotW - gapX * 2;
     frame = _frame;
     graphY = graphDY + gapY;
 }
@@ -82,37 +83,6 @@ void dynaPlots::plotMainSignals(std::vector<double> outer,
     step ++;
     cvui::sparkline(frame, lms_output, graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "LMS output");
-}
-
-void dynaPlots::plotVariables(){
-	int graphX = gapX;
-	int barX = graphDX + graphX + gapX;
-
-	int step = 0;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "outer gain");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &outer_gain,  (double)gainStart, (double)gainEnd);
-	step ++;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "inner gain");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &inner_gain,  (double)gainStart, (double)gainEnd);
-	step ++;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "remover gain");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &remover_gain, (double)gainStart, (double)gainEnd);
-	step ++;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "feedback gain");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &feedback_gain,  (double)gainStart, (double)gainEnd);
-	step ++;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "weight Eta");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &wEta,       (double)1.,   (double)10.);
-	step ++;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "w power");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &wEtaPower,  (double)-3.,  (double)3.);
-	step ++;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "bias Eta");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &bEta,       (double)1.,   (double)10.);
-	step ++;
-	cvui::text(    frame, barX + 60, barY * (bar_p + step) + topOffset, "b power");
-	cvui::trackbar(frame, barX,      barY * (bar_p + step) + topOffset, barDX, &bEtaPower,  (double)-3.,  (double)3.);
-
 }
 
 void dynaPlots::plotTitle(std::string title, long count, int duration){

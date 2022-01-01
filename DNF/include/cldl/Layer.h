@@ -308,9 +308,6 @@ private:
     
     int layerHasReported = 0;
 
-    //forward propagation of inputs:
-    const double *inputs = 0;
-
     //forward propagation of error:
     double leadForwardError = 0;
 

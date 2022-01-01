@@ -37,7 +37,6 @@ void saveParam(fstream &params_file){
 		    << outer_gain << "\n"
 		    << inner_gain << "\n"
 		    << remover_gain << "\n"
-		    << feedback_gain << "\n"
 		    << "Eta: " << "\n"
 		    << w_eta << "\n"
 		    << "LMS" << "\n"
@@ -169,7 +168,7 @@ long count = 0;
 	Fir1 lms_filter(outerDelayLineLength);
 	lms_filter.setLearningRate(LMS_LEARNING_RATE);
 	
-	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f, feedback_gain = %f\n",inner_gain,outer_gain,remover_gain,feedback_gain);
+	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f\n",inner_gain,outer_gain,remover_gain);
 
 	// main loop processsing sample by sample
 	while (!p300_infile.eof()) {
@@ -190,7 +189,6 @@ long count = 0;
 				outer_raw_data = boost::lexical_cast<double>(row_values[8]);
 			}
 			p300trigger = 0;
-			//fprintf(stderr,"%f %f %f\n",inner_raw_data,outer_raw_data,p300trigger);
 		}
 		
 		//A) INNER ELECTRODE:
@@ -217,27 +215,28 @@ long count = 0;
 			outer_delayLine[i] = outer_delayLine[i-1];
 			
 		}
+		
 		outer_delayLine[0] = outer;
-		double* outer_delayed = &outer_delayLine[0];
 		
 		// OUTER INPUT TO NETWORK
-		NNO.setInputs(outer_delayed);
+		NNO.setInputs(outer_delayLine);
 		NNO.propInputs();
 		
 		// REMOVER OUTPUT FROM NETWORK
 		double remover = NNO.getOutput(0) * remover_gain;
-		double f_nn = (inner - remover) * feedback_gain;
+		double f_nn = inner - remover;
 		
 		// FEEDBACK TO THE NETWORK 
 		NNO.setErrorCoeff(0, 1, 0, 0, 0, 0); //global, back, mid, forward, local, echo error
 		NNO.setBackwardError(f_nn);
 		NNO.propErrorBackward();
 		
-		// LEARN
-		NNO.setLearningRate(w_eta, 0);
 		if (count > (samplesNoLearning+outerDelayLineLength)){
+			// LEARN
+			NNO.setLearningRate(w_eta, 0);
 			NNO.updateWeights();
 		}
+		
 #ifdef SAVE_WEIGHTS
 		// SAVE WEIGHTS
 		for (int i = 0; i < NLAYERS; i++) {
@@ -293,7 +292,6 @@ long count = 0;
 					      ro_plot,
 					      f_nno_plot,
 					      lms_o_plot, 1);
-			plots.plotVariables();
 			plots.plotTitle(sbjct, count, round(count / fs));
 			cvui::update();
 			cv::imshow(WINDOW, frame);

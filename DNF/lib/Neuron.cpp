@@ -114,10 +114,6 @@ void Neuron::setInput(int _index,  double _value) {
     assert((_index>=0)&&(_index<nInputs));
     /*checking _index is a valid int, non-negative and within boundary*/
     inputs[_index] = _value;
-    if(myNeuronIndex == 0){
-       //cout << _index << " " << _value << endl;
-    }
-    //cout << "Neuron the input is: " << _value << endl;
 }
 
 void Neuron::propInputs(int _index,  double _value){
@@ -301,38 +297,6 @@ void Neuron::updateWeights(){
 //                << " BiDirectional " << midCoeff << " x " << midError
 //                << " Forward: " << forwardCoeff << " x " << forwardError << endl;
 //    }
-}
-
-double Neuron::doActivation(double _sum){
-    double thisoutput = 0;
-    switch(actMet){
-        case 0:
-            thisoutput = (1/(1+(exp(-_sum)))) - 0.5;
-            break;
-        case 1:
-            thisoutput = tanh(_sum);
-            break;
-        case 2:
-            thisoutput = _sum;
-            break;
-    }
-    return (thisoutput);
-}
-
-double Neuron::doActivationPrime(double _input){
-    double result = 0;
-    switch(actMet){
-        case 0:
-            result = 1 * (0.5 + doActivation(_input)) * (0.5 - doActivation(_input)); //exp(-_input) / pow((exp(-_input) + 1),2);
-            break;
-        case 1:
-            result = 1 - pow (tanh(_input), 2);
-            break;
-        case 2:
-            result = 1;
-            break;
-    }
-    return (result);
 }
 
 //*************************************************************************************
