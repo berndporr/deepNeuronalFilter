@@ -1,4 +1,4 @@
-#include "cldl/Neuron.h"
+#include "Neuron.h"
 
 #include <assert.h>
 #include <iostream>

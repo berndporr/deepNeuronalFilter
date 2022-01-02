@@ -13,9 +13,9 @@
 #include <ctime>
 #include <memory>
 #include <numeric>
-#include "cldl/Neuron.h"
-#include "cldl/Layer.h"
-#include "cldl/Net.h"
+#include "Neuron.h"
+#include "Layer.h"
+#include "Net.h"
 #include "parameters.h"
 #include "dynamicPlots.h"
 

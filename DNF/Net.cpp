@@ -1,6 +1,6 @@
-#include "cldl/Net.h"
-#include "cldl/Layer.h"
-#include "cldl/Neuron.h"
+#include "Net.h"
+#include "Layer.h"
+#include "Neuron.h"
 
 #include <stdio.h>
 #include <assert.h>
