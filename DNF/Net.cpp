@@ -130,19 +130,14 @@ void Net::propErrorBackward(){
     for (int i = nLayers-1; i > 0 ; i--){
         for (int k = 0; k < layers[i-1]->getnNeurons(); k++){
             double sum = 0.0;
-            double weightSumer = 0.0;
-            int counter = 0;
             for (int j = 0; j < layers[i]->getnNeurons(); j++){
                 tempError = layers[i]->getBackwardError(j);
                 tempWeight = layers[i]->getWeights(j,k);
                 sum += (tempError * tempWeight);
-                weightSumer += fabs(tempWeight);
-                counter += 1;
             }
             double normSum = sum ; // / weightSumer;
             assert(std::isfinite(sum));
             assert(std::isfinite(weightSumer));
-            assert(std::isfinite(counter));
             assert(std::isfinite(normSum));
             layers[i-1]->propErrorBackward(k, normSum);
           }
@@ -177,19 +172,13 @@ void Net::propMidErrorBackward(){
     for (int i = midLayerIndex; i > 0 ; i--){
         for (int k = 0; k < layers[i-1]->getnNeurons(); k++){
             double sum = 0.0;
-            double weightSumer = 0.0;
-            int counter = 0;
             for (int j = 0; j < layers[i]->getnNeurons(); j++){
                 tempError = layers[i]->getMidError(j);
                 tempWeight = layers[i]->getWeights(j,k);
                 sum += (tempError * tempWeight);
-                weightSumer += fabs(tempWeight);
-                counter += 1;
             }
-            double normSum = sum ; // / weightSumer;
+            double normSum = sum ;
             assert(std::isfinite(sum));
-            assert(std::isfinite(weightSumer));
-            assert(std::isfinite(counter));
             assert(std::isfinite(normSum));
             layers[i-1]->propMidErrorBackward(k, normSum);
         }
@@ -252,19 +241,13 @@ void Net::echoErrorBackward(){
     for (int i = nLayers-1; i > 0 ; i--){
         for (int k = 0; k < layers[i-1]->getnNeurons(); k++){
             double sum = 0.0;
-            double weightSumer = 0.0;
-            int counter = 0;
             for (int j = 0; j < layers[i]->getnNeurons(); j++){
                 tempError = layers[i]->getEchoError(j);
                 tempWeight = layers[i]->getWeights(j,k);
                 sum += (tempError * tempWeight);
-                weightSumer += fabs(tempWeight);
-                counter += 1;
             }
-            double normSum = sum ; // / weightSumer;
+            double normSum = sum ;
             assert(std::isfinite(sum));
-            assert(std::isfinite(weightSumer));
-            assert(std::isfinite(counter));
             assert(std::isfinite(normSum));
             layers[i-1]->echoErrorBackward(k, normSum);
         }
@@ -311,18 +294,12 @@ void Net::propGlobalErrorBackwardLocally(){
     for (int i = nLayers-1; i > 0 ; i--){
         for (int k = 0; k < layers[i-1]->getnNeurons(); k++){
             double sum = 0.0;
-            double weightSumer = 0.0;
-            int counter = 0;
             for (int j = 0; j < layers[i]->getnNeurons(); j++){
                 tempWeight = layers[i]->getWeights(j,k);
                 sum += (globalError * tempWeight);
-                weightSumer += fabs(tempWeight);
-                counter += 1;
             }
-            double normSum = sum; //  / weightSumer;
+            double normSum = sum;
             assert(std::isfinite(sum));
-            assert(std::isfinite(weightSumer));
-            assert(std::isfinite(counter));
             assert(std::isfinite(normSum));
             layers[i-1]->propGlobalErrorBackwardLocally(k, normSum);
         }
