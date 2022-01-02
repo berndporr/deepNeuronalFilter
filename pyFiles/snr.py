@@ -11,18 +11,18 @@ def hpFilter(x,fs=250):
     b,a = signal.butter(2,fc/fs*2,"highpass")
     return signal.lfilter(b,a,x)
 
-def calcNoisePower(subj,filename,startSec=10,fs=250):
+def calcNoisePower(subj,filename,startsec=10,fs=250):
     p = "../results/subject{}/{}".format(subj,filename)
     d = np.loadtxt(p)
-    ll = fs * startSec
+    ll = fs * startsec
     y = d[ll:,0]
     s = np.std(y)
     print("Noise Power:",s)
     return s
 
-def calcSNR(subj,filename,startSec=10,fs=250):
-    NoisePwr = calcNoisePower(subj,filename,startSec,fs)
-    vep = p300.calcVEP(subj,filename,startSec,fs)
+def calcSNR(subj,filename,startsec=10,fs=250):
+    NoisePwr = calcNoisePower(subj,filename,startsec,fs)
+    vep = p300.calcVEP(subj,filename,startsec,fs)
     s = np.max(vep)
     SignalPwr = s*s
     print("Signal Power:",SignalPwr)
@@ -36,7 +36,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         subj = int(sys.argv[1])
 
-    print("SNR from DNF:",calcSNR(subj,"fnn.tsv"))
-    print("SNR just from inner:",calcSNR(subj,"inner.tsv"))
+    startsec = 120
+
+    print("SNR from DNF:",calcSNR(subj,"fnn.tsv",startsec=startsec))
+    print("SNR just from inner:",calcSNR(subj,"inner.tsv",startsec=startsec))
 
     plt.show()
