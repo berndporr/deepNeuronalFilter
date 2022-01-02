@@ -70,35 +70,35 @@ void Layer::setlearningRate(double _w_learningRate, double _b_learningRate){
 //forward propagation of inputs:
 //*************************************************************************************
 
-void Layer::setInputs(const double* const _inputs){
-    /*this is only for the first layer*/
-    const double* inputs=_inputs;
-    for (int j=0; j<nInputs; j++){
-        Neuron** neuronsp = neurons;//point to the 1st neuron
-        /* sets a temporarily pointer to neuron-pointers
-         * within the scope of this function. this is inside
-         * the loop, so that it is set to the first neuron
-         * everytime a new value is distributed to neurons */
-        const double input= *inputs; //take this input value
-        for (int i=0; i<nNeurons; i++){
-            (*neuronsp)->setInput(j,input);
-            //set this input value for this neuron
-            neuronsp++; //point to the next neuron
-        }
-        inputs++; //point to the next input value
-    }
+void Layer::setInputs(const double* const _inputs, const double scale, const unsigned int offset, const int n) {
+	/*this is only for the first layer*/
+	const double* inputs = _inputs;
+	for (int j=0; j< (n < 0 ? nInputs:n); j++){
+		Neuron** neuronsp = neurons;//point to the 1st neuron
+		/* sets a temporarily pointer to neuron-pointers
+		 * within the scope of this function. this is inside
+		 * the loop, so that it is set to the first neuron
+		 * everytime a new value is distributed to neurons */
+		const double input= (*inputs) * scale; //take this input value
+		for (int i=0; i<nNeurons; i++){
+			(*neuronsp)->setInput(j+offset,input);
+			//set this input value for this neuron
+			neuronsp++; //point to the next neuron
+		}
+		inputs++; //point to the next input value
+	}
 }
 
 void Layer::propInputs(int _index, double _value){
-    for (int i=0; i<nNeurons; i++){
-        neurons[i]->propInputs(_index, _value);
-    }
+	for (int i=0; i<nNeurons; i++){
+		neurons[i]->propInputs(_index, _value);
+	}
 }
 
 void Layer::calcOutputs(){
-    for (int i=0; i<nNeurons; i++){
-        layerHasReported = neurons[i]->calcOutput(layerHasReported);
-    }
+	for (int i=0; i<nNeurons; i++){
+		layerHasReported = neurons[i]->calcOutput(layerHasReported);
+	}
 }
 
 //*************************************************************************************

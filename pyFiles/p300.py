@@ -42,7 +42,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         subj = int(sys.argv[1])
 
-    startsec = 60
+    startsec = 10
 
     fig, axs = plt.subplots(2)
     fig.suptitle("P300")

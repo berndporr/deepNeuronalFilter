@@ -111,7 +111,7 @@ long count = 0;
 	Net NNO(NLAYERS, nNeurons, outerDelayLineLength, 0, "P300");
 	
 	//setting up the neural networks
-	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_Sigmoid);
+	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_ReLU);
 		
 	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
 	remover_file.open(outpPrefix+"/subject" + sbjct + "/remover.tsv", fstream::out);

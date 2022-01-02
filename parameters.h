@@ -20,15 +20,15 @@ const double bsBandwidth = 2.5; // Hz
 const int bufferLength = 1000 ;
 
 // learning rate
-const double w_eta = 5;
+const double w_eta = 1;
 
 const int NLAYERS = 6;
 
 #define LMS_LEARNING_RATE 0.005
 
-const double inner_gain = 1000;
-const double outer_gain = 1000;
-const double remover_gain = 0.25;
+const double inner_gain = 1;
+const double outer_gain = 1;
+const double remover_gain = 1;
 
 #define DoShowPlots
 
