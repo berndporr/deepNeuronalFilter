@@ -83,6 +83,7 @@ void processOneSubject(int subjIndex, const char* filename) {
 	fstream lms_remover_file;
 	fstream laplace_file;
 	ifstream p300_infile;
+	fstream wdistance_file;
 #ifdef SAVE_WEIGHTS
 	fstream weight_file;
 #endif
@@ -123,6 +124,7 @@ long count = 0;
 #ifdef SAVE_WEIGHTS
 	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
 #endif
+	wdistance_file.open(outpPrefix+"/subject" + sbjct + "/weight_distance.tsv", fstream::out);
 	
 	char tmp[256];
 	if (NULL != filename) {
@@ -220,12 +222,13 @@ long count = 0;
 		
 #ifdef SAVE_WEIGHTS
 		// SAVE WEIGHTS
-		for (int i = 0; i < NLAYERS; i++) {
-			weight_file << NNO.getLayerWeightDistance(i) << " ";
-		}
-		weight_file << NNO.getWeightDistance() << "\n";
 		NNO.snapWeights(outpPrefix, "p300", subjIndex);
 #endif
+		wdistance_file << NNO.getWeightDistance();
+		for(int i=0; i < NLAYERS; i++ ) {
+			wdistance_file << "\t" << NNO.getLayerWeightDistance(i);
+		}
+		wdistance_file << endl;
 
 		// Do Laplace filter
 		double laplace = inner - outer;
@@ -292,6 +295,7 @@ long count = 0;
 	lms_file.close();
 	laplace_file.close();
 	lms_remover_file.close();
+	wdistance_file.close();
 #ifdef SAVE_WEIGHTS
 	weight_file.close();
 #endif	
