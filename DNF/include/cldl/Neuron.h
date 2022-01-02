@@ -59,7 +59,7 @@ public:
 	 * 1 for using the hyperbolic tan function
 	 * 2 for unity function (no activation)
 	 */
-	enum actMethod {Act_Sigmoid = 0, Act_Tanh = 1, Act_NONE = 2};
+	enum actMethod {Act_Sigmoid = 1, Act_Tanh = 2, Act_ReLU = 3, Act_NONE = 0};
 	/**
 	 * Options for choosing an error to monitor the gradient of
 	 * 0 for monitoring the error that propagates backward
@@ -206,6 +206,8 @@ public:
 			return (1/(1+(exp(-sum)))) - 0.5;
 		case Act_Tanh:
 			return tanh(sum);
+		case Act_ReLU:
+			if (sum > 0) return sum; else return 0;
 		case Act_NONE:
 			return sum;
 		}
@@ -223,6 +225,8 @@ public:
 			return 1 * (0.5 + doActivation(input)) * (0.5 - doActivation(input));
 		case Act_Tanh:
 			return 1 - pow (tanh(input), 2);
+		case Act_ReLU:
+			if (sum > 0) return 1; else return 0;
 		case Act_NONE:
 			return 1;
 		}

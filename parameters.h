@@ -20,7 +20,7 @@ const double bsBandwidth = 2.5; // Hz
 const int bufferLength = 1000 ;
 
 // learning rate
-const double w_eta = 50;
+const double w_eta = 5;
 
 const int NLAYERS = 6;
 
