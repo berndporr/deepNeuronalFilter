@@ -52,7 +52,7 @@ public:
 	 * 1 for initialising all weights to one
 	 * 2 for initialising all weights to a random value between 0 and 1
 	 */
-	enum weightInitMethod { W_ZEROS = 0, W_ONES = 1, W_RANDOM = 2 };
+	enum weightInitMethod { W_ZEROS = 0, W_ONES = 1, W_RANDOM = 2, W_ONES_NORM = 3, W_RANDOM_NORM = 5,  };
 	/**
 	 * Options for activation functions of the neuron
 	 * 0 for using the logistic function
@@ -109,86 +109,13 @@ public:
 	 * Sets the error of the neuron in the first hidden layer that is to be propagated forward
 	 * @param _value value of the error
 	 */
-	void setForwardError(double _value);
+	void setError(double _value);
 
 	/**
-	 * Sets the forward propagating error of the neuron in layers other than the first hidden layer
-	 * @param _index index of the error
-	 * @param _value value of the error
+	 * Allows accessing the error of this neuron
+	 * @return the value of the error
 	 */
-	void propErrorForward(int _index, double _value);
-
-	/**
-	 * Calculates the error to be propagated forward by doing a weighted sum of forward errors
-	 */
-	void calcForwardError();
-
-	/**
-	 * Sets the backward propagating error in neuron in the output layer
-	 * @param _leadError the value of the error
-	 */
-	void setBackwardError(double _leadError);
-
-	/**
-	 * Sets the error to be propagated backward for neurons in all layers except for the output layer
-	 * @param _nextSum the weighted sum of propagating errors
-	 */
-	void propErrorBackward(double _nextSum);
-
-	/**
-	 * Allows accessing the backward error
-	 * @return The back propagating error fo this neuron
-	 */
-	double getBackwardError();
-
-	/**
-	 * Sets the mid error of neuron that is on the chosen layer for bilateral propagation
-	 * @param _leadMidError the error to be propagated bilaterally
-	 */
-	void setMidError(double _leadMidError);
-
-	/**
-	 * calculates the mid error
-	 */
-	void calcMidError();
-	/**
-	 * Allows accessing the mid error of this neuron
-	 * @return the value of the mid error
-	 */
-	double getMidError();
-
-	/**
-	 * Sets the forward propagating mid errors for this neuron
-	 * @param _index index of the error
-	 * @param _value value of the error
-	 */
-	void propMidErrorForward(int _index, double _value);
-
-	/**
-	 * Sets the backward propagating mid error for this neuron
-	 * @param _nextSum the value of weighted sum of mid errors in neurons of the adjacent layer
-	 */
-	void propMidErrorBackward(double _nextSum);
-
-	/**
-	 * Allows for accessing any specific error of this neuron
-	 * @param _whichError specifies the error, for more information see whichError
-	 * @return returns the value of the chosen error
-	 */
-	double getError(whichError _whichError);
-
-	/**
-	 * Sets the coefficient of the errors used for learning
-	 * @param _globalCoeff coefficient of the global error
-	 * @param _backwardsCoeff coefficient of the error propagating backward
-	 * @param _midCoeff coefficient of the error propagating bilaterally
-	 * @param _forwardCoeff coefficient of the error propagating forward
-	 * @param _localCoeff coefficient of the error propagating locally
-	 * @param _echoCoeff coefficient of the error resonating back and forth
-	 */
-	void setErrorCoeff(double _globalCoeff, double _backwardsCoeff,
-			   double _midCoeff, double _forwardCoeff,
-			   double _localCoeff, double  _echoCoeff);
+	double getError();
 
 	/**
 	 * Performs one iteration of learning, that is: it updates all the weights assigned to each input to this neuron
@@ -234,73 +161,28 @@ public:
 	}
 
 	/**
-	 * Sets the global error for this neuron
-	 * @param _globalError the global error
+	 * Sets the internal backprop error
+	 * @param _input the input value
 	 */
-	void setGlobalError(double _globalError);
-	/**
-	 * Allows for accessing the global error
-	 * @return Returns the global error
-	 */
-	double getGlobalError();
-
-	/**
-	 * Sets the resonating error for this neuron called from the output layer only
-	 * @param _echoError The resonating error
-	 */
-
-	void setEchoError(double _echoError);
-	/**
-	 * Requests for the resonating error
-	 * @return Returns the resonating error
-	 */
-	double getEchoError();
-	/**
-	 * Sets the forward travelling resonating error for this neuron
-	 * @return the resonating error
-	 */
-	void echoErrorBackward(double _nextSum);
-	/**
-	 * Sets the backward travelling resonating error for this neuron
-	 * @return the resonating error
-	 */
-	void echoErrorForward(int _index,  double _value);
-	/**
-	 * calculated the resonating error to be propagates to adjacent layers
-	 */
-	void calcEchoError();
-
-	/**
-	 * Sets the error to be propagated locally
-	 * @param _leadLocalError the local error
-	 */
-	void setLocalError(double _leadLocalError);
-	/**
-	 * Sets the error that propagates backward but only locally (for one layer)
-	 * @param _nextSum the sum of errors to be propagated
-	 */
-	void propGlobalErrorBackwardLocally(double _nextSum);
-	/**
-	 * Requests the local error fo this neuron
-	 * @return Returns the local error
-	 */
-	double getLocalError();
+	inline void setBackpropError(const double upstreamDeltaErrorSum) {
+		error = doActivationPrime(getSumOutput()) * upstreamDeltaErrorSum;
+	}
 
 	/**
 	 * Requests the output of this neuron
 	 * @return the output of the neuron after activation
 	 */
-	double getOutput();
-	/**
-	 * Requests the forward propagating error
-	 * @return the forward error
-	 */
-	double getForwardError();
+	inline double getOutput() {
+		return output;
+	}
+
 	/**
 	 * Requests the sum output of the neuron
 	 * @return returns the sum output of the neuron before activaiton
 	 */
-	double getSumOutput();
+	inline double getSumOutput() {
+		return sum;
+	}
 
 	/**
 	 * Requests a specific weight
@@ -308,8 +190,6 @@ public:
 	 * @return Returns the chosen weight
 	 */
 	double getWeights(int _inputIndex);
-
-	double getGRAYWeights(int _inputIndex);
 
 	/**
 	 * Requests a inital value of a specific weight
@@ -323,27 +203,37 @@ public:
 	 * @return the overal weight change
 	 */
 	double getWeightChange();
+
 	/**
 	 * Requests for the maximum weights located in this neuron
 	 * @return Returns the max weight
 	 */
-	double getMaxWeight();
+	double getMaxWeight(){
+		return maxWeight;
+	}
+	
 	/**
 	 * Requests for the minimum weights located in this neuron
 	 * @return Returns the min weight
 	 */
-	double getMinWeight();
+	double getMinWeight(){
+		return minWeight;
+	}
+
 	/**
 	 * Requests for the total sum of weights located in this neuron
 	 * @return Returns the sum of weights
 	 */
-	double getSumWeight();
+	double getSumWeight(){
+		return weightSum;
+	}
 
 	/**
 	 * Requests the weight distance of all weighs in this neuron
 	 * @return returns the sqr of the total weight change in this neuron
 	 */
 	double getWeightDistance();
+	
 	/**
 	 * Requests the total number of inputs to this neuron
 	 * @return total number of inputs
@@ -354,6 +244,7 @@ public:
 	 * Saves the temporal weight change of all weights in this neuron into a file
 	 */
 	void saveWeights();
+
 	/**
 	 * Prints on the console a full description of all weights, inputs and outputs for this neuron
 	 */
@@ -364,45 +255,26 @@ public:
 	 * @param _index index of the weight
 	 * @param _weight value of the weight
 	 */
-
 	inline void setWeight(int _index, double _weight) {
 		assert((_index >= 0) && (_index < nInputs));
 		weights[_index] = _weight;
 	}
 
 private:
-
-	double forGrayScale_zero = pow(10,6);
-	double forGrayScale = pow(10,9);
-
 	// initialisation:
 	int nInputs = 0;
 	int myLayerIndex = 0;
 	int myNeuronIndex = 0;
 	double *initialWeights = 0;
-	double *grayWeights = 0;
 
 	double w_learningRate = 0;
 	double b_learningRate = 0;
     
 	int iHaveReported = 0;
 
-	//forward propagation of inputs:
-	double *inputs = 0;
 	double bias = 0;
 	double sum = 0;
 	double output = 0;
-
-	//forward propagation of error:
-	double *inputErrors = 0;
-	double forwardError = 0;
-
-	//back propagation of error
-	double backwardError = 0;
-
-	//mid propagation of error
-	double *inputMidErrors = 0;
-	double midError = 0;
 
 	//learning:
 	double backwardsCoeff = 0;
@@ -410,6 +282,7 @@ private:
 	double forwardCoeff = 0;
 	double globalCoeff = 0;
 	double *weights = 0;
+	double *inputs = 0;
 	double weightSum = 0;
 	double maxWeight = 1;
 	double minWeight = 1;
@@ -417,16 +290,5 @@ private:
 	double weightsDifference = 0;
 	int actMet = 0;
 
-	//global setting
-	double globalError = 0;
-	double localError = 0;
-	double echoCoeff = 0;
-	double localCoeff = 0;
-
-	double overallError = 0;
-	double echoError = 0;
-	double *echoErrors = 0;
-
-
-
+	double error = 0;
 };

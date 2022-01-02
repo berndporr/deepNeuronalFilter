@@ -60,6 +60,8 @@ void processOneSubject(int subjIndex, const char* filename) {
 	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 	
 	const int outerDelayLineLength = fs / outerHighpassCutOff;
+	fprintf(stderr,"outerDelayLineLength = %d\n",outerDelayLineLength);
+	
 	const int innerDelayLineLength = outerDelayLineLength / 2;
 
 	boost::circular_buffer<double> oo_buf(bufferLength);
@@ -199,7 +201,7 @@ long count = 0;
 			
 		}
 		
-		outer_delayLine[0] = outer;
+		outer_delayLine[0] = outer / (double)outerDelayLineLength;
 		
 		// OUTER INPUT TO NETWORK
 		NNO.setInputs(outer_delayLine);
@@ -210,8 +212,7 @@ long count = 0;
 		double f_nn = inner - remover;
 		
 		// FEEDBACK TO THE NETWORK 
-		NNO.setErrorCoeff(0, 1, 0, 0, 0, 0); //global, back, mid, forward, local, echo error
-		NNO.setBackwardError(f_nn);
+		NNO.setError(f_nn);
 		NNO.propErrorBackward();
 		
 		if (count > (samplesNoLearning+outerDelayLineLength)){

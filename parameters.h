@@ -11,7 +11,7 @@ const int nSubj = 20;
 const int filterorder = 2;
 const double innerHighpassCutOff = 0.5; // Hz
 
-const double outerHighpassCutOff = 1; // Hz
+const double outerHighpassCutOff = 5; // Hz
 
 const double powerlineFrequ = 50; // Hz
 const double bsBandwidth = 2.5; // Hz
@@ -20,14 +20,14 @@ const double bsBandwidth = 2.5; // Hz
 const int bufferLength = 1000 ;
 
 // learning rate
-const double w_eta = 1;
+const double w_eta = 5;
 
 const int NLAYERS = 6;
 
-#define LMS_LEARNING_RATE 0.005
+#define LMS_LEARNING_RATE 0
 
-const double inner_gain = 1;
-const double outer_gain = 1;
+const double inner_gain = 1000;
+const double outer_gain = 1000;
 const double remover_gain = 1;
 
 #define DoShowPlots
