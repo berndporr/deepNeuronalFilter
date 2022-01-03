@@ -111,7 +111,7 @@ long count = 0;
 	}
 
 	//create the neural network
-	Net NNO(NLAYERS, nNeurons, outerDelayLineLength, 0, "P300");
+	Net NNO(NLAYERS, nNeurons, outerDelayLineLength * 2, 0, "P300");
 	
 	//setting up the neural networks
 	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_ReLU);
@@ -204,7 +204,8 @@ long count = 0;
 		outer_delayLine[0] = outer / (double)outerDelayLineLength;
 		
 		// OUTER INPUT TO NETWORK
-		NNO.setInputs(outer_delayLine);
+		NNO.setInputs(outer_delayLine, 1,0,outerDelayLineLength);
+		NNO.setInputs(outer_delayLine,-1,outerDelayLineLength,outerDelayLineLength);
 		NNO.propInputs();
 		
 		// REMOVER OUTPUT FROM NETWORK
