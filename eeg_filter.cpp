@@ -147,6 +147,9 @@ long count = 0;
 	inner_filterHP.setup(fs,innerHighpassCutOff);
 	Iir::Butterworth::BandStop<filterorder> inner_filterBS;
 	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
+
+	Iir::Butterworth::HighPass<filterorder> laplaceHP;
+	laplaceHP.setup(fs,innerHighpassCutOff);
 	
 	Fir1 lms_filter(outerDelayLineLength);
 	lms_filter.setLearningRate(LMS_LEARNING_RATE);
@@ -231,7 +234,7 @@ long count = 0;
 		wdistance_file << endl;
 
 		// Do Laplace filter
-		double laplace = inner - outer;
+		double laplace = laplaceHP.filter(inner_raw_data - outer_raw_data);
 
 		// Do LMS filter
 		double corrLMS = lms_filter.filter(outer);
@@ -241,7 +244,7 @@ long count = 0;
 		}
 		
 		// SAVE SIGNALS INTO FILES
-		laplace_file << laplace << "\t" << delayedp300trigger << endl;
+		laplace_file << laplace/inner_gain << "\t" << p300trigger << endl;
 		// undo the gain so that the signal is again in volt
 		inner_file << inner/inner_gain << "\t" << delayedp300trigger << endl;
 		outer_file << outer/outer_gain << "\t" << delayedp300trigger << endl;

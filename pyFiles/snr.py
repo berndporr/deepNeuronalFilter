@@ -3,6 +3,8 @@ import numpy as np
 import sys
 import p300
 import scipy.signal as signal
+import getopt
+
 
 # http://www.scholarpedia.org/article/Signal-to-noise_ratio_in_neuroscience
 
@@ -32,14 +34,35 @@ def calcSNR(subj,filename,startsec=10,fs=250,folder="results"):
 # check if we run this as a main program
 if __name__ == "__main__":
     subj = 1
-
-    if len(sys.argv) > 1:
-        subj = int(sys.argv[1])
-
     startsec = 120
     noisefolder = "results"
+    filtered_filename = "fnn.tsv"
 
-    print("SNR from DNF:",calcSNR(subj,"fnn.tsv",startsec=startsec,folder=noisefolder))
+    helptext = 'usage: {} -p participant -s startsec -f file -n noisefolder -h'.format(sys.argv[0])
+
+    try:
+        # Gather the arguments
+        all_args = sys.argv[1:]
+        opts, arg = getopt.getopt(all_args, 'p:s:f:n:')
+        # Iterate over the options and values
+        for opt, arg_val in opts:
+            if '-p' in opt:
+                subj = int(arg_val)
+            elif '-s' in opt:
+                startsec = int(arg_val)
+            elif '-f' in opt:
+                filtered_filename = arg_val
+            elif '-n' in opt:
+                noisefolder = arg_val
+            elif '-h' in opt:
+                raise getopt.GetoptError()
+            else:
+                raise getopt.GetoptError()
+    except getopt.GetoptError:
+        print (helptext)
+        sys.exit(2)
+
+    print("SNR from Noise removal:",calcSNR(subj,filtered_filename,startsec=startsec,folder=noisefolder))
     print("SNR just from inner:",calcSNR(subj,"inner.tsv",startsec=startsec,folder=noisefolder))
 
     plt.show()
