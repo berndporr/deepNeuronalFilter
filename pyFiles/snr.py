@@ -37,9 +37,9 @@ if __name__ == "__main__":
         subj = int(sys.argv[1])
 
     startsec = 120
-    folder = "sudoku"
+    noisefolder = "results"
 
-    print("SNR from DNF:",calcSNR(subj,"fnn.tsv",startsec=startsec,folder=folder))
-    print("SNR just from inner:",calcSNR(subj,"inner.tsv",startsec=startsec,folder=folder))
+    print("SNR from DNF:",calcSNR(subj,"fnn.tsv",startsec=startsec,folder=noisefolder))
+    print("SNR just from inner:",calcSNR(subj,"inner.tsv",startsec=startsec,folder=noisefolder))
 
     plt.show()
