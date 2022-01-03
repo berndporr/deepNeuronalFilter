@@ -128,9 +128,9 @@ long count = 0;
 	
 	char tmp[256];
 	if (NULL != filename) {
-		sprintf(tmp,"../noisewalls/EEG_recordings/participant%03d/%s.tsv",subjIndex,filename);
+		sprintf(tmp,"../../noisewalls/EEG_recordings/participant%03d/%s.tsv",subjIndex,filename);
 	} else {
-		sprintf(tmp,"../noisewalls/EEG_recordings/participant%03d/rawp300.tsv",subjIndex);
+		sprintf(tmp,"../../noisewalls/EEG_recordings/participant%03d/rawp300.tsv",subjIndex);
 	}
 	p300_infile.open(tmp);
 	if (!p300_infile) {
