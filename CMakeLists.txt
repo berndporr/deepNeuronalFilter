@@ -5,7 +5,7 @@ add_subdirectory(DNF)
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
 add_executable(eeg_filter eeg_filter.cpp dynamicPlots.cpp dynamicPlots.h parameters.h cvui.h)
-target_link_libraries(eeg_filter CLDL iir_static fir ${OpenCV_LIBS})
+target_link_libraries(eeg_filter DNF iir fir ${OpenCV_LIBS})
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")

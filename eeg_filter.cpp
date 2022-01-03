@@ -13,9 +13,7 @@
 #include <ctime>
 #include <memory>
 #include <numeric>
-#include "Neuron.h"
-#include "Layer.h"
-#include "Net.h"
+#include "dnf.h"
 #include "parameters.h"
 #include "dynamicPlots.h"
 
