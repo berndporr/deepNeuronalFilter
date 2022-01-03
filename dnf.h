@@ -43,17 +43,34 @@ DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(fs /
 		NNO->propInputs();
 		
 		// REMOVER OUTPUT FROM NETWORK
-		double remover = NNO->getOutput(0);
-		double f_nn = delayed_signal - remover;
+		remover = NNO->getOutput(0);
+		f_nn = delayed_signal - remover;
 		
 		// FEEDBACK TO THE NETWORK 
 		NNO->setError(f_nn);
 		NNO->propErrorBackward();
+		NNO->updateWeights();
 		return f_nn;
 	}
 
-	const Net& getNet() const {
+	inline Net& getNet() const {
 		return *NNO;
+	}
+
+	inline const int getSignalDelaySteps() const {
+		return signalDelayLineLength;
+	}
+
+	inline const double getDelayedSignal() const {
+		return signal_delayLine[0];
+	}
+
+	inline const double getRemover() const {
+		return remover;
+	}
+
+	inline const double getOutput() const {
+		return f_nn;
 	}
 
 	~DNF() {
@@ -69,6 +86,8 @@ private:
 	boost::circular_buffer<double> signal_delayLine;
 	double* noise_delayLine;
 	int* nNeurons;
+	double remover = 0;
+	double f_nn = 0;
 };
 
 #endif

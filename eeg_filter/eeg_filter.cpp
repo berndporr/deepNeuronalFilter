@@ -60,19 +60,12 @@ void processOneSubject(int subjIndex, const char* filename) {
 	const int outerDelayLineLength = fs / outerHighpassCutOff;
 	fprintf(stderr,"outerDelayLineLength = %d\n",outerDelayLineLength);
 	
-	const int innerDelayLineLength = outerDelayLineLength / 2;
-
 	boost::circular_buffer<double> oo_buf(bufferLength);
 	boost::circular_buffer<double> io_buf(bufferLength);
 	boost::circular_buffer<double> ro_buf(bufferLength);
 	boost::circular_buffer<double> f_nno_buf(bufferLength);
 //LMS
 	boost::circular_buffer<double> lms_o_buf(bufferLength);
-	
-//adding delay line for the noise
-	double outer_delayLine[outerDelayLineLength] = {0.0};
-	boost::circular_buffer<double> innertrigger_delayLine(innerDelayLineLength);
-	boost::circular_buffer<double> inner_delayLine(innerDelayLineLength);
 	
 // FILES
 	fstream nn_file;
@@ -98,21 +91,10 @@ long count = 0;
 	//create files for saving the data and parameters
 	string sbjct = std::to_string(subjIndex);
 
-        //NN specifications
-	int nNeurons[NLAYERS];
-	// calc an exp reduction of the numbers always reaching 1
-	double b = exp(log(outerDelayLineLength)/(NLAYERS-1));
-	for(int i=0;i<NLAYERS;i++) {
-		nNeurons[i] = outerDelayLineLength / pow(b,i);
-		if (i == (NLAYERS-1)) nNeurons[i] = 1;
-		fprintf(stderr,"Layer %d has %d neurons.\n",i,nNeurons[i]);
-	}
+	DNF dnf(NLAYERS,outerDelayLineLength,fs);
 
-	//create the neural network
-	Net NNO(NLAYERS, nNeurons, outerDelayLineLength * 2, 0, "P300");
-	
-	//setting up the neural networks
-	NNO.initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_ReLU);
+	//adding delay line for the noise
+	boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());
 		
 	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
 	remover_file.open(outpPrefix+"/subject" + sbjct + "/remover.tsv", fstream::out);
@@ -183,10 +165,6 @@ long count = 0;
 		double inner_filtered = inner_filterHP.filter(inner_raw);
 		inner_filtered = inner_filterBS.filter(inner_filtered);
 
-		//3) DELAY
-		inner_delayLine.push_back(inner_filtered);
-		const double inner = inner_delayLine[0];
-		
 		innertrigger_delayLine.push_back(p300trigger);
 		const double delayedp300trigger = innertrigger_delayLine[0];
 
@@ -196,40 +174,21 @@ long count = 0;
 		const double outerhp = outer_filterHP.filter(outer_raw);
 		const double outer = outer_filterBS.filter(outerhp);
 
-		//3) DELAY LINE
-		for (int i = outerDelayLineLength-1 ; i > 0; i--) {
-			outer_delayLine[i] = outer_delayLine[i-1];
-			
-		}
-		
-		outer_delayLine[0] = outer / (double)outerDelayLineLength;
-		
-		// OUTER INPUT TO NETWORK
-		NNO.setInputs(outer_delayLine, 1,0,outerDelayLineLength);
-		NNO.setInputs(outer_delayLine,-1,outerDelayLineLength,outerDelayLineLength);
-		NNO.propInputs();
-		
-		// REMOVER OUTPUT FROM NETWORK
-		double remover = NNO.getOutput(0) * remover_gain;
-		double f_nn = inner - remover;
-		
-		// FEEDBACK TO THE NETWORK 
-		NNO.setError(f_nn);
-		NNO.propErrorBackward();
+		double f_nn = dnf.filter(inner_filtered,outer);
 		
 		if (count > (samplesNoLearning+outerDelayLineLength)){
-			// LEARN
-			NNO.setLearningRate(w_eta, 0);
-			NNO.updateWeights();
+			dnf.getNet().setLearningRate(w_eta, 0);
+		} else {
+			dnf.getNet().setLearningRate(0, 0);
 		}
 		
 #ifdef SAVE_WEIGHTS
 		// SAVE WEIGHTS
 		NNO.snapWeights(outpPrefix, "p300", subjIndex);
 #endif
-		wdistance_file << NNO.getWeightDistance();
+		wdistance_file << dnf.getNet().getWeightDistance();
 		for(int i=0; i < NLAYERS; i++ ) {
-			wdistance_file << "\t" << NNO.getLayerWeightDistance(i);
+			wdistance_file << "\t" << dnf.getNet().getLayerWeightDistance(i);
 		}
 		wdistance_file << endl;
 
@@ -238,7 +197,7 @@ long count = 0;
 
 		// Do LMS filter
 		double corrLMS = lms_filter.filter(outer);
-		double lms_output = inner - corrLMS;
+		double lms_output = dnf.getDelayedSignal() - corrLMS;
 		if (count > (samplesNoLearning+outerDelayLineLength)){
 			lms_filter.lms_update(lms_output);
 		}
@@ -246,18 +205,18 @@ long count = 0;
 		// SAVE SIGNALS INTO FILES
 		laplace_file << laplace/inner_gain << "\t" << p300trigger << endl;
 		// undo the gain so that the signal is again in volt
-		inner_file << inner/inner_gain << "\t" << delayedp300trigger << endl;
+		inner_file << dnf.getDelayedSignal()/inner_gain << "\t" << delayedp300trigger << endl;
 		outer_file << outer/outer_gain << "\t" << delayedp300trigger << endl;
-		remover_file << remover/inner_gain << endl;
-		nn_file << f_nn/inner_gain << "\t" << delayedp300trigger << endl;
+		remover_file << dnf.getRemover()/inner_gain << endl;
+		nn_file << dnf.getOutput()/inner_gain << "\t" << delayedp300trigger << endl;
 		lms_file << lms_output/inner_gain << "\t" << delayedp300trigger << endl;
 		lms_remover_file << corrLMS/inner_gain << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
 		oo_buf.push_back(outer);
-		io_buf.push_back(inner);
-		ro_buf.push_back(remover);
+		io_buf.push_back(dnf.getDelayedSignal());
+		ro_buf.push_back(dnf.getRemover());
 		f_nno_buf.push_back(f_nn);
 		// 2) LMS outputs
 		lms_o_buf.push_back(lms_output);
@@ -289,7 +248,7 @@ long count = 0;
 		}
 #endif
 	}
-	NNO.snapWeights(outpPrefix, "p300", subjIndex);
+	dnf.getNet().snapWeights(outpPrefix, "p300", subjIndex);
 	p300_infile.close();
 	remover_file.close();
 	nn_file.close();
