@@ -18,14 +18,17 @@ DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(numT
 	for(int i=0;i<NLAYERS;i++) {
 		nNeurons[i] = noiseDelayLineLength / pow(b,i);
 		if (i == (NLAYERS-1)) nNeurons[i] = 1;
-		fprintf(stderr,"Layer %d has %d neurons.\n",i,nNeurons[i]);
 	}
 	
 	//create the neural network
 	NNO = new Net(NLAYERS, nNeurons, noiseDelayLineLength * 2, 0, "");
 	
 	//setting up the neural networks
-	NNO->initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_NONE);
+	for(int i=0;i<NLAYERS;i++) {
+		Neuron::actMethod am = Neuron::Act_NONE;
+		NNO->getLayer(i)->initLayer(i,Neuron::W_RANDOM, Neuron::B_NONE, am);
+		fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
+	}
 }
 
 	double filter(double signal, double noise) {
