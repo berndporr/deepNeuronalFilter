@@ -4,12 +4,12 @@ set(CMAKE_CXX_STANDARD 11)
 
 project (DNF)
 
-add_library(DNF
-        Layer.cpp
-        Net.cpp
-        Neuron.cpp)
+add_library(DNF	
+        dnf/Layer.cpp
+        dnf/Net.cpp
+        dnf/Neuron.cpp)
 
-target_include_directories(DNF PUBLIC .)
+target_include_directories(DNF PUBLIC . dnf)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")

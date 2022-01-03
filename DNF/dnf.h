@@ -1,8 +1,8 @@
 #ifndef _DNF_H
 #define _DNF_H
 
-#include "Neuron.h"
-#include "Layer.h"
-#include "Net.h"
+#include "dnf/Neuron.h"
+#include "dnf/Layer.h"
+#include "dnf/Net.h"
 
 #endif
