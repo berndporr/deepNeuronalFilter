@@ -40,6 +40,7 @@ Neuron::~Neuron(){
 void Neuron::initNeuron(int _neuronIndex, int _layerIndex, weightInitMethod _wim, biasInitMethod _bim, actMethod _am){
 	myLayerIndex = _layerIndex;
 	myNeuronIndex = _neuronIndex;
+	actMet = _am;
 	for (int i=0; i<nInputs; i++) {
 		switch (_wim) {
 		case W_ZEROS:
@@ -72,18 +73,7 @@ void Neuron::initNeuron(int _neuronIndex, int _layerIndex, weightInitMethod _wim
 		bias=0;
 		break;
         case B_RANDOM:
-		bias= (( (double)rand() / (RAND_MAX)) * 2 ) - 1;
-		break;
-	}
-	switch(_am){
-        case Act_Sigmoid:
-		actMet = 0;
-		break;
-        case Act_Tanh:
-		actMet = 1;
-		break;
-        case Act_NONE:
-		actMet = 2;
+		bias= (( (double)rand() / (RAND_MAX))) - 0.5;
 		break;
 	}
 }
@@ -198,15 +188,11 @@ double Neuron::getInitWeights(int _inputIndex){
 //*************************************************************************************
 
 void Neuron::saveWeights(){
-	char l = '0';
-	char n = '0';
-	l += myLayerIndex + 1;
-	n += myNeuronIndex + 1;
 	string name = "w";
 	name += 'L';
-	name += l;
+	name += std::to_string(myLayerIndex + 1);
 	name += 'N';
-	name += n;
+	name += std::to_string(myNeuronIndex + 1);
 	name += ".csv";
 	std::ofstream Icofile;
 	Icofile.open(name, fstream::app);

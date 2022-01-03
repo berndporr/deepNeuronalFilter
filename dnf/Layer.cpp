@@ -227,12 +227,9 @@ void Layer::snapWeights(string prefix, string _trial, int _subject){
 
 void Layer::snapWeightsMatrixFormat(string prefix){
     std::ofstream wfile;
-    char l = '0';
-    l += myLayerIndex + 1;
-    string name = prefix+"/subject" + std::to_string(subject) + "/greyScaleMATRIX_Layer" + l
+    string name = prefix+"/subject" + std::to_string(subject) + "/MATRIX_Layer"
                   + "_Subject" + std::to_string(subject)
                   + "_" + trial;
-    //name += l;
     name += ".csv";
     wfile.open(name);
     wfile << "[" << nNeurons << "," << nInputs << "]";

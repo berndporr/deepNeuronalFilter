@@ -7,7 +7,7 @@
 
 class DNF {
 public:
-DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(fs / numTaps),
+DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(numTaps),
 		signalDelayLineLength(noiseDelayLineLength / 2),
 		signal_delayLine(signalDelayLineLength),
 		nNeurons(new int[NLAYERS]),
@@ -22,11 +22,11 @@ DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(fs /
 	}
 	
 	//create the neural network
-	NNO = new Net(NLAYERS, nNeurons, noiseDelayLineLength * 2, 0, "P300");
+	NNO = new Net(NLAYERS, nNeurons, noiseDelayLineLength * 2, 0, "");
 	
 	//setting up the neural networks
-	NNO->initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_ReLU);
-	}
+	NNO->initNetwork(Neuron::W_RANDOM, Neuron::B_NONE, Neuron::Act_NONE);
+}
 
 	double filter(double signal, double noise) {
 		signal_delayLine.push_back(signal);
