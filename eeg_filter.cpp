@@ -149,7 +149,7 @@ long count = 0;
 	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 
 	Iir::Butterworth::HighPass<filterorder> laplaceHP;
-	laplaceHP.setup(fs,innerHighpassCutOff);
+	laplaceHP.setup(fs,LaplaceCutOff);
 	
 	Fir1 lms_filter(outerDelayLineLength);
 	lms_filter.setLearningRate(LMS_LEARNING_RATE);
