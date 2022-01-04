@@ -7,29 +7,29 @@
 
 class DNF {
 public:
-DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(numTaps),
-		signalDelayLineLength(noiseDelayLineLength / 2),
-		signal_delayLine(signalDelayLineLength),
-		nNeurons(new int[NLAYERS]),
-		noise_delayLine(new double[noiseDelayLineLength]) {
-
-	// calc an exp reduction of the numbers always reaching 1
-	double b = exp(log(noiseDelayLineLength)/(NLAYERS-1));
-	for(int i=0;i<NLAYERS;i++) {
-		nNeurons[i] = noiseDelayLineLength / pow(b,i);
-		if (i == (NLAYERS-1)) nNeurons[i] = 1;
+	DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(numTaps),
+							       signalDelayLineLength(noiseDelayLineLength / 2),
+							       signal_delayLine(signalDelayLineLength),
+							       nNeurons(new int[NLAYERS]),
+							       noise_delayLine(new double[noiseDelayLineLength]) {
+		
+		// calc an exp reduction of the numbers always reaching 1
+		double b = exp(log(noiseDelayLineLength)/(NLAYERS-1));
+		for(int i=0;i<NLAYERS;i++) {
+			nNeurons[i] = noiseDelayLineLength / pow(b,i);
+			if (i == (NLAYERS-1)) nNeurons[i] = 1;
+		}
+		
+		//create the neural network
+		NNO = new Net(NLAYERS, nNeurons, noiseDelayLineLength, 0, "");
+		
+		//setting up the neural networks
+		for(int i=0;i<NLAYERS;i++) {
+			Neuron::actMethod am = Neuron::Act_Tanh;
+			NNO->getLayer(i)->initLayer(i,Neuron::W_RANDOM, Neuron::B_NONE, am);
+			fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
+		}
 	}
-	
-	//create the neural network
-	NNO = new Net(NLAYERS, nNeurons, noiseDelayLineLength * 2, 0, "");
-	
-	//setting up the neural networks
-	for(int i=0;i<NLAYERS;i++) {
-		Neuron::actMethod am = Neuron::Act_NONE;
-		NNO->getLayer(i)->initLayer(i,Neuron::W_RANDOM, Neuron::B_NONE, am);
-		fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
-	}
-}
 
 	double filter(double signal, double noise) {
 		signal_delayLine.push_back(signal);
@@ -41,8 +41,7 @@ DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(numT
 		noise_delayLine[0] = noise / (double)noiseDelayLineLength;
 
 		// NOISE INPUT TO NETWORK
-		NNO->setInputs(noise_delayLine, 1,0,noiseDelayLineLength);
-		NNO->setInputs(noise_delayLine,-1,noiseDelayLineLength,noiseDelayLineLength);
+		NNO->setInputs(noise_delayLine);
 		NNO->propInputs();
 		
 		// REMOVER OUTPUT FROM NETWORK
