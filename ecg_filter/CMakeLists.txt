@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.1.0)
+project(ecg_filter)
+set(CMAKE_CXX_STANDARD 14)
+find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED)
+find_package (Threads)
+include_directories(..)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+add_executable(ecg_filter ecg_filter.cpp dynamicPlots.cpp dynamicPlots.h parameters.h)
+target_link_libraries(ecg_filter dnf iir fir cvui ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
