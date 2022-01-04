@@ -25,9 +25,9 @@ DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(numT
 	
 	//setting up the neural networks
 	for(int i=0;i<NLAYERS;i++) {
-		Neuron::actMethod am = Neuron::Act_NONE;
+		const Neuron::actMethod am = Neuron::Act_Tanh;
 		NNO->getLayer(i)->initLayer(i,Neuron::W_RANDOM, Neuron::B_NONE, am);
-		fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
+		fprintf(stderr,"Layer %d has %d neurons. Activation = %d\n",i,nNeurons[i],am);
 	}
 }
 
