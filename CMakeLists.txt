@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.1.0)
 
-project(iir VERSION 1.9.1 LANGUAGES CXX)
+project(dnf LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
@@ -13,6 +13,7 @@ cmake_policy(SET CMP0042 NEW) # enable MACOSX_RPATH by default
 
 include(GNUInstallDirs)
 add_subdirectory(eeg_filter)
+add_subdirectory(cvui)
 enable_testing ()
 
 if (MSVC)
@@ -37,7 +38,6 @@ add_library(dnf STATIC ${LIBSRC})
 
 set_target_properties(dnf PROPERTIES
   POSITION_INDEPENDENT_CODE TRUE
-  VERSION ${PROJECT_VERSION}
   PUBLIC_HEADER dnf.h
   PRIVATE_HEADER "${LIBINCLUDE}")
 

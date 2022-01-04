@@ -11,6 +11,7 @@
 #include <chrono>
 #include <string>
 #include <ctime>
+#include <thread>         // std::thread
 #include <memory>
 #include <numeric>
 #include "dnf.h"
@@ -23,12 +24,10 @@
 using namespace std;
 constexpr int ESC_key = 27;
 
-// PLOT
-#ifdef DoShowPlots
+// PLOTTING
 #define WINDOW "Deep Neuronal Filter"
 const int plotW = 1200/2;
 const int plotH = 720;
-#endif
 
 
 // take from http://stackoverflow.com/a/236803/248823
@@ -43,7 +42,7 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems) {
 
 
 
-void processOneSubject(int subjIndex, const char* filename) {
+void processOneSubject(const int subjIndex, const char* filename, const bool showPlots = true) {
 	std::srand(1);
 
 	// file path prefix for the results
@@ -57,8 +56,8 @@ void processOneSubject(int subjIndex, const char* filename) {
 
 	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 	
-	const int outerDelayLineLength = fs / outerHighpassCutOff;
-	fprintf(stderr,"outerDelayLineLength = %d\n",outerDelayLineLength);
+	const int nTapsDNF = fs / outerHighpassCutOff;
+	fprintf(stderr,"nTapsDNF = %d\n",nTapsDNF);
 	
 	boost::circular_buffer<double> oo_buf(bufferLength);
 	boost::circular_buffer<double> io_buf(bufferLength);
@@ -81,17 +80,20 @@ void processOneSubject(int subjIndex, const char* filename) {
 	fstream weight_file;
 #endif
 
-long count = 0;
+	long count = 0;
+	
 	//setting up the interactive window and the dynamic plot class
-#ifdef DoShowPlots
 	auto frame = cv::Mat(cv::Size(plotW, plotH), CV_8UC3);
-	cvui::init(WINDOW, 1);
-	dynaPlots plots(frame, plotW, plotH);
-#endif
+	dynaPlots* plots = NULL;
+	if (showPlots) {
+		cvui::init(WINDOW, 1);
+		plots = new dynaPlots(frame, plotW, plotH);
+	}
+
 	//create files for saving the data and parameters
 	string sbjct = std::to_string(subjIndex);
 
-	DNF dnf(NLAYERS,outerDelayLineLength,fs);
+	DNF dnf(NLAYERS,nTapsDNF,fs);
 
 	//adding delay line for the noise
 	boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());
@@ -133,7 +135,7 @@ long count = 0;
 	Iir::Butterworth::HighPass<filterorder> laplaceHP;
 	laplaceHP.setup(fs,LaplaceCutOff);
 	
-	Fir1 lms_filter(outerDelayLineLength);
+	Fir1 lms_filter(nTapsDNF);
 	lms_filter.setLearningRate(LMS_LEARNING_RATE);
 	
 	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f\n",inner_gain,outer_gain,remover_gain);
@@ -176,7 +178,7 @@ long count = 0;
 
 		double f_nn = dnf.filter(inner_filtered,outer);
 		
-		if (count > (samplesNoLearning+outerDelayLineLength)){
+		if (count > (samplesNoLearning+nTapsDNF)){
 			dnf.getNet().setLearningRate(w_eta, 0);
 		} else {
 			dnf.getNet().setLearningRate(0, 0);
@@ -198,7 +200,7 @@ long count = 0;
 		// Do LMS filter
 		double corrLMS = lms_filter.filter(outer);
 		double lms_output = dnf.getDelayedSignal() - corrLMS;
-		if (count > (samplesNoLearning+outerDelayLineLength)){
+		if (count > (samplesNoLearning+nTapsDNF)){
 			lms_filter.lms_update(lms_output);
 		}
 		
@@ -230,23 +232,23 @@ long count = 0;
 		// LMS outputs
 		std::vector<double> lms_o_plot(lms_o_buf.begin(), lms_o_buf.end());
 		
-#ifdef DoShowPlots
-		frame = cv::Scalar(60, 60, 60);
-		if (0 == (count % 10)) {
-			plots.plotMainSignals(oo_plot,
-					      io_plot,
-					      ro_plot,
-					      f_nno_plot,
-					      lms_o_plot, 1);
-			plots.plotTitle(sbjct, count, round(count / fs));
-			cvui::update();
-			cv::imshow(WINDOW, frame);
-
-			if (cv::waitKey(1) == ESC_key) {
-				break;
+		if (plots) {
+			frame = cv::Scalar(60, 60, 60);
+			if (0 == (count % 10)) {
+				plots->plotMainSignals(oo_plot,
+						       io_plot,
+						       ro_plot,
+						       f_nno_plot,
+						       lms_o_plot, 1);
+				plots->plotTitle(sbjct, count, round(count / fs));
+				cvui::update();
+				cv::imshow(WINDOW, frame);
+				
+				if (cv::waitKey(1) == ESC_key) {
+					break;
+				}
 			}
 		}
-#endif
 	}
 	dnf.getNet().snapWeights(outpPrefix, "p300", subjIndex);
 	p300_infile.close();
@@ -260,7 +262,8 @@ long count = 0;
 	wdistance_file.close();
 #ifdef SAVE_WEIGHTS
 	weight_file.close();
-#endif	
+#endif
+	if (plots) delete plots;
 	cout << "The program has reached the end of the input file" << endl;
 }
 
@@ -270,19 +273,35 @@ int main(int argc, const char *argv[]) {
 	if (argc < 2) {
 		fprintf(stderr,"Usage: %s [-a] <subjectNumber>\n",argv[0]);
 		fprintf(stderr,"       -a calculates all 20 subjects in a loop.\n");
+		fprintf(stderr,"       -b calculates all 20 subjects multi-threaded without screen output.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
 		return 0;
 	}
+	
 	const char *filename = NULL;
 	if (argc > 2) {
 		filename = argv[2];
 	}
+
 	if (strcmp(argv[1],"-a") == 0) {
 		for(int i = 0; i < nSubj; i++) {
 			processOneSubject(i+1,filename);
 		}
 		return 0;
 	}
+	
+	if (strcmp(argv[1],"-b") == 0) {
+		std::thread* workers[nSubj];
+		for(int i = 0; i < nSubj; i++) {
+			workers[i] = new std::thread(processOneSubject,i+1,filename,false);
+		}
+		for(int i = 0; i < nSubj; i++) {
+			workers[i]->join();
+			delete workers[i];
+		}
+		return 0;
+	}
+	
 	const int subj = atoi(argv[1]);
 	if ( (subj < 1) || (subj > nSubj) ) {
 		fprintf(stderr,"Subj number of out range.\n");

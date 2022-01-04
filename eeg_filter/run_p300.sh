@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# P300 data:
+# Filters all subjects without graphical output
+
 mkdir -p results
 n=1;
 max=20;
@@ -11,4 +14,4 @@ done
 
 echo "Successfully created the results folders"
 
-./eeg_filter -a
+./eeg_filter -b

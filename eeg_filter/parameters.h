@@ -20,7 +20,7 @@ const double bsBandwidth = 2.5; // Hz
 const int bufferLength = 1000 ;
 
 // learning rate
-const double w_eta = 50;
+const double w_eta = 5;
 
 const int NLAYERS = 6;
 
@@ -29,8 +29,6 @@ const int NLAYERS = 6;
 const double inner_gain = 1000;
 const double outer_gain = 1000;
 const double remover_gain = 1;
-
-#define DoShowPlots
 
 // Very slow
 // #define SAVE_WEIGHTS
