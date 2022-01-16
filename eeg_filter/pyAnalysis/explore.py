@@ -17,11 +17,12 @@ class SimData:
         self.fnn = (self.loadFile("fnn.tsv"))[a:-fs,0]
         self.inner = (self.loadFile("inner.tsv"))[a:-fs,0]
         self.outer = (self.loadFile("outer.tsv"))[a:-fs,0]
-        
+
 # check if we run this as a main program
 if __name__ == "__main__":
     subj = 1
     startsec = 120
+    fs = 250
 
     helptext = 'usage: {} -p participant -s startsec -f file -h'.format(sys.argv[0])
 
@@ -49,15 +50,33 @@ if __name__ == "__main__":
 
     fig = make_subplots(rows=3, cols=1,
                         shared_xaxes=True,
-                        vertical_spacing=0.02)
+                        subplot_titles=("Inner","Outer", "DNF out"),
+                        vertical_spacing=0.1)
 
-    fig.add_trace(go.Scatter(y = simdata.inner),
+    fig.add_trace(go.Scatter(y=simdata.inner),
                   row=1, col=1)
 
-    fig.add_trace(go.Scatter(y = simdata.outer),
+    fig.add_trace(go.Scatter(y=simdata.outer),
                   row=2, col=1)
     
-    fig.add_trace(go.Scatter(y = simdata.fnn),
+    fig.add_trace(go.Scatter(y=simdata.fnn),
+                  row=3, col=1)
+    
+    fig.update_layout(title_text="DNF overview")
+    fig.show()
+
+    fig = make_subplots(rows=3, cols=1,
+                        shared_xaxes=True,
+                        subplot_titles=("Inner","Outer", "DNF out"),
+                        vertical_spacing=0.1)
+
+    fig.add_trace(go.Scatter(y=np.abs(np.fft.fft(simdata.inner)), x=np.linspace(0,fs,len(simdata.inner))),
+                  row=1, col=1)
+
+    fig.add_trace(go.Scatter(y=np.abs(np.fft.fft(simdata.outer)), x=np.linspace(0,fs,len(simdata.outer))),
+                  row=2, col=1)
+    
+    fig.add_trace(go.Scatter(y=np.abs(np.fft.fft(simdata.fnn)), x=np.linspace(0,fs,len(simdata.fnn))),
                   row=3, col=1)
     
     fig.update_layout(title_text="DNF overview")
