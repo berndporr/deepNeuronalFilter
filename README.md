@@ -20,7 +20,21 @@ This is work in progress
 
 4) And make sure you have ` cmake ` installed.
 
-## How to run
+## How to compile
 
-Work in progress
+Type:
 
+```
+cmake .
+```
+to create the makefile and then
+
+```
+make
+```
+to compile the library and the demos.
+
+## Demos
+
+The subdirectories `eeg_filter` and `ecg_filter` remove noise from
+noisy ECG and EEG.
