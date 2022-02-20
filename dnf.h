@@ -7,12 +7,14 @@
 
 class DNF {
 public:
-	DNF(const int NLAYERS, const int numTaps, double fs) : noiseDelayLineLength(numTaps),
-							       signalDelayLineLength(noiseDelayLineLength / 2),
-							       signal_delayLine(signalDelayLineLength),
-							       nNeurons(new int[NLAYERS]),
-							       noise_delayLine(new double[noiseDelayLineLength]) {
-		
+	DNF(const int NLAYERS,
+	    const int numTaps,
+	    double fs,
+	    Neuron::actMethod am = Neuron::Act_NONE) : noiseDelayLineLength(numTaps),
+			 signalDelayLineLength(noiseDelayLineLength / 2),
+			 signal_delayLine(signalDelayLineLength),
+			 nNeurons(new int[NLAYERS]),
+			 noise_delayLine(new double[noiseDelayLineLength]) {		
 		// calc an exp reduction of the numbers always reaching 1
 		double b = exp(log(noiseDelayLineLength)/(NLAYERS-1));
 		for(int i=0;i<NLAYERS;i++) {
@@ -25,7 +27,6 @@ public:
 		
 		//setting up the neural networks
 		for(int i=0;i<NLAYERS;i++) {
-			Neuron::actMethod am = Neuron::Act_Tanh;
 			NNO->getLayer(i)->initLayer(i,Neuron::W_RANDOM, Neuron::B_NONE, am);
 			fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
 		}
