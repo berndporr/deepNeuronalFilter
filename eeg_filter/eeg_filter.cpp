@@ -54,6 +54,8 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		outpPrefix = filename;
 	}
 
+	fprintf(stderr,"Starting DNF on subj %d, filename = %s.\n",subjIndex, outpPrefix.c_str());
+
 	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 	
 	const int nTapsDNF = fs / outerHighpassCutOff;
@@ -68,11 +70,9 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	
 // FILES
 	fstream nn_file;
-	fstream remover_file;
 	fstream inner_file;
 	fstream outer_file;
 	fstream lms_file;
-	fstream lms_remover_file;
 	fstream laplace_file;
 	ifstream p300_infile;
 	fstream wdistance_file;
@@ -99,11 +99,9 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());
 		
 	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
-	remover_file.open(outpPrefix+"/subject" + sbjct + "/remover.tsv", fstream::out);
 	inner_file.open(outpPrefix+"/subject" + sbjct + "/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/subject" + sbjct + "/outer.tsv", fstream::out);
 	lms_file.open(outpPrefix+"/subject" + sbjct + "/lmsOutput.tsv", fstream::out);
-	lms_remover_file.open(outpPrefix+"/subject" + sbjct + "/lmsCorrelation.tsv", fstream::out);
 	laplace_file.open(outpPrefix+"/subject" + sbjct + "/laplace.tsv", fstream::out);
 #ifdef SAVE_WEIGHTS
 	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
@@ -209,10 +207,8 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		// undo the gain so that the signal is again in volt
 		inner_file << dnf.getDelayedSignal()/inner_gain << "\t" << delayedp300trigger << endl;
 		outer_file << outer/outer_gain << "\t" << delayedp300trigger << endl;
-		remover_file << dnf.getRemover()/inner_gain << endl;
-		nn_file << dnf.getOutput()/inner_gain << "\t" << delayedp300trigger << endl;
-		lms_file << lms_output/inner_gain << "\t" << delayedp300trigger << endl;
-		lms_remover_file << corrLMS/inner_gain << endl;
+		nn_file << dnf.getOutput()/inner_gain << "\t" << dnf.getRemover()/inner_gain << "\t" << delayedp300trigger << endl;
+		lms_file << lms_output/inner_gain << "\t" << corrLMS/inner_gain << "\t" << delayedp300trigger << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
@@ -252,13 +248,11 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	}
 	dnf.getNet().snapWeights(outpPrefix, "p300", subjIndex);
 	p300_infile.close();
-	remover_file.close();
 	nn_file.close();
 	inner_file.close();
 	outer_file.close();
 	lms_file.close();
 	laplace_file.close();
-	lms_remover_file.close();
 	wdistance_file.close();
 #ifdef SAVE_WEIGHTS
 	weight_file.close();

@@ -8,7 +8,7 @@ def calcVEP(subj,filename,startsec=30,fs=250):
     d = np.loadtxt(p)
     ll = fs * startsec
     y = d[ll:,0]
-    tr = d[ll:,1]
+    tr = d[ll:,-1]
     t = "Subject {}".format(subj)
 
     oddballs = np.argwhere(tr > 0.5)
