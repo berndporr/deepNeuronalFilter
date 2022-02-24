@@ -10,7 +10,7 @@ public:
 	DNF(const int NLAYERS,
 	    const int numTaps,
 	    double fs,
-	    Neuron::actMethod am = Neuron::Act_NONE) : noiseDelayLineLength(numTaps),
+	    Neuron::actMethod am = Neuron::Act_Tanh) : noiseDelayLineLength(numTaps),
 			 signalDelayLineLength(noiseDelayLineLength / 2),
 			 signal_delayLine(signalDelayLineLength),
 			 nNeurons(new int[NLAYERS]),
