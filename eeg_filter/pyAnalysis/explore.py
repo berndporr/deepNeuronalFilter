@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     fig = make_subplots(rows=3, cols=1,
                         shared_xaxes=True,
-                        subplot_titles=("Inner","Outer", "DNF out"),
+                        subplot_titles=("Inner ","Outer ", "DNF out "),
                         vertical_spacing=0.1)
 
     fig.add_trace(go.Scatter(y=simdata.inner,x=simdata.getTimeAxis(simdata.inner)),
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     fig.add_trace(go.Scatter(y=simdata.fnn,x=simdata.getTimeAxis(simdata.fnn)),
                   row=3, col=1)
     
-    fig.update_layout(title_text="DNF overview")
+    fig.update_layout(title_text="DNF timedomain explorer for subject {}".format(subj))
     fig.show()
 
     fig = make_subplots(rows=3, cols=1,
@@ -86,5 +86,5 @@ if __name__ == "__main__":
     fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=3, col=1)
     
-    fig.update_layout(title_text="DNF overview")
+    fig.update_layout(title_text="DNF frequency domain explorer for subject {}".format(subj))
     fig.show()

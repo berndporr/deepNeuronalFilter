@@ -93,7 +93,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	//create files for saving the data and parameters
 	string sbjct = std::to_string(subjIndex);
 
-	DNF dnf(NLAYERS,nTapsDNF,fs);
+	DNF dnf(NLAYERS,nTapsDNF,fs,Neuron::Act_NONE);
 
 	//adding delay line for the noise
 	boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());

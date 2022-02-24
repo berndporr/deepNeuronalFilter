@@ -1,6 +1,3 @@
-//
-// Created by sama on 25/06/19.
-//
 #ifndef EEGFILTER_PARAMETERS_H
 #define EEGFILTER_PARAMETERS_H
 

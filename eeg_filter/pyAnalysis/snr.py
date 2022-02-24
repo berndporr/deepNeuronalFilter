@@ -18,30 +18,30 @@ def calcNoisePower(subj,filename,colmn,startsec=10,fs=250,folder="results"):
     d = np.loadtxt(p)
     ll = fs * startsec
     y = d[ll:,colmn]
-    s = np.std(y)
-    print("Noise Power of {}:{}".format(colmn,s))
+    s = 0
+    freq, power = signal.periodogram(y,fs,scaling="spectrum")
+    for f,p in zip(freq, power):
+        if (f > 5) and (f < 75):
+            s = s + p
     return s
 
 def calcSNRinner(subj,startsec=10,fs=250,folder="results"):
     filename = "inner.tsv"
     NoisePwr = calcNoisePower(subj,filename,0,startsec,fs,folder=folder)
     vep = p300.calcVEP(subj,filename,startsec,fs)
-    s = np.max(vep)
-    SignalPwr = s*s
+    SignalPwr = np.mean(vep[int(fs*0.4):]**2)
     print("Signal Power:",SignalPwr)
+    print("NoisePwr:",NoisePwr)
     snr = SignalPwr/NoisePwr
     return snr
 
 def calcSNRdnf(subj,filename,startsec=10,fs=250,folder="results"):
     NoisePwr = calcNoisePower(subj,filename,0,startsec,fs,folder=folder)
-    RemoverPwr = calcNoisePower(subj,filename,1,startsec,fs,folder=folder)
     vep = p300.calcVEP(subj,filename,startsec,fs)
-    s = np.max(vep)
-    SignalPwr = s*s
+    SignalPwr = np.mean(vep[int(fs*0.4):]**2)
     print("Signal Power:",SignalPwr)
-    reducedNoisePower = NoisePwr - RemoverPwr
-    print("reducedNoisePower = NoisePwr - RemoverPwr = {} = {} - {}".format(reducedNoisePower,NoisePwr,RemoverPwr))
-    snr = SignalPwr/reducedNoisePower
+    print("NoisePwr:",NoisePwr)
+    snr = SignalPwr/NoisePwr
     return snr
 
 # check if we run this as a main program
@@ -76,6 +76,8 @@ if __name__ == "__main__":
         sys.exit(2)
 
     print("SNR from Noise removal:",calcSNRdnf(subj,filtered_filename,startsec=startsec,folder=noisefolder))
+    print()
+    print()
     print("SNR just from inner:",calcSNRinner(subj,startsec=startsec,folder=noisefolder))
 
     plt.show()
