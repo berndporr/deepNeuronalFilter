@@ -4,6 +4,7 @@ import sys
 import getopt
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
+from scipy import signal
 
 class SimData:
     def loadFile(self,filename):
@@ -17,6 +18,9 @@ class SimData:
         self.fnn = (self.loadFile("fnn.tsv"))[a:-fs,0]
         self.inner = (self.loadFile("inner.tsv"))[a:-fs,0]
         self.outer = (self.loadFile("outer.tsv"))[a:-fs,0]
+
+    def getTimeAxis(self,data):
+        return np.linspace(0,len(data)/fs,len(data))
 
 # check if we run this as a main program
 if __name__ == "__main__":
@@ -53,13 +57,13 @@ if __name__ == "__main__":
                         subplot_titles=("Inner","Outer", "DNF out"),
                         vertical_spacing=0.1)
 
-    fig.add_trace(go.Scatter(y=simdata.inner),
+    fig.add_trace(go.Scatter(y=simdata.inner,x=simdata.getTimeAxis(simdata.inner)),
                   row=1, col=1)
 
-    fig.add_trace(go.Scatter(y=simdata.outer),
+    fig.add_trace(go.Scatter(y=simdata.outer,x=simdata.getTimeAxis(simdata.outer)),
                   row=2, col=1)
     
-    fig.add_trace(go.Scatter(y=simdata.fnn),
+    fig.add_trace(go.Scatter(y=simdata.fnn,x=simdata.getTimeAxis(simdata.fnn)),
                   row=3, col=1)
     
     fig.update_layout(title_text="DNF overview")
@@ -70,13 +74,16 @@ if __name__ == "__main__":
                         subplot_titles=("Inner","Outer", "DNF out"),
                         vertical_spacing=0.1)
 
-    fig.add_trace(go.Scatter(y=np.abs(np.fft.fft(simdata.inner)), x=np.linspace(0,fs,len(simdata.inner))),
+    f, Pxx_den = signal.periodogram(simdata.inner,simdata.fs)
+    fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=1, col=1)
 
-    fig.add_trace(go.Scatter(y=np.abs(np.fft.fft(simdata.outer)), x=np.linspace(0,fs,len(simdata.outer))),
+    f, Pxx_den = signal.periodogram(simdata.outer,simdata.fs)
+    fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=2, col=1)
-    
-    fig.add_trace(go.Scatter(y=np.abs(np.fft.fft(simdata.fnn)), x=np.linspace(0,fs,len(simdata.fnn))),
+
+    f, Pxx_den = signal.periodogram(simdata.fnn,simdata.fs)
+    fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=3, col=1)
     
     fig.update_layout(title_text="DNF overview")
