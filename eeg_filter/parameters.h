@@ -1,6 +1,10 @@
 #ifndef EEGFILTER_PARAMETERS_H
 #define EEGFILTER_PARAMETERS_H
 
+#include "dnf.h"
+
+const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
+
 // number of subjects
 const int nSubj = 20;
 
@@ -25,7 +29,7 @@ const int NLAYERS = 6;
 
 const double inner_gain = 1000;
 const double outer_gain = 1000;
-const double remover_gain = 1;
+const double remover_gain = 2;
 
 // Very slow
 // #define SAVE_WEIGHTS

@@ -19,30 +19,35 @@ def calcNoisePower(subj,filename,colmn,startsec=10,fs=250,folder="results"):
     ll = fs * startsec
     y = d[ll:,colmn]
     s = 0
-    freq, power = signal.periodogram(y,fs,scaling="spectrum")
+    freq, power = signal.welch(y,fs,scaling="spectrum",nperseg=fs)
+    w = np.array([])
     for f,p in zip(freq, power):
-        if (f > 5) and (f < 75):
+        if (f >= 5) and (f < 50):
             s = s + p
-    return s
+            if not w.any():
+                w = np.array([f,p])
+            else:
+                w = np.row_stack((w,np.array([f,p])))
+    return s,w
 
 def calcSNRinner(subj,startsec=10,fs=250,folder="results"):
     filename = "inner.tsv"
-    NoisePwr = calcNoisePower(subj,filename,0,startsec,fs,folder=folder)
+    NoisePwr,w = calcNoisePower(subj,filename,0,startsec,fs,folder=folder)
     vep = p300.calcVEP(subj,filename,startsec,fs)
     SignalPwr = np.mean(vep[int(fs*0.4):]**2)
     print("Signal Power:",SignalPwr)
     print("NoisePwr:",NoisePwr)
-    snr = SignalPwr/NoisePwr
-    return snr
+    snr = np.log10(SignalPwr/NoisePwr)*10
+    return snr,w
 
 def calcSNRdnf(subj,filename,startsec=10,fs=250,folder="results"):
-    NoisePwr = calcNoisePower(subj,filename,0,startsec,fs,folder=folder)
+    NoisePwr,w = calcNoisePower(subj,filename,0,startsec,fs,folder=folder)
     vep = p300.calcVEP(subj,filename,startsec,fs)
     SignalPwr = np.mean(vep[int(fs*0.4):]**2)
     print("Signal Power:",SignalPwr)
     print("NoisePwr:",NoisePwr)
-    snr = SignalPwr/NoisePwr
-    return snr
+    snr = np.log10(SignalPwr/NoisePwr)*10
+    return snr,w
 
 # check if we run this as a main program
 if __name__ == "__main__":
@@ -75,9 +80,15 @@ if __name__ == "__main__":
         print (helptext)
         sys.exit(2)
 
-    print("SNR from Noise removal:",calcSNRdnf(subj,filtered_filename,startsec=startsec,folder=noisefolder))
+    snr, wdnf = calcSNRdnf(subj,filtered_filename,startsec=startsec,folder=noisefolder)
+    print("SNR from Noise removal:",snr)
+    plt.plot(wdnf[:,0],wdnf[:,1],label="DNF")
+    plt.legend()
     print()
     print()
-    print("SNR just from inner:",calcSNRinner(subj,startsec=startsec,folder=noisefolder))
+    snr, winner = calcSNRinner(subj,startsec=startsec,folder=noisefolder)
+    print("SNR just from inner:",snr)
+    plt.plot(winner[:,0],winner[:,1],label="INNER")
+    plt.legend()
 
     plt.show()
