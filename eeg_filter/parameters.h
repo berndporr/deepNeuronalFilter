@@ -4,6 +4,7 @@
 #include "dnf.h"
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
+//const Neuron::actMethod ACTIVATION = Neuron::Act_NONE;
 
 // number of subjects
 const int nSubj = 20;
@@ -29,7 +30,7 @@ const int NLAYERS = 6;
 
 const double inner_gain = 1000;
 const double outer_gain = 1000;
-const double remover_gain = 2;
+const double remover_gain = 0.5;
 
 // Very slow
 // #define SAVE_WEIGHTS

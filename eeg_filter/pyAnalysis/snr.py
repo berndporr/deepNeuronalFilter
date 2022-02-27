@@ -80,6 +80,18 @@ if __name__ == "__main__":
         print (helptext)
         sys.exit(2)
 
+    if subj == 0:
+        finner2dnf = open("inner2dnf.dat","wt")
+        for subj in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]:
+            print("Subject",subj)
+            snrdnf, wdnf = calcSNRdnf(subj,filtered_filename,startsec=startsec,folder=noisefolder)
+            snrinner, winner = calcSNRinner(subj,startsec=startsec,folder=noisefolder)
+            impr = snrdnf-snrinner
+            print("SNR improvement: {} - {} = {}".format(snrinner,snrdnf,impr))
+            finner2dnf.write(str(impr)+"\n")
+        finner2dnf.close()
+        sys.exit(0)
+
     snr, wdnf = calcSNRdnf(subj,filtered_filename,startsec=startsec,folder=noisefolder)
     print("SNR from Noise removal:",snr)
     plt.plot(wdnf[:,0],wdnf[:,1],label="DNF")
