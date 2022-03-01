@@ -69,7 +69,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	boost::circular_buffer<double> lms_o_buf(bufferLength);
 	
 // FILES
-	fstream nn_file;
+	fstream dnf_file;
 	fstream inner_file;
 	fstream outer_file;
 	fstream lms_file;
@@ -98,7 +98,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	//adding delay line for the noise
 	boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());
 		
-	nn_file.open(outpPrefix+"/subject" + sbjct + "/fnn.tsv", fstream::out);
+	dnf_file.open(outpPrefix+"/subject" + sbjct + "/dnf.tsv", fstream::out);
 	inner_file.open(outpPrefix+"/subject" + sbjct + "/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/subject" + sbjct + "/outer.tsv", fstream::out);
 	lms_file.open(outpPrefix+"/subject" + sbjct + "/lmsOutput.tsv", fstream::out);
@@ -207,7 +207,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		// undo the gain so that the signal is again in volt
 		inner_file << dnf.getDelayedSignal()/inner_gain << "\t" << delayedp300trigger << endl;
 		outer_file << outer/outer_gain << "\t" << delayedp300trigger << endl;
-		nn_file << dnf.getOutput()/inner_gain << "\t" << dnf.getRemover()/inner_gain << "\t" << delayedp300trigger << endl;
+		dnf_file << dnf.getOutput()/inner_gain << "\t" << dnf.getRemover()/inner_gain << "\t" << delayedp300trigger << endl;
 		lms_file << lms_output/inner_gain << "\t" << corrLMS/inner_gain << "\t" << delayedp300trigger << endl;
 		
 		// PUT VARIABLES IN BUFFERS
@@ -248,7 +248,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	}
 	dnf.getNet().snapWeights(outpPrefix, "p300", subjIndex);
 	p300_infile.close();
-	nn_file.close();
+	dnf_file.close();
 	inner_file.close();
 	outer_file.close();
 	lms_file.close();

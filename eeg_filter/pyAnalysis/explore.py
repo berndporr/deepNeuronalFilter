@@ -15,7 +15,7 @@ class SimData:
         self.startsec = startsec
         self.subj = subj
         a = startsec * fs
-        self.fnn = (self.loadFile("fnn.tsv"))[a:-fs,0]
+        self.dnf = (self.loadFile("dnf.tsv"))[a:-fs,0]
         self.inner = (self.loadFile("inner.tsv"))[a:-fs,0]
         self.outer = (self.loadFile("outer.tsv"))[a:-fs,0]
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     fig.add_trace(go.Scatter(y=simdata.outer,x=simdata.getTimeAxis(simdata.outer)),
                   row=2, col=1)
     
-    fig.add_trace(go.Scatter(y=simdata.fnn,x=simdata.getTimeAxis(simdata.fnn)),
+    fig.add_trace(go.Scatter(y=simdata.dnf,x=simdata.getTimeAxis(simdata.dnf)),
                   row=3, col=1)
     
     fig.update_layout(title_text="DNF timedomain explorer for subject {}".format(subj))
@@ -82,7 +82,7 @@ if __name__ == "__main__":
     fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=2, col=1)
 
-    f, Pxx_den = signal.periodogram(simdata.fnn,simdata.fs)
+    f, Pxx_den = signal.periodogram(simdata.dnf,simdata.fs)
     fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=3, col=1)
     

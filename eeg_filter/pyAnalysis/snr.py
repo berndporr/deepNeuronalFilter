@@ -12,7 +12,7 @@ class SNR:
         self.startsec = startsec
         self.fs = fs
         self.folder = folder
-        self.fnn_filename = "fnn.tsv"
+        self.dnf_filename = "dnf.tsv"
         self.inner_filename = "inner.tsv"
     
     def calcNoisePower(self,filename):
@@ -42,8 +42,8 @@ class SNR:
         return snr,w
 
     def calcSNRdnf(self):
-        NoisePwr,w = self.calcNoisePower(self.fnn_filename)
-        vep = p300.calcVEP(self.subj,self.fnn_filename,self.startsec,self.fs)
+        NoisePwr,w = self.calcNoisePower(self.dnf_filename)
+        vep = p300.calcVEP(self.subj,self.dnf_filename,self.startsec,self.fs)
         SignalPwr = np.mean(vep[int(self.fs*0.4):]**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)

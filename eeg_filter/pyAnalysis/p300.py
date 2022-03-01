@@ -39,7 +39,7 @@ def plotVEP(subj,filename,ax,fs=250,startsec=10):
 if __name__ == "__main__":
     subj = 1
     startsec = 120
-    filtered_filename = "fnn.tsv"
+    filtered_filename = "dnf.tsv"
 
     helptext = 'usage: {} -p participant -s startsec -f file -h'.format(sys.argv[0])
 
