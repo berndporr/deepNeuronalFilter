@@ -26,7 +26,7 @@ const double w_eta = 5;
 
 const int NLAYERS = 6;
 
-#define LMS_LEARNING_RATE 0
+const double LMS_LEARNING_RATE = 0.01;
 
 const double inner_gain = 1000;
 const double outer_gain = 1000;

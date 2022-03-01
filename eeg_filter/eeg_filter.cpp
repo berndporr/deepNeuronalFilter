@@ -26,7 +26,7 @@ constexpr int ESC_key = 27;
 
 // PLOTTING
 #define WINDOW "Deep Neuronal Filter"
-const int plotW = 1200/2;
+const int plotW = 1200;
 const int plotH = 720;
 
 
@@ -67,6 +67,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	boost::circular_buffer<double> f_nno_buf(bufferLength);
 //LMS
 	boost::circular_buffer<double> lms_o_buf(bufferLength);
+	boost::circular_buffer<double> lms_r_buf(bufferLength);
 	
 // FILES
 	fstream dnf_file;
@@ -101,7 +102,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	dnf_file.open(outpPrefix+"/subject" + sbjct + "/dnf.tsv", fstream::out);
 	inner_file.open(outpPrefix+"/subject" + sbjct + "/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/subject" + sbjct + "/outer.tsv", fstream::out);
-	lms_file.open(outpPrefix+"/subject" + sbjct + "/lmsOutput.tsv", fstream::out);
+	lms_file.open(outpPrefix+"/subject" + sbjct + "/lms.tsv", fstream::out);
 	laplace_file.open(outpPrefix+"/subject" + sbjct + "/laplace.tsv", fstream::out);
 #ifdef SAVE_WEIGHTS
 	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
@@ -218,6 +219,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		f_nno_buf.push_back(f_nn);
 		// 2) LMS outputs
 		lms_o_buf.push_back(lms_output);
+		lms_r_buf.push_back(corrLMS);
 		
 		// PUTTING BUFFERS IN VECTORS FOR PLOTS
 		// MAIN SIGNALS
@@ -227,6 +229,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		std::vector<double> f_nno_plot(f_nno_buf.begin(), f_nno_buf.end());
 		// LMS outputs
 		std::vector<double> lms_o_plot(lms_o_buf.begin(), lms_o_buf.end());
+		std::vector<double> lms_r_plot(lms_r_buf.begin(), lms_r_buf.end());
 		
 		if (plots) {
 			frame = cv::Scalar(60, 60, 60);
@@ -235,7 +238,8 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 						       io_plot,
 						       ro_plot,
 						       f_nno_plot,
-						       lms_o_plot, 1);
+						       lms_r_plot,
+						       lms_o_plot);
 				plots->plotTitle(sbjct, count, round(count / fs));
 				cvui::update();
 				cv::imshow(WINDOW, frame);

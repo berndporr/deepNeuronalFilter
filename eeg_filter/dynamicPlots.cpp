@@ -36,51 +36,56 @@ namespace cv {
 dynaPlots::dynaPlots(cv::Mat &_frame, int _plotW, int _plotH) {
     plotH = _plotH;
     plotW = _plotW;
-    graphDX = plotW - gapX * 2;
+    graphDX = plotW/2 - gapX * 2;
     frame = _frame;
     graphY = graphDY + gapY;
 }
 dynaPlots::~dynaPlots() = default;
 
-void dynaPlots::plotMainSignals(std::vector<double> outer,
-				std::vector<double> inner,
-                                std::vector<double> remover,
-				std::vector<double> fnn,
-                                std::vector<double> lms_output,
-                                int _positionOPEN){
+void dynaPlots::plotMainSignals(std::vector<double> &outer,
+				std::vector<double> &inner,
+                                std::vector<double> &remover,
+				std::vector<double> &fnn,
+				std::vector<double> &lms_remover,
+                                std::vector<double> &lms_output
+                                ){
 
     int graphX = gapX;
 
-    double outer_min = *min_element(outer.begin(), outer.end());
-    double outer_max = *max_element(outer.begin(), outer.end());
-    double outer_v = *outer.end();
-    double inner_min = *min_element(inner.begin(), inner.end());
-    double inner_max = *max_element(inner.begin(), inner.end());
-    double inner_v = *inner.end();
-    double remover_min = *min_element(remover.begin(), remover.end());
-    double remover_max = *max_element(remover.begin(), remover.end());
-    double remover_v = *remover.end();
-    double fnn_min = *min_element(fnn.begin(), fnn.end());
-    double fnn_max = *max_element(fnn.begin(), fnn.end());
-    double fnn_v = *fnn.end();
+    const double outer_min = *min_element(outer.begin(), outer.end());
+    const double outer_max = *max_element(outer.begin(), outer.end());
+    const double inner_min = *min_element(inner.begin(), inner.end());
+    const double inner_max = *max_element(inner.begin(), inner.end());
+    const double remover_min = *min_element(remover.begin(), remover.end());
+    const double remover_max = *max_element(remover.begin(), remover.end());
+    const double fnn_min = *min_element(fnn.begin(), fnn.end());
+    const double fnn_max = *max_element(fnn.begin(), fnn.end());
+
+    const double lms_r_min = *min_element(lms_remover.begin(), lms_remover.end());
+    const double lms_r_max = *max_element(lms_remover.begin(), lms_remover.end());
 
     int step = 0;
     cvui::sparkline(frame, outer,     graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "Outer: raw(b) & filtered(w) & end(gray)");
-    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", outer_min, outer_max, outer_v);
+    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf", outer_min, outer_max);
     step ++;
     cvui::sparkline(frame, inner,     graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "inner: raw(b) & filtered(w)");
-    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", inner_min, inner_max, inner_v);
+    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf", inner_min, inner_max);
     step ++;
     cvui::sparkline(frame, remover,   graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "remover");
-    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", remover_min, remover_max, remover_v);
+    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf", remover_min, remover_max);
     step ++;
     cvui::sparkline(frame, fnn,       graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "DNF output");
-    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf value: %+.5lf", fnn_min, fnn_max, fnn_v);
-    step ++;
+    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf", fnn_min, fnn_max);
+    step = 2;
+    graphX += plotW/2;
+    cvui::sparkline(frame, lms_remover, graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
+    cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "LMS remover");
+    cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf", lms_r_min, lms_r_max);
+    step++;
     cvui::sparkline(frame, lms_output, graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "LMS output");
 }
