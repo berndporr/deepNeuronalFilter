@@ -7,12 +7,12 @@ import getopt
 
 
 class SNR:
-    def __init__(self,subj=1,startsec=10,fs=250,folder="results"):
+    def __init__(self,subj=1,startsec=10,fs=250,folder="results",noisered_filename="dnf.tsv"):
         self.subj = subj
         self.startsec = startsec
         self.fs = fs
         self.folder = folder
-        self.dnf_filename = "dnf.tsv"
+        self.noisered_filename = noisered_filename
         self.inner_filename = "inner.tsv"
     
     def calcNoisePower(self,filename):
@@ -42,8 +42,8 @@ class SNR:
         return snr,w
 
     def calcSNRdnf(self):
-        NoisePwr,w = self.calcNoisePower(self.dnf_filename)
-        vep = p300.calcVEP(self.subj,self.dnf_filename,self.startsec,self.fs)
+        NoisePwr,w = self.calcNoisePower(self.noisered_filename)
+        vep = p300.calcVEP(self.subj,self.noisered_filename,self.startsec,self.fs)
         SignalPwr = np.mean(vep[int(self.fs*0.4):]**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
@@ -56,6 +56,7 @@ if __name__ == "__main__":
     startsec = 120
     noisefolder = "results"
     fs = 250
+    filtered_filename = "dnf.tsv"
 
     helptext = 'usage: {} -p participant -s startsec -f file -n noisefolder -h'.format(sys.argv[0])
 
@@ -86,7 +87,7 @@ if __name__ == "__main__":
         finner2dnf = open("inner2dnf.dat","wt")
         for subj in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]:
             print("Subject",subj)
-            snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder)
+            snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
             snrdnf, wdnf = snr.calcSNRdnf()
             snrinner, winner = snr.calcSNRinner()
             impr = snrdnf-snrinner
@@ -95,10 +96,10 @@ if __name__ == "__main__":
         finner2dnf.close()
         sys.exit(0)
 
-    snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder)
+    snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
     snrdnf, wdnf = snr.calcSNRdnf()
     print("SNR from Noise removal:",snrdnf)
-    plt.plot(wdnf[:,0],wdnf[:,1],label="DNF")
+    plt.plot(wdnf[:,0],wdnf[:,1],label=filtered_filename)
     plt.legend()
     print()
     print()
