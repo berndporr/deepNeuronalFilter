@@ -145,7 +145,10 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		//get the data from .tsv files:
 
 		//SIGNALS
-		double inner_raw_data = 0, outer_raw_data = 0, p300trigger = 0;
+		double inner_raw_data = 0;
+		double outer_raw_data = 0;
+		double p300trigger = 0;
+		
 		if (NULL == filename) {
 			p300_infile >> inner_raw_data >> outer_raw_data >> p300trigger;
 		} else {
@@ -204,7 +207,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		}
 		
 		// SAVE SIGNALS INTO FILES
-		laplace_file << laplace/inner_gain << "\t" << p300trigger << endl;
+		laplace_file << laplace << "\t" << p300trigger << endl;
 		// undo the gain so that the signal is again in volt
 		inner_file << dnf.getDelayedSignal()/inner_gain << "\t" << delayedp300trigger << endl;
 		outer_file << outer/outer_gain << "\t" << delayedp300trigger << endl;

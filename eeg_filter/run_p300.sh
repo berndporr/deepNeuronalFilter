@@ -3,6 +3,7 @@
 # P300 data:
 # Filters all subjects without graphical output
 
+rm -rf results
 mkdir -p results
 n=1;
 max=20;
