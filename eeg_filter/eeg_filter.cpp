@@ -265,7 +265,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 
 int main(int argc, const char *argv[]) {
 	if (argc < 2) {
-		fprintf(stderr,"Usage: %s [-a] <subjectNumber>\n",argv[0]);
+		fprintf(stderr,"Usage: %s [-a] <subjectNumber> [subdir]\n",argv[0]);
 		fprintf(stderr,"       -a calculates all 20 subjects in a loop.\n");
 		fprintf(stderr,"       -b calculates all 20 subjects multi-threaded without screen output.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
