@@ -4,7 +4,7 @@ import sys
 import p300
 import scipy.signal as signal
 import getopt
-
+import os
 
 class SNR:
     def __init__(self,subj=1,startsec=10,fs=250,folder="results",noisered_filename="dnf.tsv"):
@@ -14,14 +14,19 @@ class SNR:
         self.folder = folder
         self.noisered_filename = noisered_filename
         self.inner_filename = "inner.tsv"
+        self.outer_filename = "outer.tsv"
     
-    def calcNoisePower(self,filename):
+    def loadSignal(self,filename):
         p = "../{}/subject{}/{}".format(self.folder,self.subj,filename)
         d = np.loadtxt(p)
         ll = self.fs * self.startsec
         y = d[ll:,0]
+        return y
+        
+    def calcNoisePower(self,filename):
+        y = self.loadSignal(filename)
         s = 0
-        freq, power = signal.welch(y,self.fs,scaling="spectrum",nperseg=fs)
+        freq, power = signal.welch(y,self.fs,scaling="spectrum",nperseg=self.fs)
         w = np.array([])
         for f,p in zip(freq, power):
             if (f >= 5) and (f < 50):
@@ -34,7 +39,7 @@ class SNR:
 
     def calcSNRinner(self):
         NoisePwr,w = self.calcNoisePower(self.inner_filename)
-        vep = p300.calcVEP(subj,self.inner_filename,self.startsec,self.fs)
+        vep = p300.calcVEP(self.subj,self.inner_filename,self.startsec,self.fs)
         SignalPwr = np.mean(vep[int(self.fs*0.4):]**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
@@ -49,6 +54,30 @@ class SNR:
         print("NoisePwr:",NoisePwr)
         snr = np.log10(SignalPwr/NoisePwr)*10
         return snr,w
+
+    def calcCrossCorr(self):
+        inner = self.loadSignal(self.inner_filename)
+        outer = self.loadSignal(self.outer_filename)
+        lags = signal.correlation_lags(len(inner), len(outer)) / self.fs
+        cc = signal.correlate(inner,outer)
+        return (lags,cc)
+
+    
+def calcAllSNRimprovemements(startsec = 120,
+                             noisefolder = "results",
+                             fs = 250,
+                             filtered_filename = "dnf.tsv"):
+    imprArray = np.array([])
+    for subj in range(1,21):
+        print("Subject",subj)
+        snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
+        snrdnf, wdnf = snr.calcSNRdnf()
+        snrinner, winner = snr.calcSNRinner()
+        impr = snrdnf-snrinner
+        print("SNR improvement: {} - {} = {}".format(snrinner,snrdnf,impr))
+        imprArray = np.append(imprArray,impr)
+    return imprArray
+
 
 # check if we run this as a main program
 if __name__ == "__main__":
@@ -83,19 +112,7 @@ if __name__ == "__main__":
         print (helptext)
         sys.exit(2)
 
-    if subj == 0:
-        finner2dnf = open("inner2dnf.dat","wt")
-        for subj in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]:
-            print("Subject",subj)
-            snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
-            snrdnf, wdnf = snr.calcSNRdnf()
-            snrinner, winner = snr.calcSNRinner()
-            impr = snrdnf-snrinner
-            print("SNR improvement: {} - {} = {}".format(snrinner,snrdnf,impr))
-            finner2dnf.write(str(impr)+"\n")
-        finner2dnf.close()
-        sys.exit(0)
-
+    plt.figure("Periodogram of the noise: unfilered (INNER) vs filtered (.tsv)")
     snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
     snrdnf, wdnf = snr.calcSNRdnf()
     print("SNR from Noise removal:",snrdnf)
@@ -107,5 +124,10 @@ if __name__ == "__main__":
     print("SNR just from inner:",snrinner)
     plt.plot(winner[:,0],winner[:,1],label="INNER")
     plt.legend()
+
+    plt.figure("Cross correlation of the unfiltered signals: inner vs outer")
+    l,c = snr.calcCrossCorr()
+    plt.xlim([-0.5,0.5])
+    plt.plot(l,c)
 
     plt.show()
