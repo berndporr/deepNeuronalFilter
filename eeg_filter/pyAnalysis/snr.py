@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
@@ -6,8 +7,10 @@ import scipy.signal as signal
 import getopt
 import os
 
+subjectsOK = [1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+
 class SNR:
-    def __init__(self,subj=1,startsec=10,fs=250,folder="results",noisered_filename="dnf.tsv"):
+    def __init__(self,subj,startsec,fs,folder,noisered_filename):
         self.subj = subj
         self.startsec = startsec
         self.fs = fs
@@ -68,7 +71,7 @@ def calcAllSNRimprovemements(startsec = 120,
                              fs = 250,
                              filtered_filename = "dnf.tsv"):
     imprArray = np.array([])
-    for subj in range(1,21):
+    for subj in subjectsOK:
         print("Subject",subj)
         snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
         snrdnf, wdnf = snr.calcSNRdnf()
@@ -76,7 +79,9 @@ def calcAllSNRimprovemements(startsec = 120,
         impr = snrdnf-snrinner
         print("SNR improvement: {} - {} = {}".format(snrinner,snrdnf,impr))
         imprArray = np.append(imprArray,impr)
-    return imprArray
+    snrdiff_av = np.mean(imprArray)
+    snrdiff_sd = np.std(imprArray)
+    return imprArray,snrdiff_av,snrdiff_sd
 
 
 # check if we run this as a main program

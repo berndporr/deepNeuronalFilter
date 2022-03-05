@@ -22,7 +22,7 @@ const double bsBandwidth = 2.5; // Hz
 const int bufferLength = 1000 ;
 
 // learning rate
-const double w_eta = 5;
+const double w_eta = 2;
 
 const int NLAYERS = 6;
 
@@ -30,7 +30,7 @@ const double LMS_LEARNING_RATE = 0.01;
 
 const double inner_gain = 1000;
 const double outer_gain = 1000;
-const double remover_gain = 0.5;
+const double remover_gain = 1;
 
 // Very slow
 // #define SAVE_WEIGHTS
