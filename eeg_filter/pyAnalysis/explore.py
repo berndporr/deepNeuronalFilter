@@ -84,26 +84,36 @@ def plotWithMatplotlib(task,subj,filtered_filename,startsec,endsec):
     simdata = SimData(task,subj,filtered_filename,startsec,endsec)
 
     fig = plt.figure("DNF time domain explorer for task {}, subject {}, {}".format(task,subj,filtered_filename))
+
+    m = max(simdata.inner)
+    if m < 0.0001:
+        l = 0.0001
+    elif m < 0.00025:
+        l = 0.00025
+    else:
+        l = 0.0005
     
     ax = fig.add_subplot(4,1,1)
-    ax.set_ylim([-0.0005,0.0005])
+    ax.set_ylim([-l,l])
     ax.title.set_text('Inner')
     ax.plot(simdata.getTimeAxis(simdata.inner),simdata.inner)
 
     ax = fig.add_subplot(4,1,2)
-    ax.set_ylim([-0.0005,0.0005])
+    ax.set_ylim([-l,l])
     ax.title.set_text('Outer')
     ax.plot(simdata.getTimeAxis(simdata.outer),simdata.outer)
 
     ax = fig.add_subplot(4,1,3)
-    ax.set_ylim([-0.0005,0.0005])
+    ax.set_ylim([-l,l])
     ax.title.set_text('Remover')
     ax.plot(simdata.getTimeAxis(simdata.remover),simdata.remover)
 
     ax = fig.add_subplot(4,1,4)
-    ax.set_ylim([-0.0005,0.0005])
+    ax.set_ylim([-l,l])
     ax.title.set_text('DNF output')
     ax.plot(simdata.getTimeAxis(simdata.dnf),simdata.dnf)
+
+    fig.subplots_adjust(hspace=0.5)
     
     fig = plt.figure("DNF frequ domain explorer for task {}, subject {}, {}".format(task,subj,filtered_filename))
     
@@ -126,6 +136,8 @@ def plotWithMatplotlib(task,subj,filtered_filename,startsec,endsec):
     ax.title.set_text('DNF output')
     f, P = signal.periodogram(simdata.dnf,simdata.fs)
     ax.plot(f,P)
+    
+    fig.subplots_adjust(hspace=0.5)
     
     plt.show()
 
