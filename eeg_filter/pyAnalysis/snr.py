@@ -9,7 +9,7 @@ import os
 
 subjectsOK = [1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 
-SNRbandMin = 5 # Hz
+SNRbandMin = 4 # Hz
 SNRbandMax = 50 # Hz
 
 VEPstartTime = 0.4 # sec
@@ -99,12 +99,12 @@ if __name__ == "__main__":
     fs = 250
     filtered_filename = "dnf.tsv"
 
-    helptext = 'usage: {} -p participant -s startsec -f file -n taskfolder -h'.format(sys.argv[0])
+    helptext = 'usage: {} -p participant -s startsec -f file -t task -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
         all_args = sys.argv[1:]
-        opts, arg = getopt.getopt(all_args, 'p:s:f:n:')
+        opts, arg = getopt.getopt(all_args, 'p:s:f:t:')
         # Iterate over the options and values
         for opt, arg_val in opts:
             if '-p' in opt:
@@ -113,7 +113,7 @@ if __name__ == "__main__":
                 startsec = int(arg_val)
             elif '-f' in opt:
                 filtered_filename = arg_val
-            elif '-n' in opt:
+            elif '-t' in opt:
                 if p300task != arg_val:
                     fs = 500
                     taskfolder = arg_val

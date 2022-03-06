@@ -13,7 +13,7 @@ class SimData:
     def loadFile(self,filename):
         return np.loadtxt("../{}/subject{}/{}".format(self.task,self.subj,filename))
     
-    def __init__(self,task,subj,filtered_filename,startsec):
+    def __init__(self,task,subj,filtered_filename,startsec,endsec=False):
         self.task = task
         if p300folder in task:
             self.fs = 250
@@ -22,18 +22,22 @@ class SimData:
         self.startsec = startsec
         self.subj = subj
         a = startsec * self.fs
+        if endsec:
+            b = endsec * self.fs
+        else:
+            b = -self.fs*2
         dnfdata = self.loadFile(filtered_filename)
-        self.dnf = dnfdata[a:-self.fs*2,0]
-        self.remover = dnfdata[a:-self.fs*2,1]
-        self.inner = (self.loadFile("inner.tsv"))[a:-self.fs*2,0]
-        self.outer = (self.loadFile("outer.tsv"))[a:-self.fs*2,0]
+        self.dnf = dnfdata[a:b,0]
+        self.remover = dnfdata[a:b,1]
+        self.inner = (self.loadFile("inner.tsv"))[a:b,0]
+        self.outer = (self.loadFile("outer.tsv"))[a:b,0]
 
     def getTimeAxis(self,data):
         return np.linspace(0,len(data)/self.fs,len(data))
 
 
-def plotWithPlotly(task,subj,filtered_filename,startsec):
-    simdata = SimData(task,subj,filtered_filename,startsec)
+def plotWithPlotly(task,subj,filtered_filename,startsec,endsec):
+    simdata = SimData(task,subj,filtered_filename,startsec,endsec)
 
     fig = make_subplots(rows=4, cols=1,
                         shared_xaxes=True,
@@ -72,14 +76,14 @@ def plotWithPlotly(task,subj,filtered_filename,startsec):
     fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=3, col=1)
     
-    fig.update_layout(title_text="DNF frequency domain explorer for subject {}".format(subj))
+    fig.update_layout(title_text="DNF frequency domain explorer for subject {}, {}".format(subj,filtered_filename))
     fig.show()
 
 
-def plotWithMatplotlib(task,subj,filtered_filename,startsec):
-    simdata = SimData(task,subj,filtered_filename,startsec)
+def plotWithMatplotlib(task,subj,filtered_filename,startsec,endsec):
+    simdata = SimData(task,subj,filtered_filename,startsec,endsec)
 
-    fig = plt.figure()
+    fig = plt.figure("DNF time domain explorer for task {}, subject {}, {}".format(task,subj,filtered_filename))
     
     ax = fig.add_subplot(4,1,1)
     ax.set_ylim([-0.0005,0.0005])
@@ -101,6 +105,28 @@ def plotWithMatplotlib(task,subj,filtered_filename,startsec):
     ax.title.set_text('DNF output')
     ax.plot(simdata.getTimeAxis(simdata.dnf),simdata.dnf)
     
+    fig = plt.figure("DNF frequ domain explorer for task {}, subject {}, {}".format(task,subj,filtered_filename))
+    
+    ax = fig.add_subplot(4,1,1)
+    ax.title.set_text('Inner')
+    f, P = signal.periodogram(simdata.inner,simdata.fs)
+    ax.plot(f,P)
+
+    ax = fig.add_subplot(4,1,2)
+    ax.title.set_text('Outer')
+    f, P = signal.periodogram(simdata.outer,simdata.fs)
+    ax.plot(f,P)
+
+    ax = fig.add_subplot(4,1,3)
+    ax.title.set_text('Remover')
+    f, P = signal.periodogram(simdata.remover,simdata.fs)
+    ax.plot(f,P)
+
+    ax = fig.add_subplot(4,1,4)
+    ax.title.set_text('DNF output')
+    f, P = signal.periodogram(simdata.dnf,simdata.fs)
+    ax.plot(f,P)
+    
     plt.show()
 
 
@@ -108,25 +134,28 @@ def plotWithMatplotlib(task,subj,filtered_filename,startsec):
 if __name__ == "__main__":
     subj = 10
     startsec = 60
+    endsec = False
     task = p300folder
     filtered_filename = "dnf.tsv"
     usePlotly = True
 
-    helptext = 'usage: {} -p participant -s startsec -f file -n task -h'.format(sys.argv[0])
+    helptext = 'usage: {} -p participant -s startsec -e endsec -f file -t task -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
         all_args = sys.argv[1:]
-        opts, arg = getopt.getopt(all_args, 'p:s:f:n:m')
+        opts, arg = getopt.getopt(all_args, 'p:s:e:f:t:m')
         # Iterate over the options and values
         for opt, arg_val in opts:
             if '-p' in opt:
                 subj = int(arg_val)
             elif '-s' in opt:
                 startsec = int(arg_val)
+            elif '-e' in opt:
+                endsec = int(arg_val)
             elif '-f' in opt:
                 filtered_filename = arg_val
-            elif '-n' in opt:
+            elif '-t' in opt:
                 task = arg_val
             elif '-m' in opt:
                 usePlotly = False
@@ -139,6 +168,6 @@ if __name__ == "__main__":
         sys.exit(2)
 
     if usePlotly:
-        plotWithPlotly(task,subj,filtered_filename,startsec)
+        plotWithPlotly(task,subj,filtered_filename,startsec,endsec)
     else:
-        plotWithMatplotlib(task,subj,filtered_filename,startsec)
+        plotWithMatplotlib(task,subj,filtered_filename,startsec,endsec)
