@@ -9,6 +9,11 @@ import os
 
 subjectsOK = [1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 
+SNRbandMin = 5 # Hz
+SNRbandMax = 50 # Hz
+
+VEPstartTime = 0.4 # sec
+
 class SNR:
     def __init__(self,subj,startsec,fs,folder,noisered_filename):
         self.subj = subj
@@ -32,7 +37,7 @@ class SNR:
         freq, power = signal.welch(y,self.fs,scaling="spectrum",nperseg=self.fs)
         w = np.array([])
         for f,p in zip(freq, power):
-            if (f >= 5) and (f < 50):
+            if (f >= SNRbandMin) and (f <= SNRbandMax):
                 s = s + p
                 if not w.any():
                     w = np.array([f,p])
@@ -43,7 +48,7 @@ class SNR:
     def calcSNRinner(self):
         NoisePwr,w = self.calcNoisePower(self.inner_filename)
         vep = p300.calcVEP(self.subj,self.inner_filename,self.startsec,self.fs)
-        SignalPwr = np.mean(vep[int(self.fs*0.4):]**2)
+        SignalPwr = np.mean(vep[int(self.fs*VEPstartTime):]**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
         snr = np.log10(SignalPwr/NoisePwr)*10
@@ -66,10 +71,10 @@ class SNR:
         return (lags,cc)
 
     
-def calcAllSNRimprovemements(startsec = 120,
-                             noisefolder = "results",
-                             fs = 250,
-                             filtered_filename = "dnf.tsv"):
+def calcAllSNRimprovemements(startsec,
+                             noisefolder,
+                             fs,
+                             filtered_filename):
     imprArray = np.array([])
     for subj in subjectsOK:
         print("Subject",subj)
@@ -87,7 +92,7 @@ def calcAllSNRimprovemements(startsec = 120,
 # check if we run this as a main program
 if __name__ == "__main__":
     subj = 1
-    startsec = 120
+    startsec = 60
     noisefolder = "results"
     fs = 250
     filtered_filename = "dnf.tsv"
