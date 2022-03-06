@@ -132,7 +132,7 @@ def plotWithMatplotlib(task,subj,filtered_filename,startsec,endsec):
 
 # check if we run this as a main program
 if __name__ == "__main__":
-    subj = 10
+    subj = 1
     startsec = 60
     endsec = False
     task = p300folder

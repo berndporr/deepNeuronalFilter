@@ -32,20 +32,20 @@ class SNRStat:
 # check if we run this as a main program
 if __name__ == "__main__":
     startsec = 60
-    filtered_filename = "dnf.tsv"
+    filtered_folder = "jawclench"
 
     helptext = 'usage: {} -s startsec -f file'.format(sys.argv[0])
 
     try:
         # Gather the arguments
         all_args = sys.argv[1:]
-        opts, arg = getopt.getopt(all_args, 'p:s:f:n:')
+        opts, arg = getopt.getopt(all_args, 's:t:h')
         # Iterate over the options and values
         for opt, arg_val in opts:
             if '-s' in opt:
                 startsec = int(arg_val)
-            elif '-f' in opt:
-                filtered_filename = arg_val
+            elif '-t' in opt:
+                filtered_folder = arg_val
             elif '-h' in opt:
                 raise getopt.GetoptError()
             else:
@@ -56,14 +56,24 @@ if __name__ == "__main__":
 
 
         
-jawssnr = SNRStat(500,"jawclench",startsec,filtered_filename)
-readsnr = SNRStat(500,"read",startsec,filtered_filename)
-p300snr = SNRStat(250,"results",startsec,filtered_filename)
+#plotting the box plot of the data
+dnfsnr = SNRStat(500,filtered_folder,startsec,"dnf.tsv")
+lmssnr = SNRStat(500,filtered_folder,startsec,"lms.tsv")
 box_fig = plt.figure('compare')
-plt.bar(["Jawclench","Reading","P300"],
-        height = [jawssnr.av,readsnr.av,p300snr.av],
-        yerr = [jawssnr.sd,readsnr.sd,p300snr.sd],
+plt.bar([0,1],
+        height = [dnfsnr.av,lmssnr.av],
+        yerr = [dnfsnr.sd,lmssnr.sd],
         align='center', capsize=5)
-box_fig.savefig('./SNRcompareRestWithJawClench.eps',
+box_fig.savefig('./SNRcompareDNFLMS.eps',
                 format='eps', bbox_inches='tight')
 plt.show()
+
+
+
+
+
+
+
+
+
+
