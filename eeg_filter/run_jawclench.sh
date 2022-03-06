@@ -3,6 +3,7 @@
 # Jaw clench experiment data:
 # Filters all subjects without graphical output
 
+rm -rf jawclench
 mkdir -p jawclench
 n=1;
 max=20;

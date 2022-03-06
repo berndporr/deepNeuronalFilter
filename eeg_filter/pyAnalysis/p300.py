@@ -4,8 +4,10 @@ import numpy as np
 import sys
 import getopt
 
+p300dir = "../p300/"
+
 def calcVEP(subj,filename,startsec=30,fs=250):
-    p = "../results/subject{}/{}".format(subj,filename)
+    p = p300dir+"subject{}/{}".format(subj,filename)
     d = np.loadtxt(p)
     ll = fs * startsec
     y = d[ll:,0]

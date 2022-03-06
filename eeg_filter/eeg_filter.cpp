@@ -42,16 +42,16 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems) {
 
 
 
-void processOneSubject(const int subjIndex, const char* filename, const bool showPlots = true) {
+void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, const bool showPlots = true) {
 	std::srand(1);
 
 	// file path prefix for the results
-	std::string outpPrefix = "results";
+	std::string outpPrefix = "p300";
 
 	int fs = 250;
-	if (NULL != filename) {
+	if (nullptr != tasksubdir) {
 		fs = 500;
-		outpPrefix = filename;
+		outpPrefix = tasksubdir;
 	}
 
 	fprintf(stderr,"Starting DNF on subj %d, filename = %s.\n",subjIndex, outpPrefix.c_str());
@@ -110,8 +110,8 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 	wdistance_file.open(outpPrefix+"/subject" + sbjct + "/weight_distance.tsv", fstream::out);
 	
 	char tmp[256];
-	if (NULL != filename) {
-		sprintf(tmp,"../../noisewalls/EEG_recordings/participant%03d/%s.tsv",subjIndex,filename);
+	if (nullptr != tasksubdir) {
+		sprintf(tmp,"../../noisewalls/EEG_recordings/participant%03d/%s.tsv",subjIndex,tasksubdir);
 	} else {
 		sprintf(tmp,"../../noisewalls/EEG_recordings/participant%03d/rawp300.tsv",subjIndex);
 	}
@@ -149,7 +149,7 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 		double outer_raw_data = 0;
 		double p300trigger = 0;
 		
-		if (NULL == filename) {
+		if (nullptr == tasksubdir) {
 			p300_infile >> inner_raw_data >> outer_raw_data >> p300trigger;
 		} else {
 			std::string line;
@@ -272,21 +272,21 @@ void processOneSubject(const int subjIndex, const char* filename, const bool sho
 
 int main(int argc, const char *argv[]) {
 	if (argc < 2) {
-		fprintf(stderr,"Usage: %s [-a] <subjectNumber> [subdir]\n",argv[0]);
+		fprintf(stderr,"Usage: %s [-a] <subjectNumber> [tasksubdir]\n",argv[0]);
 		fprintf(stderr,"       -a calculates all 20 subjects in a loop.\n");
 		fprintf(stderr,"       -b calculates all 20 subjects multi-threaded without screen output.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
 		return 0;
 	}
 	
-	const char *filename = NULL;
+	const char *tasksubdir = nullptr;
 	if (argc > 2) {
-		filename = argv[2];
+		tasksubdir = argv[2];
 	}
 
 	if (strcmp(argv[1],"-a") == 0) {
 		for(int i = 0; i < nSubj; i++) {
-			processOneSubject(i+1,filename);
+			processOneSubject(i+1,tasksubdir);
 		}
 		return 0;
 	}
@@ -294,7 +294,7 @@ int main(int argc, const char *argv[]) {
 	if (strcmp(argv[1],"-b") == 0) {
 		std::thread* workers[nSubj];
 		for(int i = 0; i < nSubj; i++) {
-			workers[i] = new std::thread(processOneSubject,i+1,filename,false);
+			workers[i] = new std::thread(processOneSubject,i+1,tasksubdir,false);
 		}
 		for(int i = 0; i < nSubj; i++) {
 			workers[i]->join();
@@ -308,6 +308,6 @@ int main(int argc, const char *argv[]) {
 		fprintf(stderr,"Subj number of out range.\n");
 		return -1;
 	}
-	processOneSubject(subj,filename);
+	processOneSubject(subj,tasksubdir);
 	return 0;
 }

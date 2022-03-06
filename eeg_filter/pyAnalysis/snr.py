@@ -14,6 +14,8 @@ SNRbandMax = 50 # Hz
 
 VEPstartTime = 0.4 # sec
 
+p300task = "p300"
+
 class SNR:
     def __init__(self,subj,startsec,fs,folder,noisered_filename):
         self.subj = subj
@@ -93,11 +95,11 @@ def calcAllSNRimprovemements(startsec,
 if __name__ == "__main__":
     subj = 1
     startsec = 60
-    noisefolder = "results"
+    taskfolder = p300task
     fs = 250
     filtered_filename = "dnf.tsv"
 
-    helptext = 'usage: {} -p participant -s startsec -f file -n noisefolder -h'.format(sys.argv[0])
+    helptext = 'usage: {} -p participant -s startsec -f file -n taskfolder -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
@@ -112,8 +114,9 @@ if __name__ == "__main__":
             elif '-f' in opt:
                 filtered_filename = arg_val
             elif '-n' in opt:
-                noisefolder = arg_val
-                fs = 500
+                if p300task != arg_val:
+                    fs = 500
+                    taskfolder = arg_val
             elif '-h' in opt:
                 raise getopt.GetoptError()
             else:
@@ -123,7 +126,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     plt.figure("Periodogram of the noise: unfilered (INNER) vs filtered (.tsv)")
-    snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
+    snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=taskfolder,noisered_filename=filtered_filename)
     snrdnf, wdnf = snr.calcSNRdnf()
     print("SNR from Noise removal:",snrdnf)
     plt.plot(wdnf[:,0],wdnf[:,1],label=filtered_filename)
