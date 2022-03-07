@@ -133,6 +133,8 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 
 	Iir::Butterworth::HighPass<filterorder> laplaceHP;
 	laplaceHP.setup(fs,LaplaceCutOff);
+	Iir::Butterworth::BandStop<filterorder> laplaceBS;
+	laplaceBS.setup(fs,powerlineFrequ,bsBandwidth);
 	
 	Fir1 lms_filter(nTapsDNF);
 	lms_filter.setLearningRate(LMS_LEARNING_RATE);
@@ -198,6 +200,7 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 
 		// Do Laplace filter
 		double laplace = laplaceHP.filter(inner_raw_data - outer_raw_data);
+		laplace = laplaceBS.filter(laplace);
 
 		// Do LMS filter
 		double corrLMS = lms_filter.filter(outer);

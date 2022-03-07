@@ -42,7 +42,9 @@ def plotVEP(subj,filename,ax,fs=250,startsec=10):
 if __name__ == "__main__":
     subj = 1
     startsec = 120
-    filtered_filename = "dnf.tsv"
+    dnf_filename = "dnf.tsv"
+    lms_filename = "lms.tsv"
+    laplace_filename = "laplace.tsv"
 
     helptext = 'usage: {} -p participant -s startsec -f file -h'.format(sys.argv[0])
 
@@ -56,8 +58,6 @@ if __name__ == "__main__":
                 subj = int(arg_val)
             elif '-s' in opt:
                 startsec = int(arg_val)
-            elif '-f' in opt:
-                filtered_filename = arg_val
             elif '-h' in opt:
                 raise getopt.GetoptError()
             else:
@@ -66,9 +66,21 @@ if __name__ == "__main__":
         print (helptext)
         sys.exit(2)
 
-    fig, axs = plt.subplots(2)
-    fig.suptitle("P300")
-    plotVEP(subj,filtered_filename,axs[0],startsec=startsec)
-    plotVEP(subj,"inner.tsv",axs[1],startsec=startsec)
+    fig = plt.figure("P300")
+    
+    ax = fig.add_subplot(1,4,1)
+    plotVEP(subj,"inner.tsv",ax,startsec=startsec)
+
+    ax = fig.add_subplot(1,4,2)
+    ax.title.set_text('DNF')
+    plotVEP(subj,dnf_filename,ax,startsec=startsec)
+
+    ax = fig.add_subplot(1,4,3)
+    ax.title.set_text('LMS')
+    plotVEP(subj,lms_filename,ax,startsec=startsec)
+
+    ax = fig.add_subplot(1,4,4)
+    ax.title.set_text('Laplace')
+    plotVEP(subj,laplace_filename,ax,startsec=startsec)
 
     plt.show()

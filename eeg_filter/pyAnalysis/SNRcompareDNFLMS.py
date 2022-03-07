@@ -60,20 +60,10 @@ if __name__ == "__main__":
 dnfsnr = SNRStat(500,filtered_folder,startsec,"dnf.tsv")
 lmssnr = SNRStat(500,filtered_folder,startsec,"lms.tsv")
 box_fig = plt.figure('compare')
-plt.bar([0,1],
+plt.bar(["DNF","LMS"],
         height = [dnfsnr.av,lmssnr.av],
         yerr = [dnfsnr.sd,lmssnr.sd],
         align='center', capsize=5)
 box_fig.savefig('./SNRcompareDNFLMS.eps',
                 format='eps', bbox_inches='tight')
 plt.show()
-
-
-
-
-
-
-
-
-
-
