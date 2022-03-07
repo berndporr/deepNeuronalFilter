@@ -16,6 +16,7 @@ import getopt
 
 class SNRStat:
     def __init__(self,fs,noisefolder,startsec,filtered_filename):
+        print("SNRStat:",fs,noisefolder,startsec,filtered_filename)
         alpha = 0.05
         self.snrdiff,self.av,self.sd = snr.calcAllSNRimprovemements(startsec = startsec,
                                                                     noisefolder = noisefolder,
@@ -58,7 +59,7 @@ if __name__ == "__main__":
         
 jawssnr = SNRStat(500,"jawclench",startsec,filtered_filename)
 readsnr = SNRStat(500,"read",startsec,filtered_filename)
-p300snr = SNRStat(250,"results",startsec,filtered_filename)
+p300snr = SNRStat(250,"p300",startsec,filtered_filename)
 box_fig = plt.figure('compare')
 plt.bar(["Jawclench","Reading","P300"],
         height = [jawssnr.av,readsnr.av,p300snr.av],
