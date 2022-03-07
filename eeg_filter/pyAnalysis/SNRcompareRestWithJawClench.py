@@ -58,13 +58,12 @@ if __name__ == "__main__":
 
         
 jawssnr = SNRStat(500,"jawclench",startsec,filtered_filename)
-readsnr = SNRStat(500,"read",startsec,filtered_filename)
 p300snr = SNRStat(250,"p300",startsec,filtered_filename)
 box_fig = plt.figure('compare')
-plt.bar(["Jawclench","Reading","P300"],
-        height = [jawssnr.av,readsnr.av,p300snr.av],
-        yerr = [jawssnr.sd,readsnr.sd,p300snr.sd],
+plt.bar(["Jawclench","P300"],
+        height = [jawssnr.av,p300snr.av],
+        yerr = [jawssnr.sd,p300snr.sd],
         align='center', capsize=5)
-box_fig.savefig('./SNRcompareRestWithJawClenchReading.eps',
+box_fig.savefig('./SNRcompareRestWithJawClench.eps',
                 format='eps', bbox_inches='tight')
 plt.show()
