@@ -151,7 +151,7 @@ if __name__ == "__main__":
     filtered_filename = "dnf.tsv"
     usePlotly = True
 
-    helptext = 'usage: {} -p participant -s startsec -e endsec -f file -t task -h'.format(sys.argv[0])
+    helptext = 'usage: {} -p participant -s startsec -e endsec -f noiseredfile.tsv -t task -m -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
@@ -177,6 +177,7 @@ if __name__ == "__main__":
                 raise getopt.GetoptError()
     except getopt.GetoptError:
         print (helptext)
+        print ("Option -m switches over to matplotlib. Default is plotly.")
         sys.exit(2)
 
     if usePlotly:

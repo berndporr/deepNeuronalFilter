@@ -7,10 +7,10 @@ import scipy.signal as signal
 import getopt
 import os
 
-subjectsOK = [1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+subjectsOK = [1,3,4,5,8,9,10,11,12,13,14,15,16,17,18,19,20]
 
 SNRbandMin = 5 # Hz
-SNRbandMax = 75 # Hz
+SNRbandMax = 125 # Hz
 
 VEPstartTime = 0.4 # sec
 
