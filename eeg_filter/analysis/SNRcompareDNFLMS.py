@@ -8,6 +8,7 @@ Created on Wed May 13 20:09:18 2020
 
 import numpy as np
 import matplotlib.pylab as plt
+import seaborn as sns
 from scipy import stats
 import snr
 import sys
@@ -64,6 +65,8 @@ plt.bar(["DNF","LMS"],
         height = [dnfsnr.av,lmssnr.av],
         yerr = [dnfsnr.sd,lmssnr.sd],
         align='center', capsize=5)
+plt.scatter(np.zeros(len(dnfsnr.snrdiff)),dnfsnr.snrdiff)
+plt.scatter(np.ones(len(dnfsnr.snrdiff)),lmssnr.snrdiff)
 box_fig.savefig('./SNRcompareDNFLMS.eps',
                 format='eps', bbox_inches='tight')
 plt.show()
