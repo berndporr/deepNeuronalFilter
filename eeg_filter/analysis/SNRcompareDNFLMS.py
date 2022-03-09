@@ -8,7 +8,6 @@ Created on Wed May 13 20:09:18 2020
 
 import numpy as np
 import matplotlib.pylab as plt
-import seaborn as sns
 from scipy import stats
 import snr
 import sys

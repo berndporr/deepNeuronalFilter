@@ -64,6 +64,8 @@ plt.bar(["Jawclench","P300"],
         height = [jawssnr.av,p300snr.av],
         yerr = [jawssnr.sd,p300snr.sd],
         align='center', capsize=5)
+plt.scatter(np.zeros(len(jawssnr.snrdiff)),jawssnr.snrdiff)
+plt.scatter(np.ones(len(p300snr.snrdiff)),p300snr.snrdiff)
 box_fig.savefig('./SNRcompareRestWithJawClench.eps',
                 format='eps', bbox_inches='tight')
 plt.show()
