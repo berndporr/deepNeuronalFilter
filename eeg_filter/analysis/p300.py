@@ -6,7 +6,7 @@ import getopt
 
 p300dir = "../p300/"
 
-def calcVEP(subj,filename,startsec=30,fs=250):
+def calcVEP(subj,filename,startsec,fs):
     p = p300dir+"subject{}/{}".format(subj,filename)
     d = np.loadtxt(p)
     ll = fs * startsec
@@ -28,8 +28,8 @@ def calcVEP(subj,filename,startsec=30,fs=250):
     return avg
 
 
-def plotVEP(subj,filename,ax,fs=250,startsec=10):
-    avg = calcVEP(subj,filename,startsec=startsec) * 1E6
+def plotVEP(subj,filename,ax,fs,startsec):
+    avg = calcVEP(subj,filename,startsec=startsec,fs=fs) * 1E6
     navg = len(avg)
     t = np.linspace(0,navg/fs,navg) * 1000
     ax.plot(t,avg)
@@ -45,6 +45,7 @@ if __name__ == "__main__":
     dnf_filename = "dnf.tsv"
     lms_filename = "lms.tsv"
     laplace_filename = "laplace.tsv"
+    fs = 250
 
     helptext = 'usage: {} -p participant -s startsec -f file -h'.format(sys.argv[0])
 
@@ -69,18 +70,18 @@ if __name__ == "__main__":
     fig = plt.figure("P300")
     
     ax = fig.add_subplot(1,4,1)
-    plotVEP(subj,"inner.tsv",ax,startsec=startsec)
+    plotVEP(subj,"inner.tsv",ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,2)
     ax.title.set_text('DNF')
-    plotVEP(subj,dnf_filename,ax,startsec=startsec)
+    plotVEP(subj,dnf_filename,ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,3)
     ax.title.set_text('LMS')
-    plotVEP(subj,lms_filename,ax,startsec=startsec)
+    plotVEP(subj,lms_filename,ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,4)
     ax.title.set_text('Laplace')
-    plotVEP(subj,laplace_filename,ax,startsec=startsec)
+    plotVEP(subj,laplace_filename,ax,startsec=startsec,fs=fs)
 
     plt.show()
