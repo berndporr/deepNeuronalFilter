@@ -17,6 +17,8 @@ import getopt
 class SNRStat:
     def __init__(self,fs,noisefolder,startsec,filtered_filename):
         alpha = 0.05
+        print("Starting:")
+        print(noisefolder,filtered_filename)
         self.snrdiff,self.av,self.sd = snr.calcAllSNRimprovemements(startsec = startsec,
                                                                     noisefolder = noisefolder,
                                                                     fs = fs,

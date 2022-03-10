@@ -51,7 +51,7 @@ class SNR:
     def calcSNRinner(self):
         NoisePwr,w = self.calcNoisePower(self.inner_filename)
         vep = p300.calcVEP(self.subj,self.inner_filename,self.startsec,self.fs)
-        SignalPwr = np.mean(vep[int(self.fs*VEPstartTime):int(self.fs*VEPendTime)]**2)
+        SignalPwr = np.median(vep[int(self.fs*VEPstartTime):int(self.fs*VEPendTime)]**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
         snr = np.log10(SignalPwr/NoisePwr)*10
@@ -60,7 +60,7 @@ class SNR:
     def calcSNRdnf(self):
         NoisePwr,w = self.calcNoisePower(self.noisered_filename)
         vep = p300.calcVEP(self.subj,self.noisered_filename,self.startsec,self.fs)
-        SignalPwr = np.mean(vep[int(self.fs*VEPstartTime):int(self.fs*VEPendTime)]**2)
+        SignalPwr = np.median(vep[int(self.fs*VEPstartTime):int(self.fs*VEPendTime)]**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
         snr = np.log10(SignalPwr/NoisePwr)*10
