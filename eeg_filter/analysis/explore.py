@@ -33,7 +33,7 @@ class SimData:
         self.outer = (self.loadFile("outer.tsv"))[a:b,0]
 
     def getTimeAxis(self,data):
-        return np.linspace(0,len(data)/self.fs,len(data))
+        return np.linspace(self.startsec,(len(data)/self.fs)+self.startsec,len(data))
 
 
 def plotWithPlotly(task,subj,filtered_filename,startsec,endsec):

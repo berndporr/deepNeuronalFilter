@@ -137,7 +137,6 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 	laplaceBS.setup(fs,powerlineFrequ,bsBandwidth);
 	
 	Fir1 lms_filter(nTapsDNF);
-	lms_filter.setLearningRate(LMS_LEARNING_RATE);
 	
 	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f\n",inner_gain,outer_gain,remover_gain);
 
@@ -181,7 +180,11 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 		const double outer = outer_filterBS.filter(outerhp);
 
 		double f_nn = dnf.filter(inner_filtered,outer);
-		
+
+		double w_eta = dnf_learning_rate_p300;
+		if (nullptr != tasksubdir) {
+			w_eta = dnf_learning_rate_tasks;
+		}
 		if (count > (samplesNoLearning+nTapsDNF)){
 			dnf.getNet().setLearningRate(w_eta, 0);
 		} else {
@@ -203,6 +206,15 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 		laplace = laplaceBS.filter(laplace);
 
 		// Do LMS filter
+		if (count > (samplesNoLearning+nTapsDNF)){
+			if (nullptr == tasksubdir) {
+				lms_filter.setLearningRate(lms_learning_rate_p300);
+			} else {
+				lms_filter.setLearningRate(lms_learning_rate_tasks);
+			}
+		} else {
+			lms_filter.setLearningRate(0);
+		}
 		double corrLMS = lms_filter.filter(outer);
 		double lms_output = dnf.getDelayedSignal() - corrLMS;
 		if (count > (samplesNoLearning+nTapsDNF)){

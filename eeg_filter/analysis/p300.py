@@ -41,7 +41,7 @@ def plotVEP(subj,filename,ax,fs,startsec):
 # check if we run this as a main program
 if __name__ == "__main__":
     subj = 1
-    startsec = 120
+    startsec = 2*60
     dnf_filename = "dnf.tsv"
     lms_filename = "lms.tsv"
     laplace_filename = "laplace.tsv"
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     fig = plt.figure("P300")
-    
+
     ax = fig.add_subplot(1,4,1)
     plotVEP(subj,"inner.tsv",ax,startsec=startsec,fs=fs)
 

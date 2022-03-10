@@ -4,7 +4,6 @@
 #include "dnf.h"
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
-//const Neuron::actMethod ACTIVATION = Neuron::Act_NONE;
 
 // number of subjects
 const int nSubj = 20;
@@ -21,12 +20,16 @@ const double bsBandwidth = 2.5; // Hz
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
-// learning rate
-const double w_eta = 2.5;
+// dnf learning rate
+const double dnf_learning_rate_p300 = 10;
+const double dnf_learning_rate_tasks = 2.5;
 
+// dnf number of layers
 const int NLAYERS = 6;
 
-const double LMS_LEARNING_RATE = 0.01;
+// LMS learning rates
+const double lms_learning_rate_p300 = 0.04;
+const double lms_learning_rate_tasks = 0.01;
 
 const double inner_gain = 1000;
 const double outer_gain = 1000;
