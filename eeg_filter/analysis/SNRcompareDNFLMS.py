@@ -74,7 +74,7 @@ box_fig.savefig('./SNRcompareDNFLMS.eps',
 
 t_value,p_value=stats.ttest_rel(dnfsnr.snrdiff,lmssnr.snrdiff)
 print('DNF vs LMS test statistic is %f'%float("{:.6f}".format(t_value)))
-print('p-value for two tailed test is %f'%p_value)
+print('p-value for the t-test is %f'%p_value)
 if p_value<=dnfsnr.alpha:
     print("Significantly different between DNF and LMS.")
 
