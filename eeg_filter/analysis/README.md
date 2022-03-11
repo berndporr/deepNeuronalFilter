@@ -1,11 +1,13 @@
 # Data analysis tools
 
 All tools are python commandline tools which have the same parameters:
- - -p participant number between 1 and 20
- - -s The second from where data analysis should happen (usually after learning)
- - -t The task which is either "p300" or "jawclench2.
- - -f The filter output file used. That can be either "dnf.tsv" or "lms.tsv"
+ - -p participant number between 1 and 20 (default 1)
+ - -s The second at which the data analysis starts (default 120sec for p300 and 60sec for jawclench)
+ - -t The task which is either "p300" (default) or "jawclench"
+ - -f The filter output file used. That can be either "dnf.tsv" (default) or "lms.tsv"
  - -h Help
+
+All parameters are optional and have default values set.
 
 ## explore.py
 
@@ -31,4 +33,3 @@ Calculates the SNR of one subject
 
 ## SNRcompareDNFLMS.py
 Compares DNF SNR increase against LMS SNR increase for jawclench.
-Usually no parameters are needed here.
