@@ -41,7 +41,8 @@ sudo make install
 
 ## Documentation
 
-The folder `docs` contains the class ref.
+ - Online: https://berndporr.github.io/deepNeuronalFilter/
+ - PDF: https://github.com/berndporr/deepNeuronalFilter/blob/main/docs/pdf/refman.pdf
 
 ## Applications
 
