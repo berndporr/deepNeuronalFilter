@@ -1,5 +1,4 @@
 # Deep Neuronal Filter (DNF)
-This is work in progress
 
 ## Prerequisites Libraries and packages:
 1) Install the Fir1 library from _https://github.com/berndporr/fir1_ by running:
@@ -34,7 +33,17 @@ make
 ```
 to compile the library and the demos.
 
-## Demos
+## Installation
 
-The subdirectories `eeg_filter` and `ecg_filter` remove noise from
-noisy ECG and EEG.
+```
+sudo make install
+```
+
+## Documentation
+
+The folder `docs` contains the class ref.
+
+## Applications
+
+ - eeg_filter: removes noise from EEG (release)
+ - ecg_filter: removes noise from ECG (alpha version)
