@@ -16,7 +16,7 @@ import getopt
 
 class SNRStat:
     def __init__(self,fs,noisefolder,startsec,filtered_filename):
-        alpha = 0.05
+        self.alpha = 0.05
         print("Starting:")
         print(noisefolder,filtered_filename)
         self.snrdiff,self.av,self.sd = snr.calcAllSNRimprovemements(startsec = startsec,
@@ -26,8 +26,8 @@ class SNRStat:
         print(noisefolder,filtered_filename,"avg = {}, sd = {}".format(self.av,self.sd))
         t_value,p_value=stats.ttest_1samp(self.snrdiff,0)
         print(filtered_filename,'Test statistic is %f'%float("{:.6f}".format(t_value)))
-        print('p-value for two tailed test is %f'%p_value)
-        if p_value<=alpha:
+        print('p-value for t-test is %f'%p_value)
+        if p_value<=self.alpha:
             print(filtered_filename," significantly different from baseline.")
 
 
@@ -70,4 +70,13 @@ plt.scatter(np.zeros(len(dnfsnr.snrdiff)),dnfsnr.snrdiff)
 plt.scatter(np.ones(len(dnfsnr.snrdiff)),lmssnr.snrdiff)
 box_fig.savefig('./SNRcompareDNFLMS.eps',
                 format='eps', bbox_inches='tight')
+
+
+t_value,p_value=stats.ttest_rel(dnfsnr.snrdiff,lmssnr.snrdiff)
+print('DNF vs LMS test statistic is %f'%float("{:.6f}".format(t_value)))
+print('p-value for two tailed test is %f'%p_value)
+if p_value<=dnfsnr.alpha:
+    print("Significantly different between DNF and LMS.")
+
+
 plt.show()
