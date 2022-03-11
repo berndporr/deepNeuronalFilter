@@ -1,0 +1,26 @@
+var classNet =
+[
+    [ "Net", "classNet.html#ac1ac70d3cb6eefa75a428a5421c4f37b", null ],
+    [ "~Net", "classNet.html#a517bf56cd781eafd5c7aabeca60b62b0", null ],
+    [ "getGradient", "classNet.html#a15aba9c55e25711d00ed405f1f969e8e", null ],
+    [ "getLayer", "classNet.html#aef83e3be3eee89a8e835e1057a8f8aa1", null ],
+    [ "getLayerWeightDistance", "classNet.html#a786a9396140ba805d6bf0f465c439839", null ],
+    [ "getnInputs", "classNet.html#a2dc4ec0ffd5075c3a371d2cb8e2a1db1", null ],
+    [ "getnLayers", "classNet.html#ad8a4bc8cd13aaab91e1805225529c412", null ],
+    [ "getnNeurons", "classNet.html#a80d2e88ccd26f86f08208a4ce84d002e", null ],
+    [ "getOutput", "classNet.html#a593e15676ce69f44889103bdfcfc87fc", null ],
+    [ "getSumOutput", "classNet.html#a804f2fb606130433d8cd749b339d96ae", null ],
+    [ "getWeightDistance", "classNet.html#a78d4249c2b02cac789e76a13971a6b20", null ],
+    [ "getWeights", "classNet.html#adf026191c832a70d0cface628124bbfc", null ],
+    [ "initNetwork", "classNet.html#a94fe9b3602b47aaa00c59f61749a4df3", null ],
+    [ "printNetwork", "classNet.html#af63acf374d530d329d9b335c7efaa85b", null ],
+    [ "propErrorBackward", "classNet.html#a4705daad80e705e0ef4b35b131f5180a", null ],
+    [ "propInputs", "classNet.html#a3828b3c8b1baf8319767c346af49a698", null ],
+    [ "saveWeights", "classNet.html#a62f045da7486ce8da13f0bbdf1044f83", null ],
+    [ "setError", "classNet.html#a2198ec08c94818af785ba96116bdaea2", null ],
+    [ "setInputs", "classNet.html#a3b47e6d69ed0c7691c67327e4b0ce9a8", null ],
+    [ "setLearningRate", "classNet.html#a5c063d93e3cb7776752f617f26395555", null ],
+    [ "snapWeights", "classNet.html#a617a827360899bf42c7a0558cd79f5aa", null ],
+    [ "snapWeightsMatrixFormat", "classNet.html#a28447dfbcbf96c8b051a0adc6027cd8c", null ],
+    [ "updateWeights", "classNet.html#a71c1e3ef0845f1250966c395ee0b05dd", null ]
+];

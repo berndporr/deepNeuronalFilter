@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['filter_2',['filter',['../classDNF.html#afad03ec772b965aaeb4df388febc9c32',1,'DNF']]]
+  ['biasinitmethod_1',['biasInitMethod',['../classNeuron.html#a0d41c7f3013c13aa5b8470cdb57e8ab4',1,'Neuron']]]
 ];
