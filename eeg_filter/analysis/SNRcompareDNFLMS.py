@@ -35,7 +35,6 @@ class SNRStat:
 if __name__ == "__main__":
     startsec = 60
     filtered_folder = "jawclench"
-
     helptext = 'usage: {} -s startsec -f file'.format(sys.argv[0])
 
     try:
