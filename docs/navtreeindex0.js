@@ -13,7 +13,9 @@ var NAVTREEINDEX0 =
 "classes.html":[1,1],
 "dnf_8h_source.html":[2,0,0],
 "files.html":[2,0],
-"index.html":[0],
+"functions.html":[1,2,0],
+"functions_func.html":[1,2,1],
 "index.html":[],
+"index.html":[0],
 "pages.html":[]
 };

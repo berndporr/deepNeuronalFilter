@@ -5,8 +5,22 @@
 #include "dnf/Layer.h"
 #include "dnf/Net.h"
 
+/**
+ * Main Deep Neuronal Network main class.
+ * It's designed to be as simple as possible with
+ * only a few parameters as possible.
+ **/
 class DNF {
 public:
+	/**
+	 * Constructor which sets up the delay lines, network layers
+	 * and also calculates the number of neurons per layer so
+	 * that the final layer always just has one neuron.
+	 * \param NLAYERS Number of layers
+	 * \param numTaps Number of taps for the delay line feeding into the 1st layer
+	 * \param fs Sampling rate of the signals used in Hz.
+	 * \param am The activation function for the neurons. Default is tanh.
+	 **/
 	DNF(const int NLAYERS,
 	    const int numTaps,
 	    double fs,
@@ -32,6 +46,11 @@ public:
 		}
 	}
 
+	/**
+	 * Realtime sample by sample filtering operation
+	 * \param signal The signal contaminated with noise. Should be less than one.
+	 * \param noise The reference noise. Should be less than one.
+	 **/
 	double filter(double signal, double noise) {
 		signal_delayLine.push_back(signal);
 		const double delayed_signal = signal_delayLine[0];
@@ -56,26 +75,47 @@ public:
 		return f_nn;
 	}
 
+	/**
+	 * Returns a reference to the whole neural network.
+	 **/
 	inline Net& getNet() const {
 		return *NNO;
 	}
 
+	/**
+	 * Returns the length of the delay line which
+	 * delays the signal polluted with noise.
+	 **/
 	inline const int getSignalDelaySteps() const {
 		return signalDelayLineLength;
 	}
 
+	/**
+	 * Returns the delayed signal by the delay 
+	 * indicated by getSignalDelaySteps().
+	 **/
 	inline const double getDelayedSignal() const {
 		return signal_delayLine[0];
 	}
 
+	/**
+	 * Returns the remover signal.
+	 **/
 	inline const double getRemover() const {
 		return remover;
 	}
 
+	/**
+	 * Returns the output of the DNF: the the noise
+	 * free signal.
+	 **/
 	inline const double getOutput() const {
 		return f_nn;
 	}
 
+	/**
+	 * Frees the memory used by the DNF.
+	 **/
 	~DNF() {
 		delete NNO;
 		delete[] nNeurons;

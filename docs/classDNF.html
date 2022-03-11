@@ -88,31 +88,154 @@ $(document).ready(function(){initNavTree('classDNF.html',''); initResizable(); }
 <div class="title">DNF Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Main Deep Neuronal Network main class.  
+ <a href="classDNF.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="dnf_8h_source.html">dnf.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a210a627d781f268df320c69cd121d52b"><td class="memItemLeft" align="right" valign="top"><a id="a210a627d781f268df320c69cd121d52b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>DNF</b> (const int NLAYERS, const int numTaps, double fs, Neuron::actMethod am=Neuron::Act_Tanh)</td></tr>
+<tr class="memitem:a210a627d781f268df320c69cd121d52b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#a210a627d781f268df320c69cd121d52b">DNF</a> (const int NLAYERS, const int numTaps, double fs, Neuron::actMethod am=Neuron::Act_Tanh)</td></tr>
+<tr class="memdesc:a210a627d781f268df320c69cd121d52b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor which sets up the delay lines, network layers and also calculates the number of neurons per layer so that the final layer always just has one neuron.  <a href="classDNF.html#a210a627d781f268df320c69cd121d52b">More...</a><br /></td></tr>
 <tr class="separator:a210a627d781f268df320c69cd121d52b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afad03ec772b965aaeb4df388febc9c32"><td class="memItemLeft" align="right" valign="top"><a id="afad03ec772b965aaeb4df388febc9c32"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>filter</b> (double signal, double noise)</td></tr>
+<tr class="memitem:afad03ec772b965aaeb4df388febc9c32"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#afad03ec772b965aaeb4df388febc9c32">filter</a> (double signal, double noise)</td></tr>
+<tr class="memdesc:afad03ec772b965aaeb4df388febc9c32"><td class="mdescLeft">&#160;</td><td class="mdescRight">Realtime sample by sample filtering operation.  <a href="classDNF.html#afad03ec772b965aaeb4df388febc9c32">More...</a><br /></td></tr>
 <tr class="separator:afad03ec772b965aaeb4df388febc9c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a1c18586c06de51c5ae2b3a8877fbe1"><td class="memItemLeft" align="right" valign="top"><a id="a6a1c18586c06de51c5ae2b3a8877fbe1"></a>
-Net &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>getNet</b> () const</td></tr>
+Net &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#a6a1c18586c06de51c5ae2b3a8877fbe1">getNet</a> () const</td></tr>
+<tr class="memdesc:a6a1c18586c06de51c5ae2b3a8877fbe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the whole neural network. <br /></td></tr>
 <tr class="separator:a6a1c18586c06de51c5ae2b3a8877fbe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fe563bb0e8e6f5f4bb07396494bdc66"><td class="memItemLeft" align="right" valign="top"><a id="a2fe563bb0e8e6f5f4bb07396494bdc66"></a>
-const int&#160;</td><td class="memItemRight" valign="bottom"><b>getSignalDelaySteps</b> () const</td></tr>
+const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#a2fe563bb0e8e6f5f4bb07396494bdc66">getSignalDelaySteps</a> () const</td></tr>
+<tr class="memdesc:a2fe563bb0e8e6f5f4bb07396494bdc66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the length of the delay line which delays the signal polluted with noise. <br /></td></tr>
 <tr class="separator:a2fe563bb0e8e6f5f4bb07396494bdc66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d95c8bc5df8f88ddcebc9720a2322e9"><td class="memItemLeft" align="right" valign="top"><a id="a2d95c8bc5df8f88ddcebc9720a2322e9"></a>
-const double&#160;</td><td class="memItemRight" valign="bottom"><b>getDelayedSignal</b> () const</td></tr>
+const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#a2d95c8bc5df8f88ddcebc9720a2322e9">getDelayedSignal</a> () const</td></tr>
+<tr class="memdesc:a2d95c8bc5df8f88ddcebc9720a2322e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the delayed signal by the delay indicated by <a class="el" href="classDNF.html#a2fe563bb0e8e6f5f4bb07396494bdc66" title="Returns the length of the delay line which delays the signal polluted with noise.">getSignalDelaySteps()</a>. <br /></td></tr>
 <tr class="separator:a2d95c8bc5df8f88ddcebc9720a2322e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a628b03f76c8a0e40ea191edf53888d2f"><td class="memItemLeft" align="right" valign="top"><a id="a628b03f76c8a0e40ea191edf53888d2f"></a>
-const double&#160;</td><td class="memItemRight" valign="bottom"><b>getRemover</b> () const</td></tr>
+const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#a628b03f76c8a0e40ea191edf53888d2f">getRemover</a> () const</td></tr>
+<tr class="memdesc:a628b03f76c8a0e40ea191edf53888d2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the remover signal. <br /></td></tr>
 <tr class="separator:a628b03f76c8a0e40ea191edf53888d2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e84e861919b98c56d910b90ccb9b398"><td class="memItemLeft" align="right" valign="top"><a id="a9e84e861919b98c56d910b90ccb9b398"></a>
-const double&#160;</td><td class="memItemRight" valign="bottom"><b>getOutput</b> () const</td></tr>
+const double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#a9e84e861919b98c56d910b90ccb9b398">getOutput</a> () const</td></tr>
+<tr class="memdesc:a9e84e861919b98c56d910b90ccb9b398"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the output of the <a class="el" href="classDNF.html" title="Main Deep Neuronal Network main class.">DNF</a>: the the noise free signal. <br /></td></tr>
 <tr class="separator:a9e84e861919b98c56d910b90ccb9b398"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7ca529281584cc9c5689527155e2e72"><td class="memItemLeft" align="right" valign="top"><a id="ab7ca529281584cc9c5689527155e2e72"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDNF.html#ab7ca529281584cc9c5689527155e2e72">~DNF</a> ()</td></tr>
+<tr class="memdesc:ab7ca529281584cc9c5689527155e2e72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees the memory used by the <a class="el" href="classDNF.html" title="Main Deep Neuronal Network main class.">DNF</a>. <br /></td></tr>
+<tr class="separator:ab7ca529281584cc9c5689527155e2e72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Main Deep Neuronal Network main class. </p>
+<p>It's designed to be as simple as possible with only a few parameters as possible. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a210a627d781f268df320c69cd121d52b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a210a627d781f268df320c69cd121d52b">&#9670;&nbsp;</a></span>DNF()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">DNF::DNF </td>
+          <td>(</td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>NLAYERS</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>numTaps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>fs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Neuron::actMethod&#160;</td>
+          <td class="paramname"><em>am</em> = <code>Neuron::Act_Tanh</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor which sets up the delay lines, network layers and also calculates the number of neurons per layer so that the final layer always just has one neuron. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">NLAYERS</td><td>Number of layers </td></tr>
+    <tr><td class="paramname">numTaps</td><td>Number of taps for the delay line feeding into the 1st layer </td></tr>
+    <tr><td class="paramname">fs</td><td>Sampling rate of the signals used in Hz. </td></tr>
+    <tr><td class="paramname">am</td><td>The activation function for the neurons. Default is tanh. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="afad03ec772b965aaeb4df388febc9c32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afad03ec772b965aaeb4df388febc9c32">&#9670;&nbsp;</a></span>filter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double DNF::filter </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>signal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>noise</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Realtime sample by sample filtering operation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">signal</td><td>The signal contaminated with noise. Should be less than one. </td></tr>
+    <tr><td class="paramname">noise</td><td>The reference noise. Should be less than one. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="dnf_8h_source.html">dnf.h</a></li>
 </ul>
