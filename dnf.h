@@ -50,6 +50,7 @@ public:
 	 * Realtime sample by sample filtering operation
 	 * \param signal The signal contaminated with noise. Should be less than one.
 	 * \param noise The reference noise. Should be less than one.
+	 * \returns The filtered signal where the noise has been removed by the DNF.
 	 **/
 	double filter(double signal, double noise) {
 		signal_delayLine.push_back(signal);
@@ -77,6 +78,7 @@ public:
 
 	/**
 	 * Returns a reference to the whole neural network.
+	 * \returns A reference to Net.
 	 **/
 	inline Net& getNet() const {
 		return *NNO;
@@ -85,14 +87,16 @@ public:
 	/**
 	 * Returns the length of the delay line which
 	 * delays the signal polluted with noise.
+	 * \returns Number of delay steps in samples.
 	 **/
 	inline const int getSignalDelaySteps() const {
 		return signalDelayLineLength;
 	}
 
 	/**
-	 * Returns the delayed signal by the delay 
+	 * Returns the delayed with noise polluted signal by the delay 
 	 * indicated by getSignalDelaySteps().
+	 * \returns The delayed noise polluted signal sample.
 	 **/
 	inline const double getDelayedSignal() const {
 		return signal_delayLine[0];
@@ -100,6 +104,7 @@ public:
 
 	/**
 	 * Returns the remover signal.
+	 * \returns The current remover signal sample.
 	 **/
 	inline const double getRemover() const {
 		return remover;
@@ -108,6 +113,7 @@ public:
 	/**
 	 * Returns the output of the DNF: the the noise
 	 * free signal.
+	 * \returns The current output of the DNF which is idential to filter().
 	 **/
 	inline const double getOutput() const {
 		return f_nn;
