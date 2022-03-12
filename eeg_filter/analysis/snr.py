@@ -7,7 +7,7 @@ import scipy.signal as signal
 import getopt
 import os
 
-subjectsOK = [1,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+subjectsOK = [1,3,4,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 
 SNRbandMin = 5 # Hz
 SNRbandMax = 100 # Hz
@@ -78,7 +78,8 @@ def calcAllSNRimprovemements(startsec,
                              noisefolder,
                              fs,
                              filtered_filename):
-    imprArray = np.array([])
+    beforeArray = np.array([])
+    afterArray = np.array([])
     for subj in subjectsOK:
         print("Subject",subj)
         snr = SNR(subj=subj,startsec=startsec,fs=fs,folder=noisefolder,noisered_filename=filtered_filename)
@@ -86,10 +87,12 @@ def calcAllSNRimprovemements(startsec,
         snrinner, winner = snr.calcSNRinner()
         impr = snrdnf-snrinner
         print("SNR improvement: {} - {} = {}".format(snrinner,snrdnf,impr))
-        imprArray = np.append(imprArray,impr)
+        beforeArray = np.append(beforeArray,snrinner)
+        afterArray = np.append(afterArray,snrdnf)
+    imprArray = afterArray - beforeArray
     snrdiff_av = np.mean(imprArray)
     snrdiff_sd = np.std(imprArray)
-    return imprArray,snrdiff_av,snrdiff_sd
+    return beforeArray,afterArray,snrdiff_av,snrdiff_sd
 
 
 # check if we run this as a main program

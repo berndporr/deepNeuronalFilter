@@ -13,16 +13,16 @@ import snr
 import sys
 import getopt
 
-
 class SNRStat:
     def __init__(self,fs,noisefolder,startsec,filtered_filename):
         self.alpha = 0.05
         print("Starting:")
         print(noisefolder,filtered_filename)
-        self.snrdiff,self.av,self.sd = snr.calcAllSNRimprovemements(startsec = startsec,
-                                                                    noisefolder = noisefolder,
-                                                                    fs = fs,
-                                                                    filtered_filename = filtered_filename)
+        self.before,self.after,self.av,self.sd = snr.calcAllSNRimprovemements(startsec = startsec,
+                                                                              noisefolder = noisefolder,
+                                                                              fs = fs,
+                                                                              filtered_filename = filtered_filename)
+        self.snrdiff = self.after - self.before
         print(noisefolder,filtered_filename,"avg = {}, sd = {}".format(self.av,self.sd))
         t_value,p_value=stats.ttest_1samp(self.snrdiff,0)
         print(filtered_filename,'Test statistic is %f'%float("{:.6f}".format(t_value)))
@@ -56,7 +56,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
 
-        
+
 #plotting the box plot of the data
 dnfsnr = SNRStat(500,filtered_folder,startsec,"dnf.tsv")
 lmssnr = SNRStat(500,filtered_folder,startsec,"lms.tsv")
@@ -77,5 +77,22 @@ print('p-value for the t-test is %f'%p_value)
 if p_value<=dnfsnr.alpha:
     print("Significantly different between DNF and LMS.")
 
+plt.figure("DNF improvements")
+for i in range(len(dnfsnr.snrdiff)):
+    y = np.array([dnfsnr.before[i],dnfsnr.after[i]])
+    x = np.array([0,1])
+    plt.scatter(0,dnfsnr.before[i])
+    plt.scatter(1,dnfsnr.after[i])
+    plt.ylim([-25,0])
+    plt.plot(x,y)
+
+plt.figure("LMS improvements")
+for i in range(len(lmssnr.snrdiff)):
+    y = np.array([lmssnr.before[i],lmssnr.after[i]])
+    x = np.array([0,1])
+    plt.scatter(0,lmssnr.before[i])
+    plt.scatter(1,lmssnr.after[i])
+    plt.ylim([-25,0])
+    plt.plot(x,y)
 
 plt.show()
