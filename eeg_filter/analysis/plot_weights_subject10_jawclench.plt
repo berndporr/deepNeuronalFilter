@@ -132,7 +132,7 @@ set ylabel ""
 set ylabel  font "" textcolor lt -1 rotate
 set y2label "" 
 set y2label  font "" textcolor lt -1 rotate
-set yrange [ * : * ] noreverse writeback
+set yrange [ 0 : 2.0 ] noreverse writeback
 set y2range [ * : * ] noreverse writeback
 set zlabel "" 
 set zlabel  font "" textcolor lt -1 norotate
@@ -166,5 +166,5 @@ set psdir
 set fit brief errorvariables nocovariancevariables errorscaling prescale nowrap v5
 GNUTERM = "wxt"
 ## Last datafile plotted: "../jawclench/subject10/weight_distance.tsv"
-plot "../jawclench/subject10/weight_distance.tsv" using 1 w l, "../jawclench/subject10/weight_distance.tsv" using 2 w l, "../jawclench/subject10/weight_distance.tsv" using 3 w l, "../jawclench/subject10/weight_distance.tsv" using 4 w l, "../jawclench/subject10/weight_distance.tsv" using 5 w l, "../jawclench/subject10/weight_distance.tsv" using 6 w l, "../jawclench/subject10/weight_distance.tsv" using 7 w l
+plot "../jawclench/subject10/weight_distance.tsv" using 2 w l, "../jawclench/subject10/weight_distance.tsv" using 3 w l, "../jawclench/subject10/weight_distance.tsv" using 4 w l, "../jawclench/subject10/weight_distance.tsv" using 5 w l, "../jawclench/subject10/weight_distance.tsv" using 6 w l, "../jawclench/subject10/weight_distance.tsv" using 7 w l
 #    EOF
