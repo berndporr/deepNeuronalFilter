@@ -77,7 +77,7 @@ print('p-value for the t-test is %f'%p_value)
 if p_value<=dnfsnr.alpha:
     print("Significantly different between DNF and LMS.")
 
-plt.figure("DNF improvements")
+dnf_impr = plt.figure("DNF improvements")
 for i in range(len(dnfsnr.snrdiff)):
     y = np.array([dnfsnr.before[i],dnfsnr.after[i]])
     x = np.array([0,1])
@@ -86,7 +86,11 @@ for i in range(len(dnfsnr.snrdiff)):
     plt.ylim([-25,0])
     plt.plot(x,y)
 
-plt.figure("LMS improvements")
+dnf_impr.savefig('./SNR_DNF_improvements.eps',
+                 format='eps', bbox_inches='tight')
+
+
+lms_impr = plt.figure("LMS improvements")
 for i in range(len(lmssnr.snrdiff)):
     y = np.array([lmssnr.before[i],lmssnr.after[i]])
     x = np.array([0,1])
@@ -94,5 +98,8 @@ for i in range(len(lmssnr.snrdiff)):
     plt.scatter(1,lmssnr.after[i])
     plt.ylim([-25,0])
     plt.plot(x,y)
+
+lms_impr.savefig('./SNR_LMS_improvements.eps',
+                 format='eps', bbox_inches='tight')
 
 plt.show()
