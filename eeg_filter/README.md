@@ -1,4 +1,6 @@
-# EEG filter
+# Deep Neurnal EEG filter
+
+Removes adaptively EMG muscle noise from EEG
 
 ![alt tag](screenshot.png)
 
@@ -13,11 +15,18 @@ structure looks like this:
   +--gla_researchdata_1258
 ```
 
+
+## How to build
+
+cmake .
+make
+
+
 ## How to run
 
 ### Single subject and task
 ```
-/eeg_filter <subject number> [task]
+./eeg_filter <subject number> [task]
 ```
 where the subject number is compulsory and the task
 (p300, jawclench, ...) is optional. Default is p300.
