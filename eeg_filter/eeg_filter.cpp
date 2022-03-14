@@ -109,15 +109,15 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 #endif
 	wdistance_file.open(outpPrefix+"/subject" + sbjct + "/weight_distance.tsv", fstream::out);
 	
-	char tmp[256];
+	char fullpath2data[256];
 	if (nullptr != tasksubdir) {
-		sprintf(tmp,"../../noisewalls/EEG_recordings/participant%03d/%s.tsv",subjIndex,tasksubdir);
+		sprintf(fullpath2data,tasksPath,subjIndex,tasksubdir);
 	} else {
-		sprintf(tmp,"../../noisewalls/EEG_recordings/participant%03d/rawp300.tsv",subjIndex);
+		sprintf(fullpath2data,p300Path,subjIndex);
 	}
-	p300_infile.open(tmp);
+	p300_infile.open(fullpath2data);
 	if (!p300_infile) {
-		cout << "Unable to open file: " << tmp << endl;
+		cout << "Unable to open file: " << fullpath2data << endl;
 		exit(1); // terminate with error
 	}
 	
@@ -258,7 +258,7 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 						       f_nno_plot,
 						       lms_r_plot,
 						       lms_o_plot);
-				plots->plotTitle(sbjct, count, round(count / fs));
+				plots->plotTitle(sbjct, count, round(count / fs),fullpath2data);
 				cvui::update();
 				cv::imshow(WINDOW, frame);
 				
