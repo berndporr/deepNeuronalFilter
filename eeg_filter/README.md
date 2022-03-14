@@ -18,9 +18,10 @@ structure looks like this:
 
 ## How to build
 
+```
 cmake .
 make
-
+```
 
 ## How to run
 
