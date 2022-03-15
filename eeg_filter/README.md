@@ -1,4 +1,4 @@
-# Deep Neurnal EEG filter
+# Deep Neurnal EEG Filter
 
 Removes adaptively EMG muscle noise from EEG
 

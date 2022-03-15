@@ -1,5 +1,17 @@
 # Data analysis tools
 
+## Pre-requisites
+
+The following python modules are required:
+ - matplotlib
+ - numpy
+ - plotly
+ - scipy
+
+To plot the weights please install `gnuplot`.
+
+## Commandline parameters
+
 All python commandline tools have the same parameters:
  - -p participant number between 1 and 20 (default 1)
  - -s The second at which the data analysis starts (default 120sec for p300 and 60sec for jawclench)
