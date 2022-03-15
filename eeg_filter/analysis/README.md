@@ -20,12 +20,15 @@ matplotlib or in the browser.
  - Option -e is the second where the plot ends in the timedomain.
 
 ## p300.py
-Plots the p300 if a subject.
+Plots the p300 of a subject.
 ```
 ./p300.py -p participant -s startsec -f file -h
 ```
 
 ## snr.py
+
+![alt tag](screenshot.png)
+
 Calculates the SNR of one subject
 ```
 ./p300.py -p participant -s startsec -f file -h
