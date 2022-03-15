@@ -33,6 +33,13 @@ Calculates the SNR of one subject
 
 ## SNRcompareDNFLMS.py
 Compares DNF SNR increase against LMS SNR increase for jawclench.
+```
+./SNRcompareDNFLMS.py
+```
 
 ## plot_weights_subject10_jawclench.plt
 Gnuplot script which plots the weights of the individual layers during jawclench of subject 10.
+```
+gnuplot plot_weights_subject10_jawclench.plt
+```
+which generates `gnuplot plot_weights_subject10_jawclench.eps`.
