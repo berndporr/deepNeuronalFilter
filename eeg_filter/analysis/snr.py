@@ -140,11 +140,15 @@ if __name__ == "__main__":
     snrinner, winner = snr.calcSNRinner()
     print("SNR just from inner:",snrinner)
     plt.plot(winner[:,0],winner[:,1],label="INNER")
+    plt.ylabel("V^2/Hz")
+    plt.xlabel("Hz")
     plt.legend()
 
-    plt.figure("Cross correlation of the unfiltered signals: inner vs outer")
+    plt.figure("Cross correlation: inner vs outer")
     l,c = snr.calcCrossCorr()
     plt.xlim([-0.5,0.5])
+    plt.xlabel("t/sec")
+    plt.ylabel("V^2")
     plt.plot(l,c)
 
     plt.show()

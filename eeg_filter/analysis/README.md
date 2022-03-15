@@ -1,6 +1,6 @@
 # Data analysis tools
 
-All tools are python commandline tools which have the same parameters:
+All python commandline tools have the same parameters:
  - -p participant number between 1 and 20 (default 1)
  - -s The second at which the data analysis starts (default 120sec for p300 and 60sec for jawclench)
  - -t The task which is either "p300" (default) or "jawclench"
@@ -33,3 +33,6 @@ Calculates the SNR of one subject
 
 ## SNRcompareDNFLMS.py
 Compares DNF SNR increase against LMS SNR increase for jawclench.
+
+## plot_weights_subject10_jawclench.plt
+Gnuplot script which plots the weights of the individual layers during jawclench of subject 10.
