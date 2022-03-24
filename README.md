@@ -2,8 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6360675.svg)](https://doi.org/10.5281/zenodo.6360675)
 
-## Prerequisites Libraries and packages:
-1) Install the Fir1 library from _https://github.com/berndporr/fir1_ by running:
+## Prerequisites Libraries and packages
 
 ` sudo add-apt-repository ppa:berndporr/dsp `
 
