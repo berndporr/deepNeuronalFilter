@@ -7,7 +7,7 @@
 
 ` sudo add-apt-repository ppa:berndporr/dsp `
 
-` sudo apt-get install iir1` 
+` sudo apt-get install fir1-dev` 
 
 ` sudo apt-get install iir1-dev`
 
