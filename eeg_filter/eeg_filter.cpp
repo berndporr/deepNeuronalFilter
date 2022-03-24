@@ -7,7 +7,6 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/lexical_cast.hpp>
 #include <Iir.h>
-#include <Fir1.h>
 #include <chrono>
 #include <string>
 #include <ctime>
