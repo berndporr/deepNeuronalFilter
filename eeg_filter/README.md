@@ -18,10 +18,8 @@ structure looks like this:
 
 ## How to build
 
-```
-cmake .
-make
-```
+Go to the parent directory and run `cmake .` and `make` from there initially. Then you can
+also do `make` in this subdirectory later.
 
 ## How to run
 
