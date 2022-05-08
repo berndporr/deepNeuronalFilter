@@ -3,36 +3,32 @@
 
 #include "dnf.h"
 
-const char* const p300Path = "../../gla_researchdata_1258/EEG_recordings/participant%03d/rawp300.tsv";
-const char* const tasksPath = "../../gla_researchdata_1258/EEG_recordings/participant%03d/%s.tsv";
+const double fs = 48000;
+
+const char* const audioPath = "audio/exp%d/audio.wav";
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
 
 // number of subjects
-const int nSubj = 20;
+const int nExp = 4;
 
 // pre-filtering
 const int filterorder = 2;
-const double innerHighpassCutOff = 0.5; // Hz
-const double outerHighpassCutOff = 5; // Hz
-const double LaplaceCutOff = 0.5; // Hz
-
-const double powerlineFrequ = 50; // Hz
-const double bsBandwidth = 2.5; // Hz
+const double innerHighpassCutOff = 20; // Hz
+const double outerHighpassCutOff = 20; // Hz
+const double LaplaceCutOff = 20; // Hz
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
 // dnf learning rate
-const double dnf_learning_rate_p300 = 10;
-const double dnf_learning_rate_tasks = 2.5;
+const double dnf_learning_rate = 0.5;
 
 // dnf number of layers
 const int NLAYERS = 6;
 
 // LMS learning rates
-const double lms_learning_rate_p300 = 0.04;
-const double lms_learning_rate_tasks = 0.01;
+const double lms_learning_rate = 0.5;
 
 const double inner_gain = 1000;
 const double outer_gain = 1000;

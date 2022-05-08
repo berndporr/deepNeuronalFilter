@@ -14,6 +14,7 @@ cmake_policy(SET CMP0042 NEW) # enable MACOSX_RPATH by default
 include(GNUInstallDirs)
 add_subdirectory(eeg_filter)
 add_subdirectory(ecg_filter)
+add_subdirectory(audio_filter)
 add_subdirectory(cvui)
 enable_testing ()
 
