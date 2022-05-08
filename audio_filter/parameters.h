@@ -10,18 +10,18 @@ const char* const audioPath = "audio/exp%d/audio.wav";
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
 
 // number of experiments
-const int nExp = 4;
+const int nExp = 3;
 
 // pre-filtering
 const int filterorder = 2;
-const double signalWithNoiseHighpassCutOff = 200; // Hz
+const double signalWithNoiseHighpassCutOff = 20; // Hz
 const double noiserefHighpassCutOff = 200; // Hz
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
 // dnf learning rate
-const double dnf_learning_rate = 0.5;
+const double dnf_learning_rate = 1;
 
 // dnf number of layers
 const int NLAYERS = 15;
