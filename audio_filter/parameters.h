@@ -27,7 +27,7 @@ const double dnf_learning_rate = 0.5;
 const int NLAYERS = 15;
 
 // LMS learning rates
-const double lms_learning_rate = 0.1;
+const double lms_learning_rate = 0.05;
 
 const double signalWithNoise_gain = 1;
 const double noiseref_gain = 1;

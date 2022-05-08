@@ -151,7 +151,7 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 
 		// Do LMS filter
 		if (count > (samplesNoLearning+nTapsDNF)){
-			lms_filter.setLearningRate(dnf_learning_rate);
+			lms_filter.setLearningRate(lms_learning_rate);
 		} else {
 			lms_filter.setLearningRate(0);
 		}
