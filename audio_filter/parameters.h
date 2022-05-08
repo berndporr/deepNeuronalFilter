@@ -16,16 +16,16 @@ const int nExp = 4;
 const int filterorder = 2;
 const double signalWithNoiseHighpassCutOff = 200; // Hz
 const double noiserefHighpassCutOff = 200; // Hz
-const double LaplaceCutOff = 20; // Hz
+const double LaplaceCutOff = 100; // Hz
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
 // dnf learning rate
-const double dnf_learning_rate = 0.1;
+const double dnf_learning_rate = 0.5;
 
 // dnf number of layers
-const int NLAYERS = 20;
+const int NLAYERS = 15;
 
 // LMS learning rates
 const double lms_learning_rate = 0.1;
