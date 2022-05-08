@@ -22,7 +22,7 @@ const double LaplaceCutOff = 20; // Hz
 const int bufferLength = 1000 ;
 
 // dnf learning rate
-const double dnf_learning_rate = 0.5;
+const double dnf_learning_rate = 0.05;
 
 // dnf number of layers
 const int NLAYERS = 6;

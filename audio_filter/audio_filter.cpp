@@ -30,7 +30,7 @@ void addSOXheader(fstream &f) {
 	f << "; Channels 1" << endl;
 }
 
-void processOneSubject(const int expIndex, const char* tasksubdir = nullptr, const bool showPlots = true) {
+void processOneSubject(const int expIndex, const bool showPlots = true) {
 	std::srand(1);
 
 	// file path prefix for the results
@@ -227,21 +227,16 @@ void processOneSubject(const int expIndex, const char* tasksubdir = nullptr, con
 
 int main(int argc, const char *argv[]) {
 	if (argc < 2) {
-		fprintf(stderr,"Usage: %s [-a] <subjectNumber> [tasksubdir]\n",argv[0]);
+		fprintf(stderr,"Usage: %s [-a] [-b] <expNumber>\n",argv[0]);
 		fprintf(stderr,"       -a calculates all 20 subjects in a loop.\n");
 		fprintf(stderr,"       -b calculates all 20 subjects multi-threaded without screen output.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
 		return 0;
 	}
 	
-	const char *tasksubdir = nullptr;
-	if (argc > 2) {
-		tasksubdir = argv[2];
-	}
-
 	if (strcmp(argv[1],"-a") == 0) {
 		for(int i = 0; i < nExp; i++) {
-			processOneSubject(i+1,tasksubdir);
+			processOneSubject(i+1);
 		}
 		return 0;
 	}
@@ -249,7 +244,7 @@ int main(int argc, const char *argv[]) {
 	if (strcmp(argv[1],"-b") == 0) {
 		std::thread* workers[nExp];
 		for(int i = 0; i < nExp; i++) {
-			workers[i] = new std::thread(processOneSubject,i+1,tasksubdir,false);
+			workers[i] = new std::thread(processOneSubject,i+1,false);
 		}
 		for(int i = 0; i < nExp; i++) {
 			workers[i]->join();
@@ -260,9 +255,9 @@ int main(int argc, const char *argv[]) {
 	
 	const int subj = atoi(argv[1]);
 	if ( (subj < 1) || (subj > nExp) ) {
-		fprintf(stderr,"Subj number of out range.\n");
+		fprintf(stderr,"Exp number of out range.\n");
 		return -1;
 	}
-	processOneSubject(subj,tasksubdir);
+	processOneSubject(subj);
 	return 0;
 }
