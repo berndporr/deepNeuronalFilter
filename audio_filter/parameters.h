@@ -1,5 +1,5 @@
-#ifndef EEGFILTER_PARAMETERS_H
-#define EEGFILTER_PARAMETERS_H
+#ifndef AUDIO_FILTER_PARAMETERS_H
+#define AUDIO_FILTER_PARAMETERS_H
 
 #include "dnf.h"
 
@@ -14,8 +14,8 @@ const int nExp = 4;
 
 // pre-filtering
 const int filterorder = 2;
-const double innerHighpassCutOff = 20; // Hz
-const double outerHighpassCutOff = 20; // Hz
+const double innerHighpassCutOff = 200; // Hz
+const double outerHighpassCutOff = 200; // Hz
 const double LaplaceCutOff = 20; // Hz
 
 //creat circular buffers for plotting
@@ -34,7 +34,10 @@ const double inner_gain = 1;
 const double outer_gain = 1;
 const double remover_gain = 1;
 
-// Very slow
-// #define SAVE_WEIGHTS
+// PLOTTING
+#define WINDOW "Deep Neuronal Filter"
+const int plotW = 1200;
+const int plotH = 720;
 
-#endif //EEGFILTER_PARAMETERS_H
+
+#endif //AUDIO_FILTER_PARAMETERS_H

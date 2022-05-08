@@ -114,7 +114,7 @@ public:
 		return !feof(filePtr);
 	}
 	
-	float getMonoSample() {
+	float getSample() {
 		int16_t i;
 		int r = fread(&i, sizeof(int16_t), 1, filePtr);
 		if (r < 0) return 0;
@@ -122,9 +122,10 @@ public:
 	}
 
 	StereoSample getStereoSample() {
+		if (2 != hdr.numChannels) throw "Not a stereo file.";
 		StereoSample stereoSample;
-		stereoSample.left = getMonoSample();
-		stereoSample.right = getMonoSample();
+		stereoSample.left = getSample();
+		stereoSample.right = getSample();
 		return stereoSample;
 	}
 	

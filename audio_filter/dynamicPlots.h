@@ -34,7 +34,7 @@ public:
 			     );
 	void plotVariables();
 	
-	void plotTitle(std::string title, long count, int duration, const char* fullPath);
+	void plotTitle(std::string title, long count, double duration, const char* fullPath);
 	
 private:
 	cv::Mat frame;

@@ -90,7 +90,7 @@ void dynaPlots::plotMainSignals(std::vector<double> &outer,
     cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "LMS output");
 }
 
-void dynaPlots::plotTitle(std::string title, long count, int duration,const char* fullPath){
-    cvui::printf(frame, gapX,           titleY, "Subject %s -- Sample number: %ld , Duration: %d [min] %d [s], %s",
-                 title.c_str(),count, int(duration/60) , duration % 60, fullPath);
+void dynaPlots::plotTitle(std::string title, long count, double duration,const char* fullPath){
+    cvui::printf(frame, gapX,           titleY, "Subject %s -- Sample number: %ld , Duration: %2.3f [s], %s",
+                 title.c_str(),count, duration, fullPath);
 }

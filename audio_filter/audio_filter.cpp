@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <string>
 #include <stdio.h>
 #include <boost/circular_buffer.hpp>
@@ -24,19 +25,20 @@
 using namespace std;
 constexpr int ESC_key = 27;
 
-// PLOTTING
-#define WINDOW "Deep Neuronal Filter"
-const int plotW = 1200;
-const int plotH = 720;
+void addSOXheader(fstream &f) {
+	f << "; Sample Rate " << fs << endl;
+	f << "; Channels 1" << endl;
+}
 
-
-void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, const bool showPlots = true) {
+void processOneSubject(const int expIndex, const char* tasksubdir = nullptr, const bool showPlots = true) {
 	std::srand(1);
 
 	// file path prefix for the results
 	std::string outpPrefix = "results";
 
-	fprintf(stderr,"Starting DNF on subj %d, filename = %s.\n",subjIndex, outpPrefix.c_str());
+	std::filesystem::create_directory(outpPrefix);
+
+	fprintf(stderr,"Starting DNF on subj %d, filename = %s.\n",expIndex, outpPrefix.c_str());
 
 	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 	
@@ -74,27 +76,32 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 	}
 
 	//create files for saving the data and parameters
-	string sbjct = std::to_string(subjIndex);
-
+	const std::string expDir = "/exp";
+	const std::string sd = outpPrefix + expDir + std::to_string(expIndex);
+	std::filesystem::create_directory(sd);
+	
 	DNF dnf(NLAYERS,nTapsDNF,fs,ACTIVATION);
 
-	dnf_file.open(outpPrefix+"/subject" + sbjct + "/dnf.tsv", fstream::out);
-	inner_file.open(outpPrefix+"/subject" + sbjct + "/inner.tsv", fstream::out);
-	outer_file.open(outpPrefix+"/subject" + sbjct + "/outer.tsv", fstream::out);
-	lms_file.open(outpPrefix+"/subject" + sbjct + "/lms.tsv", fstream::out);
-	laplace_file.open(outpPrefix+"/subject" + sbjct + "/laplace.tsv", fstream::out);
-#ifdef SAVE_WEIGHTS
-	weight_file.open(outpPrefix+"/subject" + sbjct + "/lWeights.tsv", fstream::out);
-#endif
-	wdistance_file.open(outpPrefix+"/subject" + sbjct + "/weight_distance.tsv", fstream::out);
+	dnf_file.open(sd + "/dnf.dat", fstream::out);
+	addSOXheader(dnf_file);
+	inner_file.open(sd + "/inner.dat", fstream::out);
+	addSOXheader(inner_file);
+	outer_file.open(sd + "/outer.dat", fstream::out);
+	addSOXheader(outer_file);
+	lms_file.open(sd + "/lms.dat", fstream::out);
+	addSOXheader(lms_file);
+	laplace_file.open(sd + "/laplace.dat", fstream::out);
+	addSOXheader(laplace_file);
+	wdistance_file.open(sd + "/weight_distance.tsv", fstream::out);
 	
 	char fullpath2data[256];
-	sprintf(fullpath2data,audioPath,subjIndex);
+	sprintf(fullpath2data,audioPath,expIndex);
 	int r = wavread.open(fullpath2data);
 	if (r < 0) {
 		cout << "Unable to open file: " << fullpath2data << endl;
 		exit(1); // terminate with error
 	}
+	wavread.printHeaderInfo();
 	
 	//setting up all the filters required
 	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
@@ -111,16 +118,9 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 
 	// main loop processsing sample by sample
 	while (wavread.hasSample()) {
-		count++;
-		//get the data from .tsv files:
-
-		//SIGNALS
-		double inner_raw_data = 0;
-		double outer_raw_data = 0;
-
 		WAVread::StereoSample s = wavread.getStereoSample();
-		inner_raw_data = s.left; // signal + noise
-		outer_raw_data = s.right; // noise ref
+		double inner_raw_data = s.left; // signal + noise
+		double outer_raw_data = s.right; // noise ref
 		
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY
@@ -139,11 +139,9 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 		} else {
 			dnf.getNet().setLearningRate(0, 0);
 		}
+
+		double t = (double)count / fs;
 		
-#ifdef SAVE_WEIGHTS
-		// SAVE WEIGHTS
-		NNO.snapWeights(outpPrefix, "p300", subjIndex);
-#endif
 		wdistance_file << dnf.getNet().getWeightDistance();
 		for(int i=0; i < NLAYERS; i++ ) {
 			wdistance_file << "\t" << dnf.getNet().getLayerWeightDistance(i);
@@ -166,12 +164,12 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 		}
 		
 		// SAVE SIGNALS INTO FILES
-		laplace_file << laplace << endl;
+		laplace_file << t << " " << laplace << endl;
 		// undo the gain so that the signal is again in volt
-		inner_file << dnf.getDelayedSignal()/inner_gain << endl;
-		outer_file << outerhp/outer_gain << "\t" << endl;
-		dnf_file << dnf.getOutput()/inner_gain << "\t" << dnf.getRemover()/inner_gain << endl;
-		lms_file << lms_output/inner_gain << "\t" << corrLMS/inner_gain << endl;
+		inner_file << t << " " << dnf.getDelayedSignal()/inner_gain << endl;
+		outer_file << t << " " << outerhp/outer_gain << " " << endl;
+		dnf_file << t << " " << dnf.getOutput()/inner_gain << " " << dnf.getRemover()/inner_gain << endl;
+		lms_file << t << " " << lms_output/inner_gain << " " << corrLMS/inner_gain << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
@@ -202,7 +200,7 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 						       f_nno_plot,
 						       lms_r_plot,
 						       lms_o_plot);
-				plots->plotTitle(sbjct, count, round(count / fs),fullpath2data);
+				plots->plotTitle(sd, count, count / fs,fullpath2data);
 				cvui::update();
 				cv::imshow(WINDOW, frame);
 				
@@ -211,8 +209,9 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 				}
 			}
 		}
+		count++;
 	}
-	dnf.getNet().snapWeights(outpPrefix, "p300", subjIndex);
+	dnf.getNet().snapWeights(outpPrefix, "p300", expIndex);
 	wavread.close();
 	dnf_file.close();
 	inner_file.close();
@@ -220,9 +219,6 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 	lms_file.close();
 	laplace_file.close();
 	wdistance_file.close();
-#ifdef SAVE_WEIGHTS
-	weight_file.close();
-#endif
 	if (plots) delete plots;
 	cout << "The program has reached the end of the input file" << endl;
 }

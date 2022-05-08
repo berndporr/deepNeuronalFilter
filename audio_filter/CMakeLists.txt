@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0)
 project(audio_filter)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED)
 find_package (Threads)
