@@ -30,8 +30,8 @@ const int NLAYERS = 6;
 // LMS learning rates
 const double lms_learning_rate = 0.5;
 
-const double inner_gain = 1000;
-const double outer_gain = 1000;
+const double inner_gain = 1;
+const double outer_gain = 1;
 const double remover_gain = 1;
 
 // Very slow

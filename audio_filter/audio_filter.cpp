@@ -16,6 +16,7 @@
 #include "dnf.h"
 #include "parameters.h"
 #include "dynamicPlots.h"
+#include "wavRead/wavread.h"
 
 #define CVUI_IMPLEMENTATION
 #include "cvui.h"
@@ -33,13 +34,7 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 	std::srand(1);
 
 	// file path prefix for the results
-	std::string outpPrefix = "p300";
-
-	int fs = 250;
-	if (nullptr != tasksubdir) {
-		fs = 500;
-		outpPrefix = tasksubdir;
-	}
+	std::string outpPrefix = "results";
 
 	fprintf(stderr,"Starting DNF on subj %d, filename = %s.\n",subjIndex, outpPrefix.c_str());
 
@@ -55,14 +50,14 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 //LMS
 	boost::circular_buffer<double> lms_o_buf(bufferLength);
 	boost::circular_buffer<double> lms_r_buf(bufferLength);
-	
+
+	WAVread wavread;
 // FILES
 	fstream dnf_file;
 	fstream inner_file;
 	fstream outer_file;
 	fstream lms_file;
 	fstream laplace_file;
-	ifstream p300_infile;
 	fstream wdistance_file;
 #ifdef SAVE_WEIGHTS
 	fstream weight_file;
@@ -83,9 +78,6 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 
 	DNF dnf(NLAYERS,nTapsDNF,fs,ACTIVATION);
 
-	//adding delay line for the noise
-	boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());
-		
 	dnf_file.open(outpPrefix+"/subject" + sbjct + "/dnf.tsv", fstream::out);
 	inner_file.open(outpPrefix+"/subject" + sbjct + "/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/subject" + sbjct + "/outer.tsv", fstream::out);
@@ -97,13 +89,9 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 	wdistance_file.open(outpPrefix+"/subject" + sbjct + "/weight_distance.tsv", fstream::out);
 	
 	char fullpath2data[256];
-	if (nullptr != tasksubdir) {
-		sprintf(fullpath2data,tasksPath,subjIndex,tasksubdir);
-	} else {
-		sprintf(fullpath2data,p300Path,subjIndex);
-	}
-	p300_infile.open(fullpath2data);
-	if (!p300_infile) {
+	sprintf(fullpath2data,audioPath,subjIndex);
+	int r = wavread.open(fullpath2data);
+	if (r < 0) {
 		cout << "Unable to open file: " << fullpath2data << endl;
 		exit(1); // terminate with error
 	}
@@ -111,69 +99,43 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 	//setting up all the filters required
 	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
 	outer_filterHP.setup(fs,outerHighpassCutOff);
-	Iir::Butterworth::BandStop<filterorder> outer_filterBS;
-	outer_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
 	inner_filterHP.setup(fs,innerHighpassCutOff);
-	Iir::Butterworth::BandStop<filterorder> inner_filterBS;
-	inner_filterBS.setup(fs,powerlineFrequ,bsBandwidth);
 
 	Iir::Butterworth::HighPass<filterorder> laplaceHP;
 	laplaceHP.setup(fs,LaplaceCutOff);
-	Iir::Butterworth::BandStop<filterorder> laplaceBS;
-	laplaceBS.setup(fs,powerlineFrequ,bsBandwidth);
 	
 	Fir1 lms_filter(nTapsDNF);
 	
 	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f\n",inner_gain,outer_gain,remover_gain);
 
 	// main loop processsing sample by sample
-	while (!p300_infile.eof()) {
+	while (wavread.hasSample()) {
 		count++;
 		//get the data from .tsv files:
 
 		//SIGNALS
 		double inner_raw_data = 0;
 		double outer_raw_data = 0;
-		double p300trigger = 0;
-		
-		if (nullptr == tasksubdir) {
-			p300_infile >> inner_raw_data >> outer_raw_data >> p300trigger;
-		} else {
-			std::string line;
-			std::getline(p300_infile, line);
-			vector<string> row_values;
-			split(line, '\t', row_values);
-			if (row_values.size()>7) {
-				inner_raw_data = boost::lexical_cast<double>(row_values[7]);
-				outer_raw_data = boost::lexical_cast<double>(row_values[8]);
-			}
-			p300trigger = 0;
-		}
+
+		WAVread::StereoSample s = wavread.getStereoSample();
+		inner_raw_data = s.left; // signal + noise
+		outer_raw_data = s.right; // noise ref
 		
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY
 		const double inner_raw = inner_gain * inner_raw_data;
 		double inner_filtered = inner_filterHP.filter(inner_raw);
-		inner_filtered = inner_filterBS.filter(inner_filtered);
-
-		innertrigger_delayLine.push_back(p300trigger);
-		const double delayedp300trigger = innertrigger_delayLine[0];
 
 		//B) OUTER ELECTRODE:
 		//1) ADJUST & AMPLIFY
 		const double outer_raw = outer_gain * outer_raw_data;
 		const double outerhp = outer_filterHP.filter(outer_raw);
-		const double outer = outer_filterBS.filter(outerhp);
 
-		double f_nn = dnf.filter(inner_filtered,outer);
+		double f_nn = dnf.filter(inner_filtered,outerhp);
 
-		double w_eta = dnf_learning_rate_p300;
-		if (nullptr != tasksubdir) {
-			w_eta = dnf_learning_rate_tasks;
-		}
 		if (count > (samplesNoLearning+nTapsDNF)){
-			dnf.getNet().setLearningRate(w_eta, 0);
+			dnf.getNet().setLearningRate(dnf_learning_rate, 0);
 		} else {
 			dnf.getNet().setLearningRate(0, 0);
 		}
@@ -190,35 +152,30 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 
 		// Do Laplace filter
 		double laplace = laplaceHP.filter(inner_raw_data - outer_raw_data);
-		laplace = laplaceBS.filter(laplace);
 
 		// Do LMS filter
 		if (count > (samplesNoLearning+nTapsDNF)){
-			if (nullptr == tasksubdir) {
-				lms_filter.setLearningRate(lms_learning_rate_p300);
-			} else {
-				lms_filter.setLearningRate(lms_learning_rate_tasks);
-			}
+			lms_filter.setLearningRate(dnf_learning_rate);
 		} else {
 			lms_filter.setLearningRate(0);
 		}
-		double corrLMS = lms_filter.filter(outer);
+		double corrLMS = lms_filter.filter(outerhp);
 		double lms_output = dnf.getDelayedSignal() - corrLMS;
 		if (count > (samplesNoLearning+nTapsDNF)){
 			lms_filter.lms_update(lms_output);
 		}
 		
 		// SAVE SIGNALS INTO FILES
-		laplace_file << laplace << "\t" << p300trigger << endl;
+		laplace_file << laplace << endl;
 		// undo the gain so that the signal is again in volt
-		inner_file << dnf.getDelayedSignal()/inner_gain << "\t" << delayedp300trigger << endl;
-		outer_file << outer/outer_gain << "\t" << delayedp300trigger << endl;
-		dnf_file << dnf.getOutput()/inner_gain << "\t" << dnf.getRemover()/inner_gain << "\t" << delayedp300trigger << endl;
-		lms_file << lms_output/inner_gain << "\t" << corrLMS/inner_gain << "\t" << delayedp300trigger << endl;
+		inner_file << dnf.getDelayedSignal()/inner_gain << endl;
+		outer_file << outerhp/outer_gain << "\t" << endl;
+		dnf_file << dnf.getOutput()/inner_gain << "\t" << dnf.getRemover()/inner_gain << endl;
+		lms_file << lms_output/inner_gain << "\t" << corrLMS/inner_gain << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
-		oo_buf.push_back(outer);
+		oo_buf.push_back(outerhp);
 		io_buf.push_back(dnf.getDelayedSignal());
 		ro_buf.push_back(dnf.getRemover());
 		f_nno_buf.push_back(f_nn);
@@ -256,7 +213,7 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 		}
 	}
 	dnf.getNet().snapWeights(outpPrefix, "p300", subjIndex);
-	p300_infile.close();
+	wavread.close();
 	dnf_file.close();
 	inner_file.close();
 	outer_file.close();
@@ -287,18 +244,18 @@ int main(int argc, const char *argv[]) {
 	}
 
 	if (strcmp(argv[1],"-a") == 0) {
-		for(int i = 0; i < nSubj; i++) {
+		for(int i = 0; i < nExp; i++) {
 			processOneSubject(i+1,tasksubdir);
 		}
 		return 0;
 	}
 	
 	if (strcmp(argv[1],"-b") == 0) {
-		std::thread* workers[nSubj];
-		for(int i = 0; i < nSubj; i++) {
+		std::thread* workers[nExp];
+		for(int i = 0; i < nExp; i++) {
 			workers[i] = new std::thread(processOneSubject,i+1,tasksubdir,false);
 		}
-		for(int i = 0; i < nSubj; i++) {
+		for(int i = 0; i < nExp; i++) {
 			workers[i]->join();
 			delete workers[i];
 		}
@@ -306,7 +263,7 @@ int main(int argc, const char *argv[]) {
 	}
 	
 	const int subj = atoi(argv[1]);
-	if ( (subj < 1) || (subj > nSubj) ) {
+	if ( (subj < 1) || (subj > nExp) ) {
 		fprintf(stderr,"Subj number of out range.\n");
 		return -1;
 	}
