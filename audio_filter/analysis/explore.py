@@ -11,7 +11,9 @@ audiofolder = "audio"
 
 class SimData:
     def loadFile(self,filename):
-        return np.loadtxt("../results/exp{}/{}".format(self.exper,filename),comments=';')
+        fullpath = "../results/exp{}/{}".format(self.exper,filename)
+        print("Loading:",fullpath)
+        return np.loadtxt(fullpath,comments=';')
     
     def __init__(self,exper,filtered_filename,startsec,endsec=False):
         self.fs = 48000

@@ -16,7 +16,6 @@ const int nExp = 4;
 const int filterorder = 2;
 const double signalWithNoiseHighpassCutOff = 200; // Hz
 const double noiserefHighpassCutOff = 200; // Hz
-const double LaplaceCutOff = 100; // Hz
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;

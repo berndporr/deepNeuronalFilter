@@ -54,16 +54,6 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 	boost::circular_buffer<double> lms_r_buf(bufferLength);
 
 	WAVread wavread;
-// FILES
-	fstream dnf_file;
-	fstream signalWithNoise_file;
-	fstream noiseref_file;
-	fstream lms_file;
-	fstream laplace_file;
-	fstream wdistance_file;
-#ifdef SAVE_WEIGHTS
-	fstream weight_file;
-#endif
 
 	long count = 0;
 	
@@ -82,16 +72,30 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 	
 	DNF dnf(NLAYERS,nTapsDNF,fs,ACTIVATION);
 
-	dnf_file.open(sd + "/dnf.dat", fstream::out);
-	addSOXheader(dnf_file);
+// FILES
+	fstream signalWithNoise_file;
 	signalWithNoise_file.open(sd + "/signalWithNoise.dat", fstream::out);
 	addSOXheader(signalWithNoise_file);
+
+	fstream noiseref_file;
 	noiseref_file.open(sd + "/noiseref.dat", fstream::out);
 	addSOXheader(noiseref_file);
-	lms_file.open(sd + "/lms.dat", fstream::out);
-	addSOXheader(lms_file);
-	laplace_file.open(sd + "/laplace.dat", fstream::out);
-	addSOXheader(laplace_file);
+
+	fstream dnfOut_file;
+	dnfOut_file.open(sd + "/dnf_out.dat", fstream::out);
+	addSOXheader(dnfOut_file);
+
+	fstream dnfRemover_file;
+	dnfRemover_file.open(sd + "/dnf_remover.dat", fstream::out);
+
+	fstream lmsOut_file;
+	lmsOut_file.open(sd + "/lms_out.dat", fstream::out);
+	addSOXheader(lmsOut_file);
+
+	fstream lmsRemover_file;
+	lmsRemover_file.open(sd + "/lms_remover.dat", fstream::out);
+
+	fstream wdistance_file;
 	wdistance_file.open(sd + "/weight_distance.tsv", fstream::out);
 	
 	char fullpath2data[256];
@@ -109,9 +113,6 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 	Iir::Butterworth::HighPass<filterorder> signalWithNoise_filterHP;
 	signalWithNoise_filterHP.setup(fs,signalWithNoiseHighpassCutOff);
 
-	Iir::Butterworth::HighPass<filterorder> laplaceHP;
-	laplaceHP.setup(fs,LaplaceCutOff);
-	
 	Fir1 lms_filter(nTapsDNF);
 	
 	fprintf(stderr,"signalWithNoise_gain = %f, noiseref_gain = %f, remover_gain = %f\n",signalWithNoise_gain,noiseref_gain,remover_gain);
@@ -148,9 +149,6 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 		}
 		wdistance_file << endl;
 
-		// Do Laplace filter
-		double laplace = laplaceHP.filter(signalWithNoise_raw_data - noiseref_raw_data);
-
 		// Do LMS filter
 		if (count > (samplesNoLearning+nTapsDNF)){
 			lms_filter.setLearningRate(dnf_learning_rate);
@@ -164,12 +162,13 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 		}
 		
 		// SAVE SIGNALS INTO FILES
-		laplace_file << t << " " << laplace << endl;
 		// undo the gain so that the signal is again in volt
 		signalWithNoise_file << t << " " << dnf.getDelayedSignal()/signalWithNoise_gain << endl;
 		noiseref_file << t << " " << noiserefhp/noiseref_gain << " " << endl;
-		dnf_file << t << " " << dnf.getOutput()/signalWithNoise_gain << " " << dnf.getRemover()/signalWithNoise_gain << endl;
-		lms_file << t << " " << lms_output/signalWithNoise_gain << " " << corrLMS/signalWithNoise_gain << endl;
+		dnfOut_file << t << " " << dnf.getOutput()/signalWithNoise_gain << endl;
+		lmsOut_file << t << " " << lms_output/signalWithNoise_gain << endl;
+		dnfRemover_file << dnf.getRemover()/signalWithNoise_gain << endl;
+		lmsRemover_file << corrLMS/signalWithNoise_gain << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
@@ -212,11 +211,12 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 		count++;
 	}
 	wavread.close();
-	dnf_file.close();
+	dnfOut_file.close();
+	dnfRemover_file.close();
 	signalWithNoise_file.close();
 	noiseref_file.close();
-	lms_file.close();
-	laplace_file.close();
+	lmsOut_file.close();
+	lmsRemover_file.close();
 	wdistance_file.close();
 	if (plots) delete plots;
 	cout << "The program has reached the end of the input file" << endl;
