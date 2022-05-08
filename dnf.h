@@ -32,7 +32,7 @@ public:
 		// calc an exp reduction of the numbers always reaching 1
 		double b = exp(log(noiseDelayLineLength)/(NLAYERS-1));
 		for(int i=0;i<NLAYERS;i++) {
-			nNeurons[i] = noiseDelayLineLength / pow(b,i);
+			nNeurons[i] = ceil(noiseDelayLineLength / pow(b,i));
 			if (i == (NLAYERS-1)) nNeurons[i] = 1;
 		}
 		

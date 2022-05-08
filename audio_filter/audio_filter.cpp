@@ -30,7 +30,7 @@ void addSOXheader(fstream &f) {
 	f << "; Channels 1" << endl;
 }
 
-void processOneSubject(const int expIndex, const bool showPlots = true) {
+void processOneExperiment(const int expIndex, const bool showPlots = true) {
 	std::srand(1);
 
 	// file path prefix for the results
@@ -38,11 +38,11 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 
 	std::filesystem::create_directory(outpPrefix);
 
-	fprintf(stderr,"Starting DNF on subj %d, filename = %s.\n",expIndex, outpPrefix.c_str());
+	fprintf(stderr,"Starting DNF on experiment %d, filename = %s.\n",expIndex, outpPrefix.c_str());
 
-	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
+	const int samplesNoLearning = 3 * fs / signalWithNoiseHighpassCutOff;
 	
-	const int nTapsDNF = fs / outerHighpassCutOff;
+	const int nTapsDNF = fs / noiserefHighpassCutOff;
 	fprintf(stderr,"nTapsDNF = %d\n",nTapsDNF);
 	
 	boost::circular_buffer<double> oo_buf(bufferLength);
@@ -56,8 +56,8 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 	WAVread wavread;
 // FILES
 	fstream dnf_file;
-	fstream inner_file;
-	fstream outer_file;
+	fstream signalWithNoise_file;
+	fstream noiseref_file;
 	fstream lms_file;
 	fstream laplace_file;
 	fstream wdistance_file;
@@ -84,10 +84,10 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 
 	dnf_file.open(sd + "/dnf.dat", fstream::out);
 	addSOXheader(dnf_file);
-	inner_file.open(sd + "/inner.dat", fstream::out);
-	addSOXheader(inner_file);
-	outer_file.open(sd + "/outer.dat", fstream::out);
-	addSOXheader(outer_file);
+	signalWithNoise_file.open(sd + "/signalWithNoise.dat", fstream::out);
+	addSOXheader(signalWithNoise_file);
+	noiseref_file.open(sd + "/noiseref.dat", fstream::out);
+	addSOXheader(noiseref_file);
 	lms_file.open(sd + "/lms.dat", fstream::out);
 	addSOXheader(lms_file);
 	laplace_file.open(sd + "/laplace.dat", fstream::out);
@@ -104,35 +104,35 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 	wavread.printHeaderInfo();
 	
 	//setting up all the filters required
-	Iir::Butterworth::HighPass<filterorder> outer_filterHP;
-	outer_filterHP.setup(fs,outerHighpassCutOff);
-	Iir::Butterworth::HighPass<filterorder> inner_filterHP;
-	inner_filterHP.setup(fs,innerHighpassCutOff);
+	Iir::Butterworth::HighPass<filterorder> noiseref_filterHP;
+	noiseref_filterHP.setup(fs,noiserefHighpassCutOff);
+	Iir::Butterworth::HighPass<filterorder> signalWithNoise_filterHP;
+	signalWithNoise_filterHP.setup(fs,signalWithNoiseHighpassCutOff);
 
 	Iir::Butterworth::HighPass<filterorder> laplaceHP;
 	laplaceHP.setup(fs,LaplaceCutOff);
 	
 	Fir1 lms_filter(nTapsDNF);
 	
-	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f\n",inner_gain,outer_gain,remover_gain);
+	fprintf(stderr,"signalWithNoise_gain = %f, noiseref_gain = %f, remover_gain = %f\n",signalWithNoise_gain,noiseref_gain,remover_gain);
 
 	// main loop processsing sample by sample
 	while (wavread.hasSample()) {
 		WAVread::StereoSample s = wavread.getStereoSample();
-		double inner_raw_data = s.left; // signal + noise
-		double outer_raw_data = s.right; // noise ref
+		double signalWithNoise_raw_data = s.left; // signal + noise
+		double noiseref_raw_data = s.right; // noise ref
 		
-		//A) INNER ELECTRODE:
+		//A) SIGNALWITHNOISE ELECTRODE:
 		//1) ADJUST & AMPLIFY
-		const double inner_raw = inner_gain * inner_raw_data;
-		double inner_filtered = inner_filterHP.filter(inner_raw);
+		const double signalWithNoise_raw = signalWithNoise_gain * signalWithNoise_raw_data;
+		double signalWithNoise_filtered = signalWithNoise_filterHP.filter(signalWithNoise_raw);
 
-		//B) OUTER ELECTRODE:
+		//B) NOISEREF ELECTRODE:
 		//1) ADJUST & AMPLIFY
-		const double outer_raw = outer_gain * outer_raw_data;
-		const double outerhp = outer_filterHP.filter(outer_raw);
+		const double noiseref_raw = noiseref_gain * noiseref_raw_data;
+		const double noiserefhp = noiseref_filterHP.filter(noiseref_raw);
 
-		double f_nn = dnf.filter(inner_filtered,outerhp);
+		double f_nn = dnf.filter(signalWithNoise_filtered,noiserefhp);
 
 		if (count > (samplesNoLearning+nTapsDNF)){
 			dnf.getNet().setLearningRate(dnf_learning_rate, 0);
@@ -149,7 +149,7 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 		wdistance_file << endl;
 
 		// Do Laplace filter
-		double laplace = laplaceHP.filter(inner_raw_data - outer_raw_data);
+		double laplace = laplaceHP.filter(signalWithNoise_raw_data - noiseref_raw_data);
 
 		// Do LMS filter
 		if (count > (samplesNoLearning+nTapsDNF)){
@@ -157,7 +157,7 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 		} else {
 			lms_filter.setLearningRate(0);
 		}
-		double corrLMS = lms_filter.filter(outerhp);
+		double corrLMS = lms_filter.filter(noiserefhp);
 		double lms_output = dnf.getDelayedSignal() - corrLMS;
 		if (count > (samplesNoLearning+nTapsDNF)){
 			lms_filter.lms_update(lms_output);
@@ -166,14 +166,14 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 		// SAVE SIGNALS INTO FILES
 		laplace_file << t << " " << laplace << endl;
 		// undo the gain so that the signal is again in volt
-		inner_file << t << " " << dnf.getDelayedSignal()/inner_gain << endl;
-		outer_file << t << " " << outerhp/outer_gain << " " << endl;
-		dnf_file << t << " " << dnf.getOutput()/inner_gain << " " << dnf.getRemover()/inner_gain << endl;
-		lms_file << t << " " << lms_output/inner_gain << " " << corrLMS/inner_gain << endl;
+		signalWithNoise_file << t << " " << dnf.getDelayedSignal()/signalWithNoise_gain << endl;
+		noiseref_file << t << " " << noiserefhp/noiseref_gain << " " << endl;
+		dnf_file << t << " " << dnf.getOutput()/signalWithNoise_gain << " " << dnf.getRemover()/signalWithNoise_gain << endl;
+		lms_file << t << " " << lms_output/signalWithNoise_gain << " " << corrLMS/signalWithNoise_gain << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
-		oo_buf.push_back(outerhp);
+		oo_buf.push_back(noiserefhp);
 		io_buf.push_back(dnf.getDelayedSignal());
 		ro_buf.push_back(dnf.getRemover());
 		f_nno_buf.push_back(f_nn);
@@ -211,11 +211,10 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 		}
 		count++;
 	}
-	dnf.getNet().snapWeights(outpPrefix, "p300", expIndex);
 	wavread.close();
 	dnf_file.close();
-	inner_file.close();
-	outer_file.close();
+	signalWithNoise_file.close();
+	noiseref_file.close();
 	lms_file.close();
 	laplace_file.close();
 	wdistance_file.close();
@@ -227,16 +226,16 @@ void processOneSubject(const int expIndex, const bool showPlots = true) {
 
 int main(int argc, const char *argv[]) {
 	if (argc < 2) {
-		fprintf(stderr,"Usage: %s [-a] [-b] <expNumber>\n",argv[0]);
-		fprintf(stderr,"       -a calculates all 20 subjects in a loop.\n");
-		fprintf(stderr,"       -b calculates all 20 subjects multi-threaded without screen output.\n");
+		fprintf(stderr,"Usage: %s [-a] [-b] [<expNumber>]\n",argv[0]);
+		fprintf(stderr,"       -a calculates all experiments one by one without screen output.\n");
+		fprintf(stderr,"       -b calculates all experiments multi-threaded without screen output.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
 		return 0;
 	}
 	
 	if (strcmp(argv[1],"-a") == 0) {
 		for(int i = 0; i < nExp; i++) {
-			processOneSubject(i+1);
+			processOneExperiment(i+1);
 		}
 		return 0;
 	}
@@ -244,7 +243,7 @@ int main(int argc, const char *argv[]) {
 	if (strcmp(argv[1],"-b") == 0) {
 		std::thread* workers[nExp];
 		for(int i = 0; i < nExp; i++) {
-			workers[i] = new std::thread(processOneSubject,i+1,false);
+			workers[i] = new std::thread(processOneExperiment,i+1,false);
 		}
 		for(int i = 0; i < nExp; i++) {
 			workers[i]->join();
@@ -253,11 +252,11 @@ int main(int argc, const char *argv[]) {
 		return 0;
 	}
 	
-	const int subj = atoi(argv[1]);
-	if ( (subj < 1) || (subj > nExp) ) {
+	const int experiment = atoi(argv[1]);
+	if ( (experiment < 1) || (experiment > nExp) ) {
 		fprintf(stderr,"Exp number of out range.\n");
 		return -1;
 	}
-	processOneSubject(subj);
+	processOneExperiment(experiment);
 	return 0;
 }

@@ -9,29 +9,29 @@ const char* const audioPath = "audio/exp%d/audio.wav";
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
 
-// number of subjects
+// number of experiments
 const int nExp = 4;
 
 // pre-filtering
 const int filterorder = 2;
-const double innerHighpassCutOff = 200; // Hz
-const double outerHighpassCutOff = 200; // Hz
+const double signalWithNoiseHighpassCutOff = 200; // Hz
+const double noiserefHighpassCutOff = 200; // Hz
 const double LaplaceCutOff = 20; // Hz
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
 // dnf learning rate
-const double dnf_learning_rate = 0.05;
+const double dnf_learning_rate = 0.1;
 
 // dnf number of layers
-const int NLAYERS = 6;
+const int NLAYERS = 20;
 
 // LMS learning rates
-const double lms_learning_rate = 0.5;
+const double lms_learning_rate = 0.1;
 
-const double inner_gain = 1;
-const double outer_gain = 1;
+const double signalWithNoise_gain = 1;
+const double noiseref_gain = 1;
 const double remover_gain = 1;
 
 // PLOTTING
