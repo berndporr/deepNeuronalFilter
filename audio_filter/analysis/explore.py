@@ -23,10 +23,11 @@ class SimData:
         if endsec:
             b = int(endsec * self.fs)
         else:
-            b = int(-self.fs*2)
-        dnfdata = self.loadFile(filtered_filename)
+            b = int(-self.fs*2) 
+        dnfdata = self.loadFile(filtered_filename+"_out.dat")
         self.dnf = dnfdata[a:b,1]
-        self.remover = dnfdata[a:b,2]
+        removerdata = self.loadFile(filtered_filename+"_remover.dat")
+        self.remover = removerdata[a:b]
         self.inner = (self.loadFile("signalWithNoise.dat"))[a:b,1]
         self.outer = (self.loadFile("noiseref.dat"))[a:b,1]
 
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     exper = 1
     startsec = 0.1
     endsec = False
-    filtered_filename = "dnf.dat"
+    filtered_filename = "dnf"
     usePlotly = True
 
     helptext = 'usage: {} -p experimentNumber -s startsec -e endsec -f noiseredfile.dat -m -h'.format(sys.argv[0])
