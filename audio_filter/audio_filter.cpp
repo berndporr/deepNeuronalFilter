@@ -42,7 +42,6 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 
 	const int samplesNoLearning = 3 * fs / signalWithNoiseHighpassCutOff;
 	
-	const int nTapsDNF = fs / noiserefHighpassCutOff;
 	fprintf(stderr,"nTapsDNF = %d\n",nTapsDNF);
 	
 	boost::circular_buffer<double> oo_buf(bufferLength);
@@ -157,9 +156,7 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 		}
 		double corrLMS = lms_filter.filter(noiserefhp);
 		double lms_output = dnf.getDelayedSignal() - corrLMS;
-		if (count > (samplesNoLearning+nTapsDNF)){
-			lms_filter.lms_update(lms_output);
-		}
+		lms_filter.lms_update(lms_output);
 		
 		// SAVE SIGNALS INTO FILES
 		// undo the gain so that the signal is again in volt

@@ -15,10 +15,13 @@ const int nExp = 3;
 // pre-filtering
 const int filterorder = 2;
 const double signalWithNoiseHighpassCutOff = 20; // Hz
-const double noiserefHighpassCutOff = 200; // Hz
+const double noiserefHighpassCutOff = 500; // Hz
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
+
+// Twice the number of taps.
+const int nTapsDNF = int(fs / noiserefHighpassCutOff) * 3;
 
 // dnf learning rate
 const double dnf_learning_rate = 1;
