@@ -5,12 +5,12 @@
 
 const double fs = 48000;
 
-const char* const audioPath = "audio/exp%d/audio.wav";
+const char* const audioPath = "audio/exp%d/signal_noise.wav";
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
 
 // number of experiments
-const int nExp = 3;
+const int nExp = 2;
 
 // pre-filtering
 const int filterorder = 2;
