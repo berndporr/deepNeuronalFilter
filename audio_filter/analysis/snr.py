@@ -12,8 +12,7 @@ SNRbandMax = 10000 # Hz
 
 endsec = 5
 
-signal_noise_filename = "signal_noise.dat"
-noise_filename = "noise.dat"
+noise_filename = "noise.wav"
 signal_filename = "signal.wav"
 
 class SNR:
@@ -22,30 +21,38 @@ class SNR:
         self.fs = fs
         self.noisered_filename = noisered_filename
 
-    def loadResultsFile(self,filename):
+    def loadResultsFile(self,filename,startsec=0,endsec=False):
         p = "../results/exp{}/{}".format(self.experiment,filename)
         d = np.loadtxt(p,comments=';')
-        return d[int(self.startsec*self.fs):,1]
+        if not endsec:
+            return d[int(startsec*self.fs):,1]
+        else:
+            return d[int(startsec*self.fs):int(endsec*self.fs),1]
 
     def loadOrigWAV(self,filename):
         p = "../audio/exp{}/{}".format(self.experiment,filename)
         samplerate, data = wavfile.read(p)
-        left = data[:, 0]
-        right = data[:, 1]
-        return left,right
+        signal_noise = data[:, 0] / 32768 # left channel
+        return signal_noise
 
     def calcSpectrum(self,y):
-        s = 0
         freq, power = signal.welch(y,self.fs,scaling="spectrum",nperseg=self.fs)
         w = np.array([])
         for f,p in zip(freq, power):
             if (f >= SNRbandMin) and (f <= SNRbandMax):
-                s = s + p
                 if not w.any():
                     w = np.array([f,p])
                 else:
                     w = np.row_stack((w,np.array([f,p])))
-        return s,w
+        return w
+
+    def calcSpectrumBefore(self):
+        n = self.loadOrigWAV(noise_filename)
+        return self.calcSpectrum(n)
+
+    def calcSpectrumAfter(self):
+        n = self.loadResultsFile(self.noisered_filename,-endsec)
+        return self.calcSpectrum(n)
 
     def calcSNRbefore(self):
         s = self.loadOrigWAV(signal_filename)
@@ -54,6 +61,9 @@ class SNR:
         n = self.loadOrigWAV(noise_filename)
         NoisePwr = np.var(n)
         print("NoisePwr:",NoisePwr)
+        nCheck = self.loadResultsFile(self.noisered_filename,0,endsec)
+        NoisePwrCheck = np.var(nCheck)
+        print("NoisePwr sanity check:",NoisePwrCheck)
         snr = np.log10(SignalPwr/NoisePwr)*10
         return snr
 
@@ -61,7 +71,7 @@ class SNR:
         s = self.loadOrigWAV(signal_filename)
         SignalPwr = np.var(s)
         print("Signal Power:",SignalPwr)
-        n = self.loadResultsFile(signal_noise_filename)
+        n = self.loadResultsFile(self.noisered_filename,-endsec)
         NoisePwr = np.var(n)
         print("NoisePwr:",NoisePwr)
         snr = np.log10(SignalPwr/NoisePwr)*10
@@ -70,10 +80,10 @@ class SNR:
     
 # check if we run this as a main program
 if __name__ == "__main__":
-    subj = 1
+    experiment = 1
     startsec = 1
     fs = 48000
-    filtered_filename = "dnf.tsv"
+    filtered_filename = "dnf_out.dat"
 
     helptext = 'usage: {} -p experiment -f file -h'.format(sys.argv[0])
 
@@ -97,15 +107,17 @@ if __name__ == "__main__":
 
     plt.figure("Periodogram of the noise: unfilered vs filtered")
     snr = SNR(experiment,fs,filtered_filename)
-    snrdnf = snr.calcSNRdnf()
-    print("SNR from Noise removal:",snrdnf)
-    plt.plot(wdnf[:,0],wdnf[:,1],label=filtered_filename)
+    snrbefore = snr.calcSNRbefore()
+    print("SNR before Noise removal:",snrbefore)
+    snrafter = snr.calcSNRafter()
+    print("SNR from Noise removal:",snrafter)
+    w1 = snr.calcSpectrumAfter()
+    plt.semilogx(w1[:,0],w1[:,1],label=filtered_filename)
     plt.legend()
     print()
     print()
-    snrinner, winner = snr.calcSNRinner()
-    print("SNR just from inner:",snrinner)
-    plt.plot(winner[:,0],winner[:,1],label="INNER")
+    w2 = snr.calcSpectrumBefore()
+    plt.semilogx(w2[:,0],w2[:,1],label="before")
     plt.ylabel("V^2/Hz")
     plt.xlabel("Hz")
     plt.legend()

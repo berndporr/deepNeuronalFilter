@@ -24,10 +24,10 @@ const int bufferLength = 1000 ;
 const int nTapsDNF = int(fs / noiserefHighpassCutOff) * 3;
 
 // dnf learning rate
-const double dnf_learning_rate = 1;
+const double dnf_learning_rate = 0.5;
 
 // dnf number of layers
-const int NLAYERS = 15;
+const int NLAYERS = 20;
 
 // LMS learning rates
 const double lms_learning_rate = 0.05;
