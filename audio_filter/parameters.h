@@ -7,7 +7,7 @@ const double fs = 48000;
 
 const char* const audioPath = "audio/exp%d/signal_noise.wav";
 
-const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
+const Neuron::actMethod ACTIVATION = Neuron::Act_NONE;
 
 // number of experiments
 const int nExp = 2;
@@ -15,19 +15,19 @@ const int nExp = 2;
 // pre-filtering
 const int filterorder = 2;
 const double signalWithNoiseHighpassCutOff = 20; // Hz
-const double noiserefHighpassCutOff = 500; // Hz
+const double noiserefHighpassCutOff = 20; // Hz
 
 //creat circular buffers for plotting
 const int bufferLength = 1000 ;
 
 // Twice the number of taps.
-const int nTapsDNF = int(fs / noiserefHighpassCutOff) * 3;
+const int nTapsDNF = 300; //int(fs / noiserefHighpassCutOff) * 3;
 
 // dnf learning rate
-const double dnf_learning_rate = 0.5;
+const double dnf_learning_rate = 1;
 
 // dnf number of layers
-const int NLAYERS = 20;
+const int NLAYERS = 5;
 
 // LMS learning rates
 const double lms_learning_rate = 0.05;

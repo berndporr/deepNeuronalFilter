@@ -1,0 +1,337 @@
+\hypertarget{classNet}{}\doxysection{Net Class Reference}
+\label{classNet}\index{Net@{Net}}
+
+
+\mbox{\hyperlink{classNet}{Net}} is the main class used to set up a neural network used for closed-\/loop Deep Learning.  
+
+
+
+
+{\ttfamily \#include $<$Net.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classNet_ac1ac70d3cb6eefa75a428a5421c4f37b}{Net}} (const int \+\_\+n\+Layers, const int $\ast$const \+\_\+n\+Neurons, const int \+\_\+n\+Inputs, const int \+\_\+subject, const string \+\_\+trial)
+\begin{DoxyCompactList}\small\item\em Constructor\+: The neural network that performs the learning. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classNet_a517bf56cd781eafd5c7aabeca60b62b0}\label{classNet_a517bf56cd781eafd5c7aabeca60b62b0}} 
+\mbox{\hyperlink{classNet_a517bf56cd781eafd5c7aabeca60b62b0}{$\sim$\+Net}} ()
+\begin{DoxyCompactList}\small\item\em Destructor De-\/allocated any memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classNet_a94fe9b3602b47aaa00c59f61749a4df3}{init\+Network}} (\mbox{\hyperlink{classNeuron_a39247e1f8fe154f6e45ceba6adee9853}{Neuron\+::weight\+Init\+Method}} \+\_\+wim, \mbox{\hyperlink{classNeuron_a0d41c7f3013c13aa5b8470cdb57e8ab4}{Neuron\+::bias\+Init\+Method}} \+\_\+bim, \mbox{\hyperlink{classNeuron_a0149bf83d0c7497cb9bcf1153443302d}{Neuron\+::act\+Method}} \+\_\+am)
+\begin{DoxyCompactList}\small\item\em Dictates the initialisation of the weights and biases and determines the activation function of the neurons. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classNet_a5c063d93e3cb7776752f617f26395555}{set\+Learning\+Rate}} (double \+\_\+w\+\_\+learning\+Rate, double \+\_\+b\+\_\+learning\+Rate)
+\begin{DoxyCompactList}\small\item\em Sets the learning rate. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classNet_a3b47e6d69ed0c7691c67327e4b0ce9a8}{set\+Inputs}} (const double $\ast$\+\_\+inputs, const double scale=1.\+0, const unsigned int offset=0, const int n=-\/1)
+\begin{DoxyCompactList}\small\item\em Sets the inputs to the network in each iteration of learning, needs to be placed in an infinite loop. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classNet_a3828b3c8b1baf8319767c346af49a698}\label{classNet_a3828b3c8b1baf8319767c346af49a698}} 
+void \mbox{\hyperlink{classNet_a3828b3c8b1baf8319767c346af49a698}{prop\+Inputs}} ()
+\begin{DoxyCompactList}\small\item\em It propagates the inputs forward through the network. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classNet_a4705daad80e705e0ef4b35b131f5180a}\label{classNet_a4705daad80e705e0ef4b35b131f5180a}} 
+void \mbox{\hyperlink{classNet_a4705daad80e705e0ef4b35b131f5180a}{prop\+Error\+Backward}} ()
+\begin{DoxyCompactList}\small\item\em Propagates the error backward. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classNet_a2198ec08c94818af785ba96116bdaea2}{set\+Error}} (double \+\_\+lead\+Error)
+\begin{DoxyCompactList}\small\item\em Sets the error at the output layer to be propagated backward. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{classNet_a15aba9c55e25711d00ed405f1f969e8e}{get\+Gradient}} (\mbox{\hyperlink{classLayer_aa3e8ccfa1f353a0967dd6fd868ada4ac}{Layer\+::which\+Gradient}} \+\_\+which\+Gradient)
+\begin{DoxyCompactList}\small\item\em It provides a measure of how the magnitude of the error changes through the layers to alarm for vanishing or exploding gradients. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classNet_a71c1e3ef0845f1250966c395ee0b05dd}\label{classNet_a71c1e3ef0845f1250966c395ee0b05dd}} 
+void \mbox{\hyperlink{classNet_a71c1e3ef0845f1250966c395ee0b05dd}{update\+Weights}} ()
+\begin{DoxyCompactList}\small\item\em Requests that all layers perform one iteration of learning. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classLayer}{Layer}} $\ast$ \mbox{\hyperlink{classNet_aef83e3be3eee89a8e835e1057a8f8aa1}{get\+Layer}} (int \+\_\+layer\+Index)
+\begin{DoxyCompactList}\small\item\em Allows \mbox{\hyperlink{classNet}{Net}} to access each layer. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{classNet_a593e15676ce69f44889103bdfcfc87fc}{get\+Output}} (int \+\_\+neuron\+Index)
+\begin{DoxyCompactList}\small\item\em Allows the user to access the activation output of a specific neuron in the output layer only. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{classNet_a804f2fb606130433d8cd749b339d96ae}{get\+Sum\+Output}} (int \+\_\+neuron\+Index)
+\begin{DoxyCompactList}\small\item\em Allows the user to access the weighted sum output of a specific neuron in output layer only. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{classNet_ad8a4bc8cd13aaab91e1805225529c412}{getn\+Layers}} ()
+\begin{DoxyCompactList}\small\item\em Informs on the total number of hidden layers (excluding the input layer) \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{classNet_a2dc4ec0ffd5075c3a371d2cb8e2a1db1}{getn\+Inputs}} ()
+\begin{DoxyCompactList}\small\item\em Informs on the total number of inputs to the network. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{classNet_a78d4249c2b02cac789e76a13971a6b20}{get\+Weight\+Distance}} ()
+\begin{DoxyCompactList}\small\item\em Allows for monitoring the overall weight change of the network. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{classNet_a786a9396140ba805d6bf0f465c439839}{get\+Layer\+Weight\+Distance}} (int \+\_\+layer\+Index)
+\begin{DoxyCompactList}\small\item\em Allows for monitoring the weight change in a specific layer of the network. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{classNet_adf026191c832a70d0cface628124bbfc}{get\+Weights}} (int \+\_\+layer\+Index, int \+\_\+neuron\+Index, int \+\_\+weight\+Index)
+\begin{DoxyCompactList}\small\item\em Grants access to a specific weight in the network. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{classNet_a80d2e88ccd26f86f08208a4ce84d002e}{getn\+Neurons}} ()
+\begin{DoxyCompactList}\small\item\em Informs on the total number of neurons in the network. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classNet_a62f045da7486ce8da13f0bbdf1044f83}\label{classNet_a62f045da7486ce8da13f0bbdf1044f83}} 
+void \mbox{\hyperlink{classNet_a62f045da7486ce8da13f0bbdf1044f83}{save\+Weights}} ()
+\begin{DoxyCompactList}\small\item\em Saves the temporal changes of all weights in all neurons into files. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classNet_a617a827360899bf42c7a0558cd79f5aa}\label{classNet_a617a827360899bf42c7a0558cd79f5aa}} 
+void \mbox{\hyperlink{classNet_a617a827360899bf42c7a0558cd79f5aa}{snap\+Weights}} (string prefix, string \+\_\+trial, int \+\_\+subject)
+\begin{DoxyCompactList}\small\item\em Snaps the final distribution of all weights in a specific layer, this is overwritten every time the function is called. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classNet_a28447dfbcbf96c8b051a0adc6027cd8c}\label{classNet_a28447dfbcbf96c8b051a0adc6027cd8c}} 
+void {\bfseries snap\+Weights\+Matrix\+Format} (string prefix)
+\item 
+\mbox{\Hypertarget{classNet_af63acf374d530d329d9b335c7efaa85b}\label{classNet_af63acf374d530d329d9b335c7efaa85b}} 
+void \mbox{\hyperlink{classNet_af63acf374d530d329d9b335c7efaa85b}{print\+Network}} ()
+\begin{DoxyCompactList}\small\item\em Prints on the console a full tree of the network with the values of all weights and outputs for all neurons. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\mbox{\hyperlink{classNet}{Net}} is the main class used to set up a neural network used for closed-\/loop Deep Learning. 
+
+It initialises all the layers and the neurons internally.
+
+(C) 2019,2020, Bernd Porr \href{mailto:bernd@glasgowneuro.tech}{\texttt{ bernd@glasgowneuro.\+tech}} (C) 2019,2020, Sama Daryanavard \href{mailto:2089166d@student.gla.ac.uk}{\texttt{ 2089166d@student.\+gla.\+ac.\+uk}}
+
+G\+NU G\+E\+N\+E\+R\+AL P\+U\+B\+L\+IC L\+I\+C\+E\+N\+SE 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classNet_ac1ac70d3cb6eefa75a428a5421c4f37b}\label{classNet_ac1ac70d3cb6eefa75a428a5421c4f37b}} 
+\index{Net@{Net}!Net@{Net}}
+\index{Net@{Net}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{Net()}{Net()}}
+{\footnotesize\ttfamily Net\+::\+Net (\begin{DoxyParamCaption}\item[{const int}]{\+\_\+n\+Layers,  }\item[{const int $\ast$const}]{\+\_\+n\+Neurons,  }\item[{const int}]{\+\_\+n\+Inputs,  }\item[{const int}]{\+\_\+subject,  }\item[{const string}]{\+\_\+trial }\end{DoxyParamCaption})}
+
+
+
+Constructor\+: The neural network that performs the learning. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+n\+Layers} & Total number of hidden layers, excluding the input layer \\
+\hline
+{\em \+\_\+n\+Neurons} & A pointer to an int array with number of neurons for all layers need to have the length of \+\_\+n\+Layers. \\
+\hline
+{\em \+\_\+n\+Inputs} & Number of Inputs to the network \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classNet_a15aba9c55e25711d00ed405f1f969e8e}\label{classNet_a15aba9c55e25711d00ed405f1f969e8e}} 
+\index{Net@{Net}!getGradient@{getGradient}}
+\index{getGradient@{getGradient}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getGradient()}{getGradient()}}
+{\footnotesize\ttfamily double Net\+::get\+Gradient (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classLayer_aa3e8ccfa1f353a0967dd6fd868ada4ac}{Layer\+::which\+Gradient}}}]{\+\_\+which\+Gradient }\end{DoxyParamCaption})}
+
+
+
+It provides a measure of how the magnitude of the error changes through the layers to alarm for vanishing or exploding gradients. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+which\+Error} & choose what error to monitor, for more information see \mbox{\hyperlink{classNeuron_a5480e3d8ba5be971f0de77bc178e592a}{Neuron\+::which\+Error}} \\
+\hline
+{\em \+\_\+which\+Gradient} & choose what gradient of the chosen error to monitor, for more information see \mbox{\hyperlink{classLayer_aa3e8ccfa1f353a0967dd6fd868ada4ac}{Layer\+::which\+Gradient}} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns the ratio of the chosen gradient in the last layer to the the first layer 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_aef83e3be3eee89a8e835e1057a8f8aa1}\label{classNet_aef83e3be3eee89a8e835e1057a8f8aa1}} 
+\index{Net@{Net}!getLayer@{getLayer}}
+\index{getLayer@{getLayer}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getLayer()}{getLayer()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classLayer}{Layer}}$\ast$ Net\+::get\+Layer (\begin{DoxyParamCaption}\item[{int}]{\+\_\+layer\+Index }\end{DoxyParamCaption})}
+
+
+
+Allows \mbox{\hyperlink{classNet}{Net}} to access each layer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+layer\+Index} & the index of the chosen layer \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A pointer to the chosen \mbox{\hyperlink{classLayer}{Layer}} 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_a786a9396140ba805d6bf0f465c439839}\label{classNet_a786a9396140ba805d6bf0f465c439839}} 
+\index{Net@{Net}!getLayerWeightDistance@{getLayerWeightDistance}}
+\index{getLayerWeightDistance@{getLayerWeightDistance}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getLayerWeightDistance()}{getLayerWeightDistance()}}
+{\footnotesize\ttfamily double Net\+::get\+Layer\+Weight\+Distance (\begin{DoxyParamCaption}\item[{int}]{\+\_\+layer\+Index }\end{DoxyParamCaption})}
+
+
+
+Allows for monitoring the weight change in a specific layer of the network. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+layer\+Index} & The index of the chosen layer \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns the Euclidean wight distance of neurons in the chosen layer from their initial value 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_a2dc4ec0ffd5075c3a371d2cb8e2a1db1}\label{classNet_a2dc4ec0ffd5075c3a371d2cb8e2a1db1}} 
+\index{Net@{Net}!getnInputs@{getnInputs}}
+\index{getnInputs@{getnInputs}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getnInputs()}{getnInputs()}}
+{\footnotesize\ttfamily int Net\+::getn\+Inputs (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Informs on the total number of inputs to the network. 
+
+\begin{DoxyReturn}{Returns}
+Total number of inputs 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_ad8a4bc8cd13aaab91e1805225529c412}\label{classNet_ad8a4bc8cd13aaab91e1805225529c412}} 
+\index{Net@{Net}!getnLayers@{getnLayers}}
+\index{getnLayers@{getnLayers}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getnLayers()}{getnLayers()}}
+{\footnotesize\ttfamily int Net\+::getn\+Layers (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Informs on the total number of hidden layers (excluding the input layer) 
+
+\begin{DoxyReturn}{Returns}
+Total number of hidden layers in the network 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_a80d2e88ccd26f86f08208a4ce84d002e}\label{classNet_a80d2e88ccd26f86f08208a4ce84d002e}} 
+\index{Net@{Net}!getnNeurons@{getnNeurons}}
+\index{getnNeurons@{getnNeurons}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getnNeurons()}{getnNeurons()}}
+{\footnotesize\ttfamily int Net\+::getn\+Neurons (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Informs on the total number of neurons in the network. 
+
+\begin{DoxyReturn}{Returns}
+The total number of neurons 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_a593e15676ce69f44889103bdfcfc87fc}\label{classNet_a593e15676ce69f44889103bdfcfc87fc}} 
+\index{Net@{Net}!getOutput@{getOutput}}
+\index{getOutput@{getOutput}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getOutput()}{getOutput()}}
+{\footnotesize\ttfamily double Net\+::get\+Output (\begin{DoxyParamCaption}\item[{int}]{\+\_\+neuron\+Index }\end{DoxyParamCaption})}
+
+
+
+Allows the user to access the activation output of a specific neuron in the output layer only. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+neuron\+Index} & The index of the chosen neuron \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The value at the output of the chosen neuron 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_a804f2fb606130433d8cd749b339d96ae}\label{classNet_a804f2fb606130433d8cd749b339d96ae}} 
+\index{Net@{Net}!getSumOutput@{getSumOutput}}
+\index{getSumOutput@{getSumOutput}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getSumOutput()}{getSumOutput()}}
+{\footnotesize\ttfamily double Net\+::get\+Sum\+Output (\begin{DoxyParamCaption}\item[{int}]{\+\_\+neuron\+Index }\end{DoxyParamCaption})}
+
+
+
+Allows the user to access the weighted sum output of a specific neuron in output layer only. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+neuron\+Index} & The index of the chosen neuron \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The value at the sum output of the chosen neuron 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_a78d4249c2b02cac789e76a13971a6b20}\label{classNet_a78d4249c2b02cac789e76a13971a6b20}} 
+\index{Net@{Net}!getWeightDistance@{getWeightDistance}}
+\index{getWeightDistance@{getWeightDistance}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getWeightDistance()}{getWeightDistance()}}
+{\footnotesize\ttfamily double Net\+::get\+Weight\+Distance (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Allows for monitoring the overall weight change of the network. 
+
+\begin{DoxyReturn}{Returns}
+returns the Euclidean wight distance of all neurons in the network from their initial value 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_adf026191c832a70d0cface628124bbfc}\label{classNet_adf026191c832a70d0cface628124bbfc}} 
+\index{Net@{Net}!getWeights@{getWeights}}
+\index{getWeights@{getWeights}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{getWeights()}{getWeights()}}
+{\footnotesize\ttfamily double Net\+::get\+Weights (\begin{DoxyParamCaption}\item[{int}]{\+\_\+layer\+Index,  }\item[{int}]{\+\_\+neuron\+Index,  }\item[{int}]{\+\_\+weight\+Index }\end{DoxyParamCaption})}
+
+
+
+Grants access to a specific weight in the network. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+layer\+Index} & Index of the layer that contains the chosen weight \\
+\hline
+{\em \+\_\+neuron\+Index} & Index of the neuron in the chosen layer that contains the chosen weight \\
+\hline
+{\em \+\_\+weight\+Index} & Index of the input to which the chosen weight is assigned \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns the value of the chosen weight 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classNet_a94fe9b3602b47aaa00c59f61749a4df3}\label{classNet_a94fe9b3602b47aaa00c59f61749a4df3}} 
+\index{Net@{Net}!initNetwork@{initNetwork}}
+\index{initNetwork@{initNetwork}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{initNetwork()}{initNetwork()}}
+{\footnotesize\ttfamily void Net\+::init\+Network (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classNeuron_a39247e1f8fe154f6e45ceba6adee9853}{Neuron\+::weight\+Init\+Method}}}]{\+\_\+wim,  }\item[{\mbox{\hyperlink{classNeuron_a0d41c7f3013c13aa5b8470cdb57e8ab4}{Neuron\+::bias\+Init\+Method}}}]{\+\_\+bim,  }\item[{\mbox{\hyperlink{classNeuron_a0149bf83d0c7497cb9bcf1153443302d}{Neuron\+::act\+Method}}}]{\+\_\+am }\end{DoxyParamCaption})}
+
+
+
+Dictates the initialisation of the weights and biases and determines the activation function of the neurons. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+wim} & weights initialisation method, see \mbox{\hyperlink{classNeuron_a39247e1f8fe154f6e45ceba6adee9853}{Neuron\+::weight\+Init\+Method}} for different options \\
+\hline
+{\em \+\_\+bim} & biases initialisation method, see \mbox{\hyperlink{classNeuron_a0d41c7f3013c13aa5b8470cdb57e8ab4}{Neuron\+::bias\+Init\+Method}} for different options \\
+\hline
+{\em \+\_\+am} & activation method, see \mbox{\hyperlink{classNeuron_a0149bf83d0c7497cb9bcf1153443302d}{Neuron\+::act\+Method}} for different options \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classNet_a2198ec08c94818af785ba96116bdaea2}\label{classNet_a2198ec08c94818af785ba96116bdaea2}} 
+\index{Net@{Net}!setError@{setError}}
+\index{setError@{setError}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{setError()}{setError()}}
+{\footnotesize\ttfamily void Net\+::set\+Error (\begin{DoxyParamCaption}\item[{double}]{\+\_\+lead\+Error }\end{DoxyParamCaption})}
+
+
+
+Sets the error at the output layer to be propagated backward. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+lead\+Error} & The closed-\/loop error for learning \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classNet_a3b47e6d69ed0c7691c67327e4b0ce9a8}\label{classNet_a3b47e6d69ed0c7691c67327e4b0ce9a8}} 
+\index{Net@{Net}!setInputs@{setInputs}}
+\index{setInputs@{setInputs}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{setInputs()}{setInputs()}}
+{\footnotesize\ttfamily void Net\+::set\+Inputs (\begin{DoxyParamCaption}\item[{const double $\ast$}]{\+\_\+inputs,  }\item[{const double}]{scale = {\ttfamily 1.0},  }\item[{const unsigned int}]{offset = {\ttfamily 0},  }\item[{const int}]{n = {\ttfamily -\/1} }\end{DoxyParamCaption})}
+
+
+
+Sets the inputs to the network in each iteration of learning, needs to be placed in an infinite loop. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+inputs} & A pointer to the array of inputs \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classNet_a5c063d93e3cb7776752f617f26395555}\label{classNet_a5c063d93e3cb7776752f617f26395555}} 
+\index{Net@{Net}!setLearningRate@{setLearningRate}}
+\index{setLearningRate@{setLearningRate}!Net@{Net}}
+\doxysubsubsection{\texorpdfstring{setLearningRate()}{setLearningRate()}}
+{\footnotesize\ttfamily void Net\+::set\+Learning\+Rate (\begin{DoxyParamCaption}\item[{double}]{\+\_\+w\+\_\+learning\+Rate,  }\item[{double}]{\+\_\+b\+\_\+learning\+Rate }\end{DoxyParamCaption})}
+
+
+
+Sets the learning rate. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+learning\+Rate} & Sets the learning rate for all layers and neurons. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Net.\+h\end{DoxyCompactItemize}
