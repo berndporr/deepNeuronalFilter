@@ -19,6 +19,10 @@ Usage: ./audio_filter [-a] [-b] [<expNumber>]
        Press ESC in the plot window to cancel the program.
 ```
 
+For example `./audio_filter 1` processes the audio of the 1st
+experiment in a GUI. `./audio_filter -b` processes all experiments
+multi-threaded without a GUI.
+
 ## Results
 The results are created in the `results` folder:
 
