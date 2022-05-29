@@ -3,7 +3,7 @@
 ## Input files
 
 Input files are in the `audio` folder. The `signal_noise.wav`
-file is the processed by `audio_filter`. Channel layout of the
+file is the WAV processed by `audio_filter`. Channel layout of the
 WAV files:
 
 - left: signal + noise
@@ -22,7 +22,11 @@ Usage: ./audio_filter [-a] [-b] [<expNumber>]
 ## Results
 The results are created in the `results` folder:
 
-`dnf_out.dat  dnf_remover.dat  lms_out.dat  lms_remover.dat  noiseref.dat  signalWithNoise.dat  weight_distance.tsv`.
+ - `dnf_out.dat` : Output of the DNF
+ - `lms_out.dat` : Output of the LMS/FIR filter
+ - `noiseref.dat`: Noise reference (input)
+ - `signalWithNoise.dat` : Signal + noise (input)
+ - `weight_distance.tsv` : Weight distance. Format: d_all,d0,d1,d2,d3,...
 
 The `.dat` files are audio files which can be played back with `sox`. For example:
 
@@ -30,4 +34,5 @@ The `.dat` files are audio files which can be played back with `sox`. For exampl
 sox dnf_out.dat -d
 ```
 
-playback can be started even during filtering.
+playback can be started even during filtering, especially when using the `-b` option.
+
