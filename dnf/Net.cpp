@@ -26,7 +26,7 @@ using namespace std;
 
 Net::Net(const int _nLayers, const int * const _nNeurons, const int _nInputs, const int _subject, const string _trial){
 	nLayers = _nLayers; //no. of layers including inputs and outputs layers
-	layers= new Layer*[nLayers];
+	layers= new Layer*[(unsigned)nLayers];
 	const int* nNeuronsp = _nNeurons; //number of neurons in each layer
 	nInputs=_nInputs; // the no. of inputs to the network (i.e. the first layer)
 	//cout << "nInputs: " << nInputs << endl;
@@ -44,7 +44,7 @@ Net::Net(const int _nLayers, const int * const _nNeurons, const int _nInputs, co
 		nNeuronsp++; //point to the no. of neurons in the next layer
 	}
 	nOutputs=layers[nLayers-1]->getnNeurons();
-	errorGradient= new double[nLayers];
+	errorGradient= new double[(unsigned)nLayers];
 	//cout << "net" << endl;
 }
 

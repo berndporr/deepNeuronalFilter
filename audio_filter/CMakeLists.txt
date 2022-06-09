@@ -13,4 +13,4 @@ endif()
 add_subdirectory(wavRead)
 
 add_executable(audio_filter audio_filter.cpp dynamicPlots.cpp dynamicPlots.h parameters.h)
-target_link_libraries(audio_filter dnf iir::iir_static fir cvui ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(audio_filter dnf iir::iir fir cvui ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
