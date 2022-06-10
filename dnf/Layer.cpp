@@ -27,7 +27,7 @@ Layer::Layer(int _nNeurons, int _nInputs, int _subject, string _trial){
     trial = _trial;
     nNeurons = _nNeurons; // number of neurons in this layer
     nInputs = _nInputs; // number of inputs to each neuron
-    neurons = new Neuron*[nNeurons];
+    neurons = new Neuron*[(unsigned)nNeurons];
     /* dynamic allocation of memory to n number of
      * neuron-pointers and returning a pointer, "neurons",
      * to the first element */
@@ -81,7 +81,7 @@ void Layer::setInputs(const double* const _inputs, const double scale, const uns
 		 * everytime a new value is distributed to neurons */
 		const double input= (*inputs) * scale; //take this input value
 		for (int i=0; i<nNeurons; i++){
-			(*neuronsp)->setInput(j+offset,input);
+		  (*neuronsp)->setInput(j+(int)offset,input);
 			//set this input value for this neuron
 			neuronsp++; //point to the next neuron
 		}
