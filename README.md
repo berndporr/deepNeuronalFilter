@@ -4,10 +4,9 @@
 
 ## Prerequisites Libraries and packages
 
-Installation instructions below for Ununtu Linux LTS. It also compiles on a Mac. Just install
-the homebrew packages.
+Installation instructions below are for Ubuntu Linux LTS and MacOS.
 
-1) Install the IIR and FIR libraries
+1) Install the IIR and FIR filter libraries
 
 Linux: `sudo add-apt-repository ppa:berndporr/dsp`, Mac: `brew tap berndporr/dsp`
 
@@ -23,7 +22,7 @@ Linux: `sudo apt install libopencv-dev`, Mac: `brew install opencv`
 
 Linux: `sudo apt-get install libboost-all-dev`, Mac: is included in opencv
 
-4) And make sure you have ` cmake ` installed.
+4) And make sure you have `cmake` installed.
 
 ## How to compile
 
@@ -54,3 +53,4 @@ sudo make install
 
  - eeg_filter: removes noise from EEG (release)
  - ecg_filter: removes noise from ECG (alpha version)
+ - audio_filter: removes noise from audio (beta version)
