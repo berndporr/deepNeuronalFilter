@@ -38,6 +38,8 @@ make
 ```
 to compile the library and the demos.
 
+On a Mac you might want to generate the project for xcode with `cmake -G Xcode .`.
+
 ## Installation
 
 ```
