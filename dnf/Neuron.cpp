@@ -22,9 +22,9 @@ using namespace std;
 Neuron::Neuron(int _nInputs)
 {
 	nInputs=_nInputs;
-	weights = new double[nInputs];
-	initialWeights = new double[nInputs];
-	inputs = new double[nInputs];
+	weights = new double[(unsigned)nInputs];
+	initialWeights = new double[(unsigned)nInputs];
+	inputs = new double[(unsigned)nInputs];
 }
 
 Neuron::~Neuron(){
