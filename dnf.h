@@ -46,6 +46,12 @@ public:
 		}
 	}
 
+	enum ErrorPropagation { Backprop = 0, ModulatedHebb = 1 };
+
+	void setErrorPropagation(ErrorPropagation e) {
+		errorPropagation = e;
+	}
+
 	/**
 	 * Realtime sample by sample filtering operation
 	 * \param signal The signal contaminated with noise. Should be less than one.
@@ -71,7 +77,15 @@ public:
 		
 		// FEEDBACK TO THE NETWORK 
 		NNO->setError(f_nn);
-		NNO->propErrorBackward();
+		switch (errorPropagation) {
+		case Backprop:
+		default:
+			NNO->propErrorBackward();
+			break;
+		case ModulatedHebb:
+			NNO->propModulatedHebb(f_nn);
+			break;
+		}
 		NNO->updateWeights();
 		return f_nn;
 	}
@@ -137,6 +151,7 @@ private:
 	int* nNeurons;
 	double remover = 0;
 	double f_nn = 0;
+	ErrorPropagation errorPropagation = Backprop;
 };
 
 #endif

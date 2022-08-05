@@ -82,6 +82,12 @@ public:
 	void propErrorBackward();
 
 
+	/**
+	 * Propagates the error backward
+	 **/
+	void propModulatedHebb(float modulator);
+
+
 /**
  * Sets the error at the output layer to be propagated backward.
  * @param _leadError The closed-loop error for learning

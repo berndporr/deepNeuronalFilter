@@ -48,7 +48,7 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 	boost::circular_buffer<double> io_buf(bufferLength);
 	boost::circular_buffer<double> ro_buf(bufferLength);
 	boost::circular_buffer<double> f_nno_buf(bufferLength);
-//LMS
+	//LMS
 	boost::circular_buffer<double> lms_o_buf(bufferLength);
 	boost::circular_buffer<double> lms_r_buf(bufferLength);
 
@@ -71,7 +71,7 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 	
 	DNF dnf(NLAYERS,nTapsDNF,fs,ACTIVATION);
 
-// FILES
+	// FILES
 	fstream signalWithNoise_file;
 	signalWithNoise_file.open(sd + "/signalWithNoise.dat", fstream::out);
 	addSOXheader(signalWithNoise_file);
@@ -86,6 +86,8 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 
 	fstream dnfRemover_file;
 	dnfRemover_file.open(sd + "/dnf_remover.dat", fstream::out);
+// ***add***
+	addSOXheader(dnfRemover_file);
 
 	fstream lmsOut_file;
 	lmsOut_file.open(sd + "/lms_out.dat", fstream::out);
@@ -93,6 +95,8 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 
 	fstream lmsRemover_file;
 	lmsRemover_file.open(sd + "/lms_remover.dat", fstream::out);
+// ***add***
+	addSOXheader(lmsRemover_file);
 
 	fstream wdistance_file;
 	wdistance_file.open(sd + "/weight_distance.tsv", fstream::out);
@@ -115,6 +119,11 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 	Fir1 lms_filter(nTapsDNF);
 	
 	fprintf(stderr,"signalWithNoise_gain = %f, noiseref_gain = %f, remover_gain = %f\n",signalWithNoise_gain,noiseref_gain,remover_gain);
+
+	int nIgn = start_time_ignore * fs;
+	for(int i = 0; (i < nIgn) && wavread.hasSample(); i++) {
+		wavread.getStereoSample();
+	}
 
 	// main loop processsing sample by sample
 	while (wavread.hasSample()) {
@@ -142,6 +151,7 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 
 		double t = (double)count / fs;
 		
+		// Write the weight distance to the file
 		wdistance_file << dnf.getNet().getWeightDistance();
 		for(int i=0; i < NLAYERS; i++ ) {
 			wdistance_file << "\t" << dnf.getNet().getLayerWeightDistance(i);
@@ -162,10 +172,15 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 		// undo the gain so that the signal is again in volt
 		signalWithNoise_file << t << " " << dnf.getDelayedSignal()/signalWithNoise_gain << endl;
 		noiseref_file << t << " " << noiserefhp/noiseref_gain << " " << endl;
-		dnfOut_file << t << " " << dnf.getOutput()/signalWithNoise_gain << endl;
+
+// ***modified***	dnfOut_file << t << " " << dnf.getOutput()/signalWithNoise_gain << endl;
+		dnfOut_file << t << " " << f_nn/signalWithNoise_gain << endl;
+		
 		lmsOut_file << t << " " << lms_output/signalWithNoise_gain << endl;
-		dnfRemover_file << dnf.getRemover()/signalWithNoise_gain << endl;
-		lmsRemover_file << corrLMS/signalWithNoise_gain << endl;
+// ***modified***	dnfRemover_file << dnf.getRemover()/signalWithNoise_gain << endl;
+		dnfRemover_file << t << " " << dnf.getRemover()/signalWithNoise_gain << endl;
+// ***modified***	lmsRemover_file << corrLMS/signalWithNoise_gain << endl;
+		lmsRemover_file << t << " " << corrLMS/signalWithNoise_gain << endl;
 		
 		// PUT VARIABLES IN BUFFERS
 		// 1) MAIN SIGNALS
@@ -223,16 +238,28 @@ void processOneExperiment(const int expIndex, const bool showPlots = true) {
 
 int main(int argc, const char *argv[]) {
 	if (argc < 2) {
-		fprintf(stderr,"Usage: %s [-a] [-b] [<expNumber>]\n",argv[0]);
+		fprintf(stderr,"Usage: %s [-a] [-b] [-s] [-h] [<expNumber>]\n",argv[0]);
 		fprintf(stderr,"       -a calculates all experiments one by one without screen output.\n");
 		fprintf(stderr,"       -b calculates all experiments multi-threaded without screen output.\n");
+		fprintf(stderr,"       -s [<expNumber>] calculates one experiment without screen output.\n");
+		fprintf(stderr,"       -h show help text.\n");
+		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
+		return 0;
+	}
+
+	if (strcmp(argv[1],"-h") == 0) {
+		fprintf(stderr,"Usage: %s [-a] [-b] [-s] [<expNumber>]\n",argv[0]);
+		fprintf(stderr,"       -a calculates all experiments one by one without screen output.\n");
+		fprintf(stderr,"       -b calculates all experiments multi-threaded without screen output.\n");
+		fprintf(stderr,"       -s [<expNumber>] calculates one experiment without screen output.\n");
+		fprintf(stderr,"       -h show help text.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
 		return 0;
 	}
 	
 	if (strcmp(argv[1],"-a") == 0) {
 		for(int i = 0; i < nExp; i++) {
-			processOneExperiment(i+1);
+			processOneExperiment(i+1,false);
 		}
 		return 0;
 	}
@@ -246,6 +273,17 @@ int main(int argc, const char *argv[]) {
 			workers[i]->join();
 			delete workers[i];
 		}
+		return 0;
+	}
+
+// ***add***
+	if (strcmp(argv[1],"-s") == 0) {
+		const int experiment = atoi(argv[2]);
+		if ( (experiment < 1) || (experiment > nExp) ) {
+			fprintf(stderr,"Exp number of out range.\n");
+			return -1;
+		}
+		processOneExperiment(experiment,false);
 		return 0;
 	}
 	

@@ -117,7 +117,21 @@ void Net::propErrorBackward(){
 			layers[i-1]->getNeuron(k)->setBackpropError(sum);
 		}
 	}
-	//cout << "--------------------------------------------------" << endl;
+}
+
+void Net::propModulatedHebb(float modulator){
+	double tempWeight = 0;
+	for (int i = nLayers-1; i > 0 ; i--){
+		for (int k = 0; k < layers[i-1]->getnNeurons(); k++){
+			double sum = 0.0;
+			for (int j = 0; j < layers[i]->getnNeurons(); j++){
+				tempWeight = layers[i]->getWeights(j,k);
+				sum += (modulator * tempWeight);
+			}
+			assert(std::isfinite(sum));
+			layers[i-1]->getNeuron(k)->setBackpropError(sum);
+		}
+	}
 }
 
 //*************************************************************************************
