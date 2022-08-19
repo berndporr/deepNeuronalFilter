@@ -105,26 +105,32 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 	
 	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f\n",inner_gain,outer_gain,remover_gain);
 
-	std::random_device rd_r{};
-	std::mt19937 gen_r{rd_r()};
- 	std::normal_distribution<> d_r{50,10}; // uV
+	std::random_device rd_r;
+	std::mt19937 gen_r(rd_r());
+ 	std::normal_distribution<> d_r(0,50); // uV
+	Iir::Butterworth::LowPass<filterorder> rLP;
+	rLP.setup(fs,noiseModelLowpassFreq);
+	Iir::Butterworth::BandPass<filterorder> rBP;
+	rBP.setup(fs,noiseModelBandpassCenter,noiseModelBandpassWidth);
 
-	std::random_device rd_e{};
-	std::mt19937 gen_e{rd_e()};
- 	std::normal_distribution<> d_e{50,10}; // uV
+	std::random_device rd_e;
+	std::mt19937 gen_e(rd_e());
+ 	std::normal_distribution<> d_e(0,50); // uV
+	Iir::Butterworth::LowPass<filterorder> eLP;
+	eLP.setup(fs,signalModelLowpassFreq);
 
 	// main loop processsing sample by sample
 	for (long count=0; count<n; count++) {
-		//SIGNALS
-		double inner_raw_data = 0;
-		double outer_raw_data = 0;
 		double p300trigger = 0;
 
-		float r = d_r(gen_r) / 1E-6;
-		float e = d_e(gen_e) / 1E-6;
+		double r = d_r(gen_r) / 1E6;
+		r = rLP.filter(r) + rBP.filter(r);
+		
+		double e = d_e(gen_e) / 1E6;
+		e = eLP.filter(e);
 
-		inner_raw_data = r + e;
-		outer_raw_data = r + alpha * e;
+		double inner_raw_data = r + e;
+		double outer_raw_data = r + alpha * e;
 		
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY
@@ -234,6 +240,7 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 int main(int argc, const char *argv[]) {
 	if (argc < 2) {
 		fprintf(stderr,"Usage: %s [-b]\n",argv[0]);
+		fprintf(stderr,"       -a calculates with screen output.\n");
 		fprintf(stderr,"       -b calculates without screen output.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
 		return 0;
@@ -243,6 +250,10 @@ int main(int argc, const char *argv[]) {
 	float duration = 120;
 	if (strcmp(argv[1],"-b") == 0) {
 		screenoutput = false;
+	}
+	
+	if (strcmp(argv[1],"-a") == 0) {
+		screenoutput = true;
 	}
 	
 	processOneSubject(duration,screenoutput);
