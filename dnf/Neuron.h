@@ -277,10 +277,6 @@ private:
 	double output = 0;
 
 	//learning:
-	double backwardsCoeff = 0;
-	double midCoeff = 0;
-	double forwardCoeff = 0;
-	double globalCoeff = 0;
 	double *weights = 0;
 	double *inputs = 0;
 	double weightSum = 0;

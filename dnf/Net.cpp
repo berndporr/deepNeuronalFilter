@@ -26,7 +26,7 @@ using namespace std;
 
 Net::Net(const int _nLayers, const int * const _nNeurons, const int _nInputs, const int _subject, const string _trial){
 	nLayers = _nLayers; //no. of layers including inputs and outputs layers
-	layers= new Layer*[nLayers];
+	layers= new Layer*[(unsigned)nLayers];
 	const int* nNeuronsp = _nNeurons; //number of neurons in each layer
 	nInputs=_nInputs; // the no. of inputs to the network (i.e. the first layer)
 	//cout << "nInputs: " << nInputs << endl;
@@ -44,7 +44,7 @@ Net::Net(const int _nLayers, const int * const _nNeurons, const int _nInputs, co
 		nNeuronsp++; //point to the no. of neurons in the next layer
 	}
 	nOutputs=layers[nLayers-1]->getnNeurons();
-	errorGradient= new double[nLayers];
+	errorGradient= new double[(unsigned)nLayers];
 	//cout << "net" << endl;
 }
 
@@ -114,11 +114,24 @@ void Net::propErrorBackward(){
 				sum += (tempError * tempWeight);
 			}
 			assert(std::isfinite(sum));
-			assert(std::isfinite(weightSumer));
 			layers[i-1]->getNeuron(k)->setBackpropError(sum);
 		}
 	}
-	//cout << "--------------------------------------------------" << endl;
+}
+
+void Net::propModulatedHebb(float modulator){
+	double tempWeight = 0;
+	for (int i = nLayers-1; i > 0 ; i--){
+		for (int k = 0; k < layers[i-1]->getnNeurons(); k++){
+			double sum = 0.0;
+			for (int j = 0; j < layers[i]->getnNeurons(); j++){
+				tempWeight = layers[i]->getWeights(j,k);
+				sum += (modulator * tempWeight);
+			}
+			assert(std::isfinite(sum));
+			layers[i-1]->getNeuron(k)->setBackpropError(sum);
+		}
+	}
 }
 
 //*************************************************************************************

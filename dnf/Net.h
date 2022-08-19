@@ -82,6 +82,12 @@ public:
 	void propErrorBackward();
 
 
+	/**
+	 * Propagates the error backward
+	 **/
+	void propModulatedHebb(float modulator);
+
+
 /**
  * Sets the error at the output layer to be propagated backward.
  * @param _leadError The closed-loop error for learning
@@ -181,64 +187,44 @@ private:
 	 * Total number of hidden layers
 	 */
 	int nLayers = 0;
-	/**
+
+        /**
+         * The error
+         **/
+        double theLeadError = 0;
+
+        /**
 	 * total number of neurons
 	 */
 	int nNeurons = 0;
-	/**
+
+        /**
 	 * total number of weights
 	 */
 	int nWeights = 0;
+  
 	/**
 	 * total number of inputs
 	 */
 	int nInputs = 0;
+  
 	/**
 	 * total number of outputs
 	 */
 	int nOutputs = 0;
-	/**
-	 * the learning rate
-	 */
-	double w_learningRate = 0;
+  
 	/**
 	 * A double pointer to the layers in the network
 	 */
 	Layer **layers = 0;
+  
 	/**
 	 * A pointer to the inputs of the network
 	 */
 	const double *inputs = 0;
-	/**
-	 * The error to be propagated forward
-	 */
-	double leadForwardError = 0;
-	/**
-	 * The error to be propagated backward
-	 */
-	double theLeadError = 0;
-	/**
-	 * Index of the layer at which the mid error is injected
-	 */
-	int midLayerIndex = 0;
-	/**
-	 * The error to be propagated bilaterally
-	 */
-	double theLeadMidError = 0;
+  
 	/**
 	 * A pointer to the gradient of the error
 	 */
 	double *errorGradient = NULL;
-	/**
-	 * The global error that is passed to every neuron
-	 */
-	double globalError = 0;
-	/**
-	 * The error to be propagated bac and forth through the network
-	 */
-	double echoError = 0;
-	/**
-	 * The error to be propagated locally
-	 */
-	double theLeadLocalError = 0;
 };

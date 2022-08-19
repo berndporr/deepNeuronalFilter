@@ -32,7 +32,7 @@ public:
 		// calc an exp reduction of the numbers always reaching 1
 		double b = exp(log(noiseDelayLineLength)/(NLAYERS-1));
 		for(int i=0;i<NLAYERS;i++) {
-			nNeurons[i] = noiseDelayLineLength / pow(b,i);
+			nNeurons[i] = ceil(noiseDelayLineLength / pow(b,i));
 			if (i == (NLAYERS-1)) nNeurons[i] = 1;
 		}
 		
@@ -44,6 +44,12 @@ public:
 			NNO->getLayer(i)->initLayer(i,Neuron::W_RANDOM, Neuron::B_NONE, am);
 			fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
 		}
+	}
+
+	enum ErrorPropagation { Backprop = 0, ModulatedHebb = 1 };
+
+	void setErrorPropagation(ErrorPropagation e) {
+		errorPropagation = e;
 	}
 
 	/**
@@ -71,7 +77,15 @@ public:
 		
 		// FEEDBACK TO THE NETWORK 
 		NNO->setError(f_nn);
-		NNO->propErrorBackward();
+		switch (errorPropagation) {
+		case Backprop:
+		default:
+			NNO->propErrorBackward();
+			break;
+		case ModulatedHebb:
+			NNO->propModulatedHebb(f_nn);
+			break;
+		}
 		NNO->updateWeights();
 		return f_nn;
 	}
@@ -137,6 +151,7 @@ private:
 	int* nNeurons;
 	double remover = 0;
 	double f_nn = 0;
+	ErrorPropagation errorPropagation = Backprop;
 };
 
 #endif
