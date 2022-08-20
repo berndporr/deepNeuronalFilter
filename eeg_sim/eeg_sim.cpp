@@ -33,7 +33,7 @@ const int plotW = 1200;
 const int plotH = 720;
 
 
-void processOneSubject(float duration = 120, const bool showPlots = true, float alpha = 0) {
+void runSimulation(float duration = 120, const bool showPlots = true, float alpha = 0.1) {
 	std::srand(1);
 
 	// file path prefix for the results
@@ -59,6 +59,8 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 	boost::circular_buffer<double> lms_r_buf(bufferLength);
 	
 // FILES
+	fstream signal_file;
+	fstream noise_file;
 	fstream dnf_file;
 	fstream inner_file;
 	fstream outer_file;
@@ -78,7 +80,9 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 
 	//adding delay line for the noise
 	boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());
-		
+
+	signal_file.open(outpPrefix+"/signal.tsv", fstream::out);
+	noise_file.open(outpPrefix+"/noise.tsv", fstream::out);
 	dnf_file.open(outpPrefix+"/dnf.tsv", fstream::out);
 	inner_file.open(outpPrefix+"/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/outer.tsv", fstream::out);
@@ -123,9 +127,11 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 
 		double r = d_r(gen_r) / 1E6;
 		r = rBP.filter(r);
+		noise_file << r << endl;
 		
 		double c = d_c(gen_c) / 1E6;
 		c = cLP.filter(c);
+		signal_file << c << endl;
 
 		double inner_raw_data = r + c;
 		double outer_raw_data = r + alpha * c;
@@ -223,6 +229,8 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 			}
 		}
 	}
+	signal_file.close();
+	noise_file.close();
 	dnf_file.close();
 	inner_file.close();
 	outer_file.close();
@@ -254,6 +262,6 @@ int main(int argc, const char *argv[]) {
 		screenoutput = true;
 	}
 	
-	processOneSubject(duration,screenoutput);
+	runSimulation(duration,screenoutput);
 	return 0;
 }
