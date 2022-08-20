@@ -27,7 +27,7 @@ class ParalysedEEG:
         self.f_signal_max = 95
 
     def paralysedEEGVarianceFromWhithamEtAl(self,datasetIndex=0):
-        a = self.allsubjects[datasetIndex]
+        a = self.allsubjectdata[datasetIndex]
         f = a[:,0]
         p = a[:,1]
         psd = interp1d(f, p, kind='cubic')
