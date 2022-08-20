@@ -113,7 +113,7 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 
 	std::random_device rd_c;
 	std::mt19937 gen_c(rd_c());
- 	std::normal_distribution<> d_c(0,8); // uV
+ 	std::normal_distribution<> d_c(0,50); // uV
 	Iir::Butterworth::LowPass<filterorder> cLP;
 	cLP.setup(fs,signalModelLowpassFreq);
 
