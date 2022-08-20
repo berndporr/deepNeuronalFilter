@@ -17,27 +17,43 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
 import math as math
-from scipy.interpolate import interp1d
 import scipy.stats as stats
+from numpy.polynomial import Polynomial
 
 class ParalysedEEG:
 
-    def __init__(self):
+    DEFAULT_DATASET_INDEX = 0
+
+    def __init__(self,datasetIndex = -1,degree = 15):
         self.f_signal_min = 1
         self.f_signal_max = 95
+        if datasetIndex in range(len(self.allsubjectdata)):
+            a = self.allsubjectdata[datasetIndex]
+            f = a[:,0]
+            p = a[:,1]
+            self.psd_coeff = Polynomial.fit(f, p, degree, domain = [self.f_signal_min,self.f_signal_max])
+        else:
+            a = self.allsubjectdata[0]
+            f = a[:,0]
+            p = a[:,1]
+            tmpcoeff = Polynomial.fit(f, p, degree, domain = [self.f_signal_min,self.f_signal_max])
+            for i in range(len(self.allsubjectdata)-1):
+                a = self.allsubjectdata[i+1]
+                f = a[:,0]
+                p = a[:,1]
+                c = Polynomial.fit(f, p, degree, domain = [self.f_signal_min,self.f_signal_max])
+                tmpcoeff = tmpcoeff + c
+            self.psd_coeff = tmpcoeff / len(self.allsubjectdata)
 
-    def paralysedEEGVarianceFromWhithamEtAl(self,datasetIndex=0):
-        a = self.allsubjectdata[datasetIndex]
-        f = a[:,0]
-        p = a[:,1]
-        psd = interp1d(f, p, kind='cubic')
-        return psd
+    def paralysedEEGVarianceFromWhithamEtAl(self,frequency):
+        return self.psd_coeff(frequency)
 
-    def averageEEGVoltage(self,bandpower):
-        psd = self.calculateParalysedEEGVariance()
-        for f2 in np.arange(1,90,1.0):
-            bandpower = bandpower + 10**psd(f2)
-            print("Average EEG voltage is (uV):",round((bandpower**0.5)*1E6))
+    def totalEEGPower(self):
+        totalpower = 0
+        for f in np.arange(1,90,1.0):
+            psd = self.paralysedEEGVarianceFromWhithamEtAl(f)
+            totalpower = totalpower + 10**psd
+        return totalpower
 
     sub1a = np.array([[  0.688863, -10.456   ],
        [  1.836969, -10.808   ],
