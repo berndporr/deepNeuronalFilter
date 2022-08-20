@@ -33,7 +33,7 @@ const int plotW = 1200;
 const int plotH = 720;
 
 
-void processOneSubject(float duration = 120, const bool showPlots = true, float alpha = 0.1) {
+void processOneSubject(float duration = 120, const bool showPlots = true, float alpha = 0) {
 	std::srand(1);
 
 	// file path prefix for the results
@@ -108,29 +108,27 @@ void processOneSubject(float duration = 120, const bool showPlots = true, float 
 	std::random_device rd_r;
 	std::mt19937 gen_r(rd_r());
  	std::normal_distribution<> d_r(0,50); // uV
-	Iir::Butterworth::LowPass<filterorder> rLP;
-	rLP.setup(fs,noiseModelLowpassFreq);
 	Iir::Butterworth::BandPass<filterorder> rBP;
 	rBP.setup(fs,noiseModelBandpassCenter,noiseModelBandpassWidth);
 
-	std::random_device rd_e;
-	std::mt19937 gen_e(rd_e());
- 	std::normal_distribution<> d_e(0,50); // uV
-	Iir::Butterworth::LowPass<filterorder> eLP;
-	eLP.setup(fs,signalModelLowpassFreq);
+	std::random_device rd_c;
+	std::mt19937 gen_c(rd_c());
+ 	std::normal_distribution<> d_c(0,8); // uV
+	Iir::Butterworth::LowPass<filterorder> cLP;
+	cLP.setup(fs,signalModelLowpassFreq);
 
 	// main loop processsing sample by sample
 	for (long count=0; count<n; count++) {
 		double p300trigger = 0;
 
 		double r = d_r(gen_r) / 1E6;
-		r = rLP.filter(r) + rBP.filter(r);
+		r = rBP.filter(r);
 		
-		double e = d_e(gen_e) / 1E6;
-		e = eLP.filter(e);
+		double c = d_c(gen_c) / 1E6;
+		c = cLP.filter(c);
 
-		double inner_raw_data = r + e;
-		double outer_raw_data = r + alpha * e;
+		double inner_raw_data = r + c;
+		double outer_raw_data = r + alpha * c;
 		
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY

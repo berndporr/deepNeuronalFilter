@@ -3,10 +3,9 @@
 
 #include "dnf.h"
 
-const double noiseModelLowpassFreq = 5; // Hz
-const double noiseModelBandpassCenter = 45; // Hz
-const double noiseModelBandpassWidth = 40; // Hz
-const double signalModelLowpassFreq = 5; // Hz
+const double noiseModelBandpassCenter = 50; // Hz
+const double noiseModelBandpassWidth = 30; // Hz
+const double signalModelLowpassFreq = 17; // Hz
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;
 
