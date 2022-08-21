@@ -1,20 +1,8 @@
-# Deep Neurnal EEG Filter
+# Deep Neurnal EEG Filter -- with simulated EEG
 
 Removes adaptively EMG muscle noise from EEG
 
 ![alt tag](screenshot.png)
-
-## Dataset
-
-Download the dataset from https://researchdata.gla.ac.uk/1258/
-and unpack the zip outwidth of this repository so that the directory
-structure looks like this:
-```
---+--deepNeuronalFilter/eeg_filter
-  |
-  +--gla_researchdata_1258
-```
-
 
 ## How to build
 
@@ -23,23 +11,20 @@ also do `make` in this subdirectory later.
 
 ## How to run
 
-### Single subject and task
+### Single simulation
 ```
-./eeg_filter <subject number> [task]
+./eeg_sim [-a]
 ```
-where the subject number is compulsory and the task
-(p300, jawclench, ...) is optional. Default is p300.
+where `-a` disables the graphical output. The output directory
+is `results`.
 
-### All subjects and both p300 & jawclench
-
-Just type:
+### Stats simulation
 ```
-./runall.sh
+./eeg_sim [-b]
 ```
-and the data from all 20 subjects is filtered for both
-the p300 and the jawclench task.
+which runs multi-threaded with 20 runs and stores the
+results in `results/0..19/`.
 
 ## Analysis
 
-For plotting the P300 peaks, calculating the SNR, the weight
-developments go to the subdirectory `analysis`.
+Head to the `analysis` directory.
