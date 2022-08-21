@@ -79,7 +79,7 @@ for i in range(len(dnfsnr.snrdiff)):
     x = np.array([0,1])
     plt.scatter(0,dnfsnr.before[i])
     plt.scatter(1,dnfsnr.after[i])
-    plt.ylim([-15,5])
+    plt.ylim([-12.5,2.5])
     plt.plot(x,y)
 
 dnf_impr.savefig('./SNR_DNF_improvements.eps',
@@ -92,7 +92,7 @@ for i in range(len(lmssnr.snrdiff)):
     x = np.array([0,1])
     plt.scatter(0,lmssnr.before[i])
     plt.scatter(1,lmssnr.after[i])
-    plt.ylim([-15,5])
+    plt.ylim([-12.5,2.5])
     plt.plot(x,y)
 
 lms_impr.savefig('./SNR_LMS_improvements.eps',
