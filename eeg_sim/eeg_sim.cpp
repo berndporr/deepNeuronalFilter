@@ -32,11 +32,13 @@ constexpr int ESC_key = 27;
 const int plotW = 1200;
 const int plotH = 720;
 
+const float signalAmplitude = 40; // uV (before lowpass filtering)
 
 void runSimulation(const float duration,
 		   const bool showPlots = true,
 		   const int experimentNumber = -1,
-		   const float alpha = 0.1) {
+		   const float alpha = 0.1,
+		   const float noiseAmplitude = 25) {
 	std::srand(1);
 
 	// file path prefix for the results
@@ -48,17 +50,12 @@ void runSimulation(const float duration,
 		mkdir(outpPrefix.c_str(), S_IRWXU);
 	}
 
-	std::cout << "Writing results to the subdir: " << outpPrefix << endl;
-
 	int fs = 500;
 	int n = int(fs * duration);
-
-	fprintf(stderr,"Starting DNF\n");
 
 	const int samplesNoLearning = 3 * fs / innerHighpassCutOff;
 	
 	const int nTapsDNF = fs / outerHighpassCutOff;
-	fprintf(stderr,"nTapsDNF = %d\n",nTapsDNF);
 	
 	boost::circular_buffer<double> oo_buf(bufferLength);
 	boost::circular_buffer<double> io_buf(bufferLength);
@@ -117,19 +114,28 @@ void runSimulation(const float duration,
 	
 	Fir1 lms_filter(nTapsDNF);
 	
-	fprintf(stderr,"inner_gain = %f, outer_gain = %f, remover_gain = %f\n",inner_gain,outer_gain,remover_gain);
-
 	std::random_device rd_r;
 	std::mt19937 gen_r(rd_r());
- 	std::normal_distribution<> d_r(0,50); // uV
+ 	std::normal_distribution<> d_r(0,noiseAmplitude); // uV
 	Iir::Butterworth::BandPass<filterorder> rBP;
 	rBP.setup(fs,noiseModelBandpassCenter,noiseModelBandpassWidth);
 
 	std::random_device rd_c;
 	std::mt19937 gen_c(rd_c());
- 	std::normal_distribution<> d_c(0,50); // uV
+ 	std::normal_distribution<> d_c(0,signalAmplitude); // uV
 	Iir::Butterworth::LowPass<filterorder> cLP;
 	cLP.setup(fs,signalModelLowpassFreq);
+
+	fprintf(stderr,
+		"Starting DNF: subdir = %s, inner_gain = %f, outer_gain = %f,"
+		"remover_gain = %f, alpha = %f, noiseAmplitude = %f, nTapsDNF = %d\n",
+		outpPrefix.c_str(),
+		inner_gain,
+		outer_gain,
+		remover_gain,
+		alpha,
+		noiseAmplitude,
+		nTapsDNF);
 
 	// main loop processsing sample by sample
 	for (long count=0; count<n; count++) {
@@ -248,7 +254,7 @@ void runSimulation(const float duration,
 	laplace_file.close();
 	wdistance_file.close();
 	if (plots) delete plots;
-	cout << "The program has reached the end of the input file" << endl;
+	cout << "Sim finished." << endl;
 }
 
 
@@ -257,7 +263,9 @@ void runSimulation(const float duration,
 int main(int argc, const char *argv[]) {
 	const int nExperiments = 20;
 	const float duration = 120; // sec
-	const float alpha = 0.1;
+	const float alpha = 0.25;
+	const float averageNoiseAmplitude = 40; // uV
+	const float standardDevNoiseAmplitude = 20; // uV
 	
 	bool screenoutput = true;
 	
@@ -272,8 +280,13 @@ int main(int argc, const char *argv[]) {
 		}
 		if (strcmp(argv[1],"-b") == 0) {
 			std::thread* workers[nExperiments];
+			std::random_device rd_noiseAmplitude;
+			std::mt19937 gen_noiseAmplitude(rd_noiseAmplitude());
+			std::normal_distribution<> d_noiseAmplitude(averageNoiseAmplitude,
+								    standardDevNoiseAmplitude); // uV
 			for(int i = 0; i < nExperiments; i++) {
-				workers[i] = new std::thread(runSimulation,duration,false,i,alpha);
+				float noiseAmplitude = d_noiseAmplitude(gen_noiseAmplitude);
+				workers[i] = new std::thread(runSimulation,duration,false,i,alpha,noiseAmplitude);
 			}
 			for(int i = 0; i < nExperiments; i++) {
 				workers[i]->join();
@@ -284,6 +297,6 @@ int main(int argc, const char *argv[]) {
 	}
 
 	std::cout << "Running a single simulation" << endl;
-	runSimulation(duration,screenoutput,0,alpha);
+	runSimulation(duration,screenoutput,-1,alpha,averageNoiseAmplitude);
 	return 0;
 }

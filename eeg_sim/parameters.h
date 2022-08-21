@@ -4,7 +4,7 @@
 #include "dnf.h"
 
 const double noiseModelBandpassCenter = 50; // Hz
-const double noiseModelBandpassWidth = 45; // Hz
+const double noiseModelBandpassWidth = 40; // Hz
 const double signalModelLowpassFreq = 17; // Hz
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;

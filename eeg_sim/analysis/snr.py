@@ -12,6 +12,8 @@ SNRbandMax = 100 # Hz
 
 nExperiments = 20
 
+resultsdir = "../results/"
+
 class SNR:
     def __init__(self,subj,startsec,fs,noisered_filename):
         self.subj = subj
@@ -22,7 +24,10 @@ class SNR:
         self.outer_filename = "outer.tsv"
     
     def loadSignal(self,filename):
-        p = "../results/{}/{}".format(self.subj,filename)
+        p = resultsdir
+        if self.subj >= 0:
+            p = p + "/" + str(self.subj) + "/"
+        p = p + filename
         d = np.loadtxt(p)
         ll = self.fs * self.startsec
         y = d[ll:,0]
@@ -90,7 +95,7 @@ def calcAllSNRimprovemements(startsec,
 
 # check if we run this as a main program
 if __name__ == "__main__":
-    subj = 0
+    subj = -1
     startsec = 60
     fs = 500
     filtered_filename = "dnf.tsv"

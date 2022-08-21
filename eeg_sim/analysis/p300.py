@@ -9,13 +9,17 @@ from scipy import signal
 resultsdir = "../results/"
 
 def calcVEP(subj,filename,startsec,fs):
-    d = np.loadtxt(resultsdir+"/"+str(subj)+"/"+filename)
+    pa = resultsdir
+    if subj >= 0:
+        pa = pa + "/" + str(subj) + "/"
+    d = np.loadtxt(pa+filename)
     ll = fs * startsec
     y1 = d[ll:,0]
-    s = np.loadtxt(resultsdir+"/"+str(subj)+"/signal.tsv")
+    s = np.loadtxt(pa+"/signal.tsv")
     y2 = s[ll:]
-    avg = signal.correlate(y1,y2)
-    avg = np.abs(avg)
+    avg = signal.correlate(y1,y2,mode='same')
+    n = len(y1)
+    avg = np.sqrt(np.abs(avg)/n)
     return avg
 
 
@@ -25,18 +29,18 @@ def plotVEP(subj,filename,ax,fs,startsec):
     t = np.linspace(-navg/fs/2,navg/fs/2,navg)
     ax.plot(t,avg)
     ax.set_title(filename)
-    ax.set_xlabel("t/ms")
+    ax.set_xlabel("t/s")
     ax.set_ylabel("P300/uV")
 
 
 # check if we run this as a main program
 if __name__ == "__main__":
-    subj = 0
-    startsec = 2*60
+    subj = -1
+    startsec = 60
     dnf_filename = "dnf.tsv"
     lms_filename = "lms.tsv"
     laplace_filename = "laplace.tsv"
-    fs = 250
+    fs = 500
 
     helptext = 'usage: {} -p participant -s startsec -f file -h'.format(sys.argv[0])
 
@@ -58,7 +62,7 @@ if __name__ == "__main__":
         print (helptext)
         sys.exit(2)
 
-    fig = plt.figure("P300")
+    fig = plt.figure("P300 (here: crosscorr with known pure EEG signal)")
 
     ax = fig.add_subplot(1,4,1)
     plotVEP(subj,"inner.tsv",ax,startsec=startsec,fs=fs)
