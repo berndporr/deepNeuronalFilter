@@ -33,12 +33,22 @@ const int plotW = 1200;
 const int plotH = 720;
 
 
-void runSimulation(float duration = 120, const bool showPlots = true, float alpha = 0.1) {
+void runSimulation(const float duration,
+		   const bool showPlots = true,
+		   const int experimentNumber = -1,
+		   const float alpha = 0.1) {
 	std::srand(1);
 
 	// file path prefix for the results
 	std::string outpPrefix = "results";
 	mkdir(outpPrefix.c_str(), S_IRWXU);
+
+	if (experimentNumber != -1) {
+		outpPrefix = "results/"+std::to_string(experimentNumber);
+		mkdir(outpPrefix.c_str(), S_IRWXU);
+	}
+
+	std::cout << "Writing results to the subdir: " << outpPrefix << endl;
 
 	int fs = 500;
 	int n = int(fs * duration);
@@ -243,25 +253,37 @@ void runSimulation(float duration = 120, const bool showPlots = true, float alph
 
 
 
+
 int main(int argc, const char *argv[]) {
+	const int nExperiments = 20;
+	const float duration = 120; // sec
+	const float alpha = 0.1;
+	
+	bool screenoutput = true;
+	
 	if (argc < 2) {
-		fprintf(stderr,"Usage: %s [-b]\n",argv[0]);
-		fprintf(stderr,"       -a calculates with screen output.\n");
-		fprintf(stderr,"       -b calculates without screen output.\n");
+		fprintf(stderr,"Usage: %s [-a] [-b]\n",argv[0]);
+		fprintf(stderr,"       -a disables screen output.\n");
+		fprintf(stderr,"       -b calculates 20 simulations multi-threaded without screen output.\n");
 		fprintf(stderr,"       Press ESC in the plot window to cancel the program.\n");
-		return 0;
+	} else {
+		if (strcmp(argv[1],"-a") == 0) {
+			screenoutput = false;
+		}
+		if (strcmp(argv[1],"-b") == 0) {
+			std::thread* workers[nExperiments];
+			for(int i = 0; i < nExperiments; i++) {
+				workers[i] = new std::thread(runSimulation,duration,false,i,alpha);
+			}
+			for(int i = 0; i < nExperiments; i++) {
+				workers[i]->join();
+				delete workers[i];
+			}
+			return 0;
+		}
 	}
 
-	bool screenoutput = true;
-	float duration = 120;
-	if (strcmp(argv[1],"-b") == 0) {
-		screenoutput = false;
-	}
-	
-	if (strcmp(argv[1],"-a") == 0) {
-		screenoutput = true;
-	}
-	
-	runSimulation(duration,screenoutput);
+	std::cout << "Running a single simulation" << endl;
+	runSimulation(duration,screenoutput,0,alpha);
 	return 0;
 }

@@ -9,11 +9,12 @@ from scipy import signal
 
 class SimData:
     def loadFile(self,filename):
-        return np.loadtxt("../results/{}".format(filename))
+        return np.loadtxt("../results/{}/{}".format(self.subj,filename))
     
-    def __init__(self,filtered_filename,startsec,endsec=False):
+    def __init__(self,subj,filtered_filename,startsec,endsec=False):
         self.fs = 500
         self.startsec = startsec
+        self.subj = subj
         a = startsec * self.fs
         if endsec:
             b = endsec * self.fs
@@ -29,8 +30,8 @@ class SimData:
         return np.linspace(self.startsec,(len(data)/self.fs)+self.startsec,len(data))
 
 
-def plotWithPlotly(filtered_filename,startsec,endsec):
-    simdata = SimData(filtered_filename,startsec,endsec)
+def plotWithPlotly(subj,filtered_filename,startsec,endsec):
+    simdata = SimData(subj,filtered_filename,startsec,endsec)
 
     fig = make_subplots(rows=4, cols=1,
                         shared_xaxes=True,
@@ -49,7 +50,7 @@ def plotWithPlotly(filtered_filename,startsec,endsec):
     fig.add_trace(go.Scatter(y=simdata.dnf,x=simdata.getTimeAxis(simdata.dnf)),
                   row=4, col=1)
     
-    fig.update_layout(title_text="DNF timedomain explorer")
+    fig.update_layout(title_text="DNF timedomain explorer for subject {}".format(subj))
     fig.show()
 
     fig = make_subplots(rows=3, cols=1,
@@ -69,14 +70,14 @@ def plotWithPlotly(filtered_filename,startsec,endsec):
     fig.add_trace(go.Scatter(y=Pxx_den, x=f),
                   row=3, col=1)
     
-    fig.update_layout(title_text="DNF frequency domain explorer for {}".format(filtered_filename))
+    fig.update_layout(title_text="DNF frequency domain explorer for subject {}, {}".format(subj,filtered_filename))
     fig.show()
 
 
-def plotWithMatplotlib(filtered_filename,startsec,endsec):
-    simdata = SimData(filtered_filename,startsec,endsec)
+def plotWithMatplotlib(subj,filtered_filename,startsec,endsec):
+    simdata = SimData(subj,filtered_filename,startsec,endsec)
 
-    fig = plt.figure("DNF time domain explorer for {}".format(filtered_filename))
+    fig = plt.figure("DNF time domain explorer for experiment {}, {}".format(subj,filtered_filename))
 
     m = max(simdata.inner)
     if m < 0.0001:
@@ -108,7 +109,7 @@ def plotWithMatplotlib(filtered_filename,startsec,endsec):
 
     fig.subplots_adjust(hspace=0.5)
     
-    fig = plt.figure("DNF frequ domain explorer for {}".format(filtered_filename))
+    fig = plt.figure("DNF frequ domain explorer for subject {}, {}".format(subj,filtered_filename))
     
     ax = fig.add_subplot(4,1,1)
     ax.title.set_text('Inner')
@@ -137,12 +138,13 @@ def plotWithMatplotlib(filtered_filename,startsec,endsec):
 
 # check if we run this as a main program
 if __name__ == "__main__":
+    subj = 0
     startsec = 60
     endsec = False
     filtered_filename = "dnf.tsv"
     usePlotly = True
 
-    helptext = 'usage: {} -s startsec -e endsec -f noiseredfile.tsv -m -h'.format(sys.argv[0])
+    helptext = 'usage: {} -p participant -s startsec -e endsec -f noiseredfile.tsv -m -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
@@ -150,7 +152,9 @@ if __name__ == "__main__":
         opts, arg = getopt.getopt(all_args, 'p:s:e:f:t:m')
         # Iterate over the options and values
         for opt, arg_val in opts:
-            if '-s' in opt:
+            if '-p' in opt:
+                subj = int(arg_val)
+            elif '-s' in opt:
                 startsec = int(arg_val)
             elif '-e' in opt:
                 endsec = int(arg_val)
@@ -168,6 +172,6 @@ if __name__ == "__main__":
         sys.exit(2)
 
     if usePlotly:
-        plotWithPlotly(filtered_filename,startsec,endsec)
+        plotWithPlotly(subj,filtered_filename,startsec,endsec)
     else:
-        plotWithMatplotlib(filtered_filename,startsec,endsec)
+        plotWithMatplotlib(subj,filtered_filename,startsec,endsec)

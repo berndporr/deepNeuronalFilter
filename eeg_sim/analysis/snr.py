@@ -10,10 +10,11 @@ import os
 SNRbandMin = 5 # Hz
 SNRbandMax = 100 # Hz
 
-resultsdir = "../results/"
+nExperiments = 20
 
 class SNR:
-    def __init__(self,startsec,fs,noisered_filename):
+    def __init__(self,subj,startsec,fs,noisered_filename):
+        self.subj = subj
         self.startsec = startsec
         self.fs = fs
         self.noisered_filename = noisered_filename
@@ -21,7 +22,8 @@ class SNR:
         self.outer_filename = "outer.tsv"
     
     def loadSignal(self,filename):
-        d = np.loadtxt(resultsdir+filename)
+        p = "../results/{}/{}".format(self.subj,filename)
+        d = np.loadtxt(p)
         ll = self.fs * self.startsec
         y = d[ll:,0]
         return y
@@ -42,7 +44,7 @@ class SNR:
 
     def calcSNRinner(self):
         NoisePwr,w = self.calcNoisePower(self.inner_filename)
-        vep = p300.calcVEP(self.inner_filename,self.startsec,self.fs)
+        vep = p300.calcVEP(self.subj,self.inner_filename,self.startsec,self.fs)
         SignalPwr = np.max(vep**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
@@ -51,7 +53,7 @@ class SNR:
 
     def calcSNRdnf(self):
         NoisePwr,w = self.calcNoisePower(self.noisered_filename)
-        vep = p300.calcVEP(self.noisered_filename,self.startsec,self.fs)
+        vep = p300.calcVEP(self.subj,self.noisered_filename,self.startsec,self.fs)
         SignalPwr = np.max(vep**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
@@ -71,24 +73,29 @@ def calcAllSNRimprovemements(startsec,
                              filtered_filename):
     beforeArray = np.array([])
     afterArray = np.array([])
-    snr = SNR(startsec=startsec,fs=fs,noisered_filename=filtered_filename)
-    snrdnf, wdnf = snr.calcSNRdnf()
-    snrinner, winner = snr.calcSNRinner()
-    impr = snrdnf-snrinner
-    print("SNR improvement: {} - {} = {}".format(snrinner,snrdnf,impr))
-    beforeArray = np.append(beforeArray,snrinner)
-    afterArray = np.append(afterArray,snrdnf)
+    for subj in range(nExperiments):
+        print("Subject",subj)
+        snr = SNR(subj=subj,startsec=startsec,fs=fs,noisered_filename=filtered_filename)
+        snrdnf, wdnf = snr.calcSNRdnf()
+        snrinner, winner = snr.calcSNRinner()
+        impr = snrdnf-snrinner
+        print("SNR improvement: {} - {} = {}".format(snrinner,snrdnf,impr))
+        beforeArray = np.append(beforeArray,snrinner)
+        afterArray = np.append(afterArray,snrdnf)
     imprArray = afterArray - beforeArray
-    return beforeArray,afterArray,imprArray
+    snrdiff_av = np.mean(imprArray)
+    snrdiff_sd = np.std(imprArray)
+    return beforeArray,afterArray,snrdiff_av,snrdiff_sd
 
 
 # check if we run this as a main program
 if __name__ == "__main__":
+    subj = 0
     startsec = 60
     fs = 500
     filtered_filename = "dnf.tsv"
 
-    helptext = 'usage: {} -s startsec -f file -t task -h'.format(sys.argv[0])
+    helptext = 'usage: {} -p participant -s startsec -f file -t task -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
@@ -96,7 +103,9 @@ if __name__ == "__main__":
         opts, arg = getopt.getopt(all_args, 'p:s:f:t:')
         # Iterate over the options and values
         for opt, arg_val in opts:
-            if '-s' in opt:
+            if '-p' in opt:
+                subj = int(arg_val)
+            elif '-s' in opt:
                 startsec = int(arg_val)
             elif '-f' in opt:
                 filtered_filename = arg_val
@@ -109,7 +118,7 @@ if __name__ == "__main__":
         sys.exit(2)
 
     plt.figure("Periodogram of the noise: unfilered (INNER) vs filtered (.tsv)")
-    snr = SNR(startsec=startsec,fs=fs,noisered_filename=filtered_filename)
+    snr = SNR(subj=subj,startsec=startsec,fs=fs,noisered_filename=filtered_filename)
     snrdnf, wdnf = snr.calcSNRdnf()
     print("SNR from Noise removal:",snrdnf)
     plt.plot(wdnf[:,0],wdnf[:,1],label=filtered_filename)

@@ -3,40 +3,42 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import getopt
+
 from scipy import signal
 
 resultsdir = "../results/"
 
-def calcVEP(filename,startsec,fs):
-    d = np.loadtxt(resultsdir+filename)
+def calcVEP(subj,filename,startsec,fs):
+    d = np.loadtxt(resultsdir+"/"+str(subj)+"/"+filename)
     ll = fs * startsec
     y1 = d[ll:,0]
-    s = np.loadtxt(resultsdir+"signal.tsv")
+    s = np.loadtxt(resultsdir+"/"+str(subj)+"/signal.tsv")
     y2 = s[ll:]
     avg = signal.correlate(y1,y2)
     avg = np.abs(avg)
     return avg
 
 
-def plotVEP(filename,ax,fs,startsec):
-    avg = calcVEP(filename,startsec=startsec,fs=fs) * 1E6
+def plotVEP(subj,filename,ax,fs,startsec):
+    avg = calcVEP(subj,filename,startsec=startsec,fs=fs) * 1E6
     navg = len(avg)
     t = np.linspace(-navg/fs/2,navg/fs/2,navg)
     ax.plot(t,avg)
     ax.set_title(filename)
-    ax.set_xlabel("t/s")
+    ax.set_xlabel("t/ms")
     ax.set_ylabel("P300/uV")
 
 
 # check if we run this as a main program
 if __name__ == "__main__":
+    subj = 0
     startsec = 2*60
     dnf_filename = "dnf.tsv"
     lms_filename = "lms.tsv"
     laplace_filename = "laplace.tsv"
     fs = 250
 
-    helptext = 'usage: {} -s startsec -f file -h'.format(sys.argv[0])
+    helptext = 'usage: {} -p participant -s startsec -f file -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
@@ -44,7 +46,9 @@ if __name__ == "__main__":
         opts, arg = getopt.getopt(all_args, 'p:s:f:')
         # Iterate over the options and values
         for opt, arg_val in opts:
-            if '-s' in opt:
+            if '-p' in opt:
+                subj = int(arg_val)
+            elif '-s' in opt:
                 startsec = int(arg_val)
             elif '-h' in opt:
                 raise getopt.GetoptError()
@@ -57,18 +61,18 @@ if __name__ == "__main__":
     fig = plt.figure("P300")
 
     ax = fig.add_subplot(1,4,1)
-    plotVEP("inner.tsv",ax,startsec=startsec,fs=fs)
+    plotVEP(subj,"inner.tsv",ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,2)
     ax.title.set_text('DNF')
-    plotVEP(dnf_filename,ax,startsec=startsec,fs=fs)
+    plotVEP(subj,dnf_filename,ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,3)
     ax.title.set_text('LMS')
-    plotVEP(lms_filename,ax,startsec=startsec,fs=fs)
+    plotVEP(subj,lms_filename,ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,4)
     ax.title.set_text('Laplace')
-    plotVEP(laplace_filename,ax,startsec=startsec,fs=fs)
+    plotVEP(subj,laplace_filename,ax,startsec=startsec,fs=fs)
 
     plt.show()

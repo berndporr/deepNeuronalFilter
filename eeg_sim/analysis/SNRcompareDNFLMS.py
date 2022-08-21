@@ -14,16 +14,15 @@ import sys
 import getopt
 
 class SNRStat:
-    def __init__(self,fs,noisefolder,startsec,filtered_filename):
+    def __init__(self,fs,startsec,filtered_filename):
         self.alpha = 0.05
         print("Starting:")
-        print(noisefolder,filtered_filename)
+        print(filtered_filename)
         self.before,self.after,self.av,self.sd = snr.calcAllSNRimprovemements(startsec = startsec,
-                                                                              noisefolder = noisefolder,
                                                                               fs = fs,
                                                                               filtered_filename = filtered_filename)
         self.snrdiff = self.after - self.before
-        print(noisefolder,filtered_filename,"avg = {}, sd = {}".format(self.av,self.sd))
+        print(filtered_filename,"avg = {}, sd = {}".format(self.av,self.sd))
         t_value,p_value=stats.ttest_1samp(self.snrdiff,0)
         print(filtered_filename,'Test statistic is %f'%float("{:.6f}".format(t_value)))
         print('p-value for t-test is %f'%p_value)
@@ -34,7 +33,6 @@ class SNRStat:
 # check if we run this as a main program
 if __name__ == "__main__":
     startsec = 60
-    filtered_folder = "jawclench"
     helptext = 'usage: {} -s startsec -f file'.format(sys.argv[0])
 
     try:
@@ -45,8 +43,6 @@ if __name__ == "__main__":
         for opt, arg_val in opts:
             if '-s' in opt:
                 startsec = int(arg_val)
-            elif '-t' in opt:
-                filtered_folder = arg_val
             elif '-h' in opt:
                 raise getopt.GetoptError()
             else:
@@ -58,8 +54,8 @@ if __name__ == "__main__":
 
 
 #plotting the box plot of the data
-dnfsnr = SNRStat(500,filtered_folder,startsec,"dnf.tsv")
-lmssnr = SNRStat(500,filtered_folder,startsec,"lms.tsv")
+dnfsnr = SNRStat(500,startsec,"dnf.tsv")
+lmssnr = SNRStat(500,startsec,"lms.tsv")
 box_fig = plt.figure('compare')
 plt.bar(["DNF","LMS"],
         height = [dnfsnr.av,lmssnr.av],
