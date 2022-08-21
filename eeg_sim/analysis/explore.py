@@ -9,7 +9,10 @@ from scipy import signal
 
 class SimData:
     def loadFile(self,filename):
-        return np.loadtxt("../results/{}/{}".format(self.subj,filename))
+        if self.subj < 0:
+            return np.loadtxt("../results/{}".format(filename))
+        else:
+            return np.loadtxt("../results/{}/{}".format(self.subj,filename))
     
     def __init__(self,subj,filtered_filename,startsec,endsec=False):
         self.fs = 500
@@ -138,8 +141,8 @@ def plotWithMatplotlib(subj,filtered_filename,startsec,endsec):
 
 # check if we run this as a main program
 if __name__ == "__main__":
-    subj = 0
-    startsec = 60
+    subj = -1
+    startsec = 10
     endsec = False
     filtered_filename = "dnf.tsv"
     usePlotly = True
