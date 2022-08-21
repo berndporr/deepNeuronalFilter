@@ -5,7 +5,7 @@
 
 const int nExperiments = 20;
 const float duration = 120; // sec
-const float alpha = 0.25;
+const float alpha = 0.4;
 
 const float averageNoiseAmplitude = 15; // uV (pre filtering)
 const float standardDevNoiseAmplitude = 5; // uV

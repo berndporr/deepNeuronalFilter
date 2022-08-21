@@ -23,8 +23,10 @@ public:
 	 **/
 	DNF(const int NLAYERS,
 	    const int numTaps,
-	    double fs,
-	    Neuron::actMethod am = Neuron::Act_Tanh) : noiseDelayLineLength(numTaps),
+	    const double fs,
+	    const Neuron::actMethod am = Neuron::Act_Tanh,
+	    const bool debugOutput = false
+		) : noiseDelayLineLength(numTaps),
 			 signalDelayLineLength(noiseDelayLineLength / 2),
 			 signal_delayLine(signalDelayLineLength),
 			 nNeurons(new int[NLAYERS]),
@@ -42,13 +44,15 @@ public:
 		//setting up the neural networks
 		for(int i=0;i<NLAYERS;i++) {
 			NNO->getLayer(i)->initLayer(i,Neuron::W_RANDOM, Neuron::B_NONE, am);
-			fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
+			if (debugOutput) {
+				fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
+			}
 		}
 	}
 
 	enum ErrorPropagation { Backprop = 0, ModulatedHebb = 1 };
 
-	void setErrorPropagation(ErrorPropagation e) {
+	void setErrorPropagation(const ErrorPropagation e) {
 		errorPropagation = e;
 	}
 
@@ -58,7 +62,7 @@ public:
 	 * \param noise The reference noise. Should be less than one.
 	 * \returns The filtered signal where the noise has been removed by the DNF.
 	 **/
-	double filter(double signal, double noise) {
+	double filter(const double signal, const double noise) {
 		signal_delayLine.push_back(signal);
 		const double delayed_signal = signal_delayLine[0];
 		

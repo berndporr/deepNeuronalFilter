@@ -62,6 +62,8 @@ if __name__ == "__main__":
         print (helptext)
         sys.exit(2)
 
+    print("P300 without doing P300 because we know the pure EEG signal!")
+
     fig = plt.figure("P300 (here: crosscorr with known pure EEG signal)")
 
     ax = fig.add_subplot(1,4,1)
