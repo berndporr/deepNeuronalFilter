@@ -137,6 +137,12 @@ void runSimulation(const float duration,
 		noiseAmplitude,
 		nTapsDNF);
 
+	const long jawclenchSampleDistance = jawclenchEverySec * fs;
+	const long jawclenchSampleDuration = jawclenchDuration * fs;
+
+	long jawclenchDistanceCounter = jawclenchSampleDistance;
+	long jawclenchDurationCounter = 0;
+
 	// main loop processsing sample by sample
 	for (long count=0; count<n; count++) {
 		double p300trigger = 0;
@@ -144,7 +150,19 @@ void runSimulation(const float duration,
 		double r = d_r(gen_r) / 1E6;
 		r = rBP.filter(r);
 		noise_file << r << endl;
-		
+
+		if (jawclenchDistanceCounter > 0) {
+			jawclenchDistanceCounter--;
+		} else {
+			jawclenchDistanceCounter = jawclenchSampleDistance;
+			jawclenchDurationCounter = jawclenchSampleDuration;
+		}
+
+		if (jawclenchDurationCounter > 0) {
+			jawclenchDurationCounter--;
+			r = r * jawclenchNoiseBoost;
+		}
+
 		double c = d_c(gen_c) / 1E6;
 		c = cLP.filter(c);
 		signal_file << c << endl;
@@ -261,12 +279,6 @@ void runSimulation(const float duration,
 
 
 int main(int argc, const char *argv[]) {
-	const int nExperiments = 20;
-	const float duration = 120; // sec
-	const float alpha = 0.25;
-	const float averageNoiseAmplitude = 40; // uV
-	const float standardDevNoiseAmplitude = 20; // uV
-	
 	bool screenoutput = true;
 	
 	if (argc < 2) {
