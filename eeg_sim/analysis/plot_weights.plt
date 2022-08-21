@@ -11,7 +11,7 @@
 #    	faq, bugs, etc:   type "help FAQ"
 #    	immediate help:   type "help"  (plot window: hit 'h')
 set terminal postscript eps enhanced color solid
-set output 'plot_weights_experiment_0.eps'
+set output 'plot_weights.eps'
 unset clip points
 set clip one
 unset clip two
@@ -165,6 +165,6 @@ set fontpath
 set psdir
 set fit brief errorvariables nocovariancevariables errorscaling prescale nowrap v5
 GNUTERM = "wxt"
-## Last datafile plotted: "../results/0/weight_distance.tsv"
-plot "../results/0/weight_distance.tsv" using 2 w l, "../results/0/weight_distance.tsv" using 3 w l, "../results/0/weight_distance.tsv" using 4 w l, "../results/0/weight_distance.tsv" using 5 w l, "../results/0/weight_distance.tsv" using 6 w l, "../results/0/weight_distance.tsv" using 7 w l
+## Last datafile plotted: "../results/weight_distance.tsv"
+plot "../results/weight_distance.tsv" using 2 w l, "../results/weight_distance.tsv" using 3 w l, "../results/weight_distance.tsv" using 4 w l, "../results/weight_distance.tsv" using 5 w l, "../results/weight_distance.tsv" using 6 w l, "../results/weight_distance.tsv" using 7 w l
 #    EOF
