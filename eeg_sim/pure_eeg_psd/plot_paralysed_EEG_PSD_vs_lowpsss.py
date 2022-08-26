@@ -1,5 +1,6 @@
+#!/usr/bin/python3
 import matplotlib.pyplot as plt
-from ParalysedEEG import ParalysedEEG
+from ParalysedEEG import ParalysedEEGFromWhithamEtAl
 import numpy as np
 from scipy import signal
 
@@ -11,11 +12,10 @@ b, a = signal.butter(filter_order, cutoff, 'low', analog=True)
 w, h = signal.freqs(b, a)
 h = h * eeg_max_signal_amplitude
 
-for i in range(len(ParalysedEEG.allsubjectdata)):
-    p = ParalysedEEG(i)
+for i in range(len(ParalysedEEGFromWhithamEtAl.allsubjectdata)):
+    p = ParalysedEEGFromWhithamEtAl(i)
     f = np.linspace(p.f_signal_min,p.f_signal_max,100)
-    psd = p.paralysedEEGVarianceFromWhithamEtAl(f)
-    totalEEGPower = p.totalEEGPower()
+    psd = p.EEGVariance(f)
     plt.plot(f,psd,linewidth=1,label="dataset #{}".format(i))
 plt.ylim([-16,-10])
 plt.xlim([0,100])

@@ -1,18 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-(C) 2022 Bernd Porr <bernd.porr@glasgow.ac.uk>
-
-GNU GENERAL PUBLIC LICENSE
-Version 3, 29 June 2007
-
-Log Power spectra re-constructed from the figures of:
-
-Scalp electrical recording during paralysis: Quantitative evidence that
-EEG frequencies above 20 Hz are contaminated by EMG
-Emma M. Whitham a , Kenneth J. Pope b , Sean P. Fitzgibbon c , Trent Lewis b ,
-C. Richard Clark c , Stephen Loveless d , Marita Broberg e , Angus Wallace e ,
-Dylan DeLosAngeles e , Peter Lillie f , Andrew Hardy f , Rik
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
@@ -20,13 +6,36 @@ import math as math
 import scipy.stats as stats
 from numpy.polynomial import Polynomial
 
-class ParalysedEEG:
+class ParalysedEEGFromWhithamEtAl:
+    """
+    (C) 2022 Bernd Porr <bernd.porr@glasgow.ac.uk>
 
-    DEFAULT_DATASET_INDEX = 0
+    GNU GENERAL PUBLIC LICENSE
+    Version 3, 29 June 2007
+
+    Log Power spectra of pure EEG from two temporarily paralysed
+    subjects. Data adapted from the figures in:
+
+    Scalp electrical recording during paralysis: Quantitative evidence that
+    EEG frequencies above 20 Hz are contaminated by EMG
+    Emma M. Whitham a , Kenneth J. Pope b , Sean P. Fitzgibbon c , Trent Lewis b ,
+    C. Richard Clark c , Stephen Loveless d , Marita Broberg e , Angus Wallace e ,
+    Dylan DeLosAngeles e , Peter Lillie f , Andrew Hardy f , Rik
+
+    by having manually clicked on the datapoints of the 6 PSD plots
+    in the paper and then done a polynomial fit to smooth out the errors
+    from the manual clicking.
+    """
+
+    f_signal_min = 1
+    f_signal_max = 95
 
     def __init__(self,datasetIndex = -1,degree = 15):
-        self.f_signal_min = 1
-        self.f_signal_max = 95
+        """
+        Provides the power spectrum from Figure `datasetIndex` from Whitham et al
+        using a polynomial fit. The default degreee is 15. If no datasetIndex is
+        given or is negative then average from all 6 figures from the paper is calculated.
+        """
         if datasetIndex in range(len(self.allsubjectdata)):
             a = self.allsubjectdata[datasetIndex]
             f = a[:,0]
@@ -45,13 +54,19 @@ class ParalysedEEG:
                 tmpcoeff = tmpcoeff + c
             self.psd_coeff = tmpcoeff / len(self.allsubjectdata)
 
-    def paralysedEEGVarianceFromWhithamEtAl(self,frequency):
+    def EEGVariance(self,frequency):
+        """
+        Returns the EEG variance (i.e. power spectral density) at the specified frequency
+        """
         return self.psd_coeff(frequency)
 
     def totalEEGPower(self):
+        """
+        Calculates the total power of the EEG.
+        """
         totalpower = 0
-        for f in np.arange(1,90,1.0):
-            psd = self.paralysedEEGVarianceFromWhithamEtAl(f)
+        for f in np.arange(self.f_signal_min,self.f_signal_max,1.0):
+            psd = self.EEGVariance(f)
             totalpower = totalpower + 10**psd
         return totalpower
 

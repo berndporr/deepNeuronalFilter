@@ -69,6 +69,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         print("Specify 'rest' or 'jawclench' to plot the spectrum at rest or during a jaw clench");
+        quit()
     else:
         if sys.argv[1] == 'jawclench':
             a = int(toplot.Fs * 28.6)
