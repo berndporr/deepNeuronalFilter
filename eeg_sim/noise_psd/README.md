@@ -23,7 +23,3 @@ All jaw clenches concatenated. Run: `python3 ./plot_subj10_t_f.py jawclench`:
 Run `python3 ./plot_subj10_t_f.py rest`:
 
 ![alt tag](rest.png)
-
-
-## How to run
-
