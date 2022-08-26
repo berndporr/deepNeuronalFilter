@@ -8,13 +8,15 @@ const float duration = 120; // sec
 const float alpha = 0.4;
 
 const float averageNoiseAmplitude = 15; // uV (pre filtering)
-const float standardDevNoiseAmplitude = 5; // uV
+const float standardDevNoiseAmplitude = 5; // uV (for stats)
+
 const double noiseModelBandpassCenter = 50; // Hz
 const double noiseModelBandpassWidth = 90; // Hz
 const double jawclenchEverySec = 15; // sec
 const double jawclenchDuration = 1.5; // sec
 const double jawclenchNoiseBoost = 5; // gain
 
+const float signalAmplitude = 35; // uV (before lowpass filtering)
 const double signalModelLowpassFreq = 17; // Hz
 
 const Neuron::actMethod ACTIVATION = Neuron::Act_Tanh;

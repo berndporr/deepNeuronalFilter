@@ -1,11 +1,4 @@
 #!/usr/bin/python3
-"""
-Created on Fri Dec 24 18:28:41 2021
-@author: luciamb, Bernd Porr 
-
-Plots both channels of one subject & task
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.signal as signal
@@ -40,7 +33,7 @@ class tasks_eeg:
         self.ch1 = signal.lfilter(bHigh,aHigh,self.ch1);
         
         # Remove 50Hz noise
-        b50,a50 = signal.butter(4,[48/self.Fs*2,52/self.Fs*2],'stop')
+        b50,a50 = signal.butter(4,[49/self.Fs*2,51/self.Fs*2],'stop')
         self.ch1 = signal.lfilter(b50,a50,self.ch1);
         
         # Remove 150Hz interference
@@ -103,8 +96,9 @@ if __name__ == "__main__":
     plt.subplot(212)
 
     f, Pxx_den = signal.periodogram(ch1,toplot.Fs,scaling='spectrum')
-    plt.plot(f, np.log10(np.abs(Pxx_den)))
+    plt.plot(f, np.abs(Pxx_den))
     plt.xlabel('Freq/Hz')
     plt.ylabel('Log Power (V^2/Hz)')
-    plt.ylim([-18,-9])
+    plt.ylim([0,1E-10])
+    plt.xlim([0,100])
     plt.show()

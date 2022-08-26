@@ -32,8 +32,6 @@ constexpr int ESC_key = 27;
 const int plotW = 1200;
 const int plotH = 720;
 
-const float signalAmplitude = 40; // uV (before lowpass filtering)
-
 void runSimulation(const float duration,
 		   const bool showPlots = true,
 		   const int experimentNumber = -1,
@@ -71,6 +69,8 @@ void runSimulation(const float duration,
 	fstream dnf_file;
 	fstream inner_file;
 	fstream outer_file;
+	fstream inner_raw_file;
+	fstream outer_raw_file;
 	fstream lms_file;
 	fstream laplace_file;
 	fstream wdistance_file;
@@ -93,6 +93,8 @@ void runSimulation(const float duration,
 	dnf_file.open(outpPrefix+"/dnf.tsv", fstream::out);
 	inner_file.open(outpPrefix+"/inner.tsv", fstream::out);
 	outer_file.open(outpPrefix+"/outer.tsv", fstream::out);
+	inner_raw_file.open(outpPrefix+"/inner_raw.tsv", fstream::out);
+	outer_raw_file.open(outpPrefix+"/outer_raw.tsv", fstream::out);
 	lms_file.open(outpPrefix+"/lms.tsv", fstream::out);
 	laplace_file.open(outpPrefix+"/laplace.tsv", fstream::out);
 	wdistance_file.open(outpPrefix+"/weight_distance.tsv", fstream::out);
@@ -127,14 +129,16 @@ void runSimulation(const float duration,
 	cLP.setup(fs,signalModelLowpassFreq);
 
 	fprintf(stderr,
-		"Starting DNF: subdir = %s, inner_gain = %f, outer_gain = %f,"
-		"remover_gain = %f, alpha = %f, noiseAmplitude = %f, nTapsDNF = %d\n",
+		"Starting DNF: subdir = %s, inner_gain = %f, outer_gain = %f, "
+		"remover_gain = %f, alpha = %f, noiseAmplitude = %f uV, "
+		"signalAmplitude = %f uV, nTapsDNF = %d\n",
 		outpPrefix.c_str(),
 		inner_gain,
 		outer_gain,
 		remover_gain,
 		alpha,
 		noiseAmplitude,
+		signalAmplitude,
 		nTapsDNF);
 
 	const long jawclenchSampleDistance = jawclenchEverySec * fs;
@@ -169,6 +173,9 @@ void runSimulation(const float duration,
 
 		double inner_raw_data = r + c;
 		double outer_raw_data = r + alpha * c;
+
+		inner_raw_file << inner_raw_data << endl;
+		outer_raw_file << outer_raw_data << endl;
 		
 		//A) INNER ELECTRODE:
 		//1) ADJUST & AMPLIFY
@@ -268,6 +275,8 @@ void runSimulation(const float duration,
 	dnf_file.close();
 	inner_file.close();
 	outer_file.close();
+	inner_raw_file.close();
+	outer_raw_file.close();
 	lms_file.close();
 	laplace_file.close();
 	wdistance_file.close();

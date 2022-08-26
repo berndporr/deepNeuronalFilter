@@ -14,7 +14,7 @@ class SimData:
         else:
             return np.loadtxt("../results/{}/{}".format(self.subj,filename))
     
-    def __init__(self,subj,filtered_filename,startsec,endsec=False):
+    def __init__(self,subj,filtered_filename,startsec,endsec,useraw):
         self.fs = 500
         self.startsec = startsec
         self.subj = subj
@@ -26,15 +26,21 @@ class SimData:
         dnfdata = self.loadFile(filtered_filename)
         self.dnf = dnfdata[a:b,0]
         self.remover = dnfdata[a:b,1]
-        self.inner = (self.loadFile("inner.tsv"))[a:b,0]
-        self.outer = (self.loadFile("outer.tsv"))[a:b,0]
+        if useraw:
+            self.inner = (self.loadFile("inner_raw.tsv"))[a:b]
+            self.outer = (self.loadFile("outer_raw.tsv"))[a:b]
+            print("Using raw input signals to DNF")
+        else:
+            self.inner = (self.loadFile("inner.tsv"))[a:b,0]
+            self.outer = (self.loadFile("outer.tsv"))[a:b,0]
+            print("using pre-filtered signalst to DNF")
 
     def getTimeAxis(self,data):
         return np.linspace(self.startsec,(len(data)/self.fs)+self.startsec,len(data))
 
 
-def plotWithPlotly(subj,filtered_filename,startsec,endsec):
-    simdata = SimData(subj,filtered_filename,startsec,endsec)
+def plotWithPlotly(subj,filtered_filename,startsec,endsec,useraw):
+    simdata = SimData(subj,filtered_filename,startsec,endsec,useraw)
 
     fig = make_subplots(rows=4, cols=1,
                         shared_xaxes=True,
@@ -77,8 +83,8 @@ def plotWithPlotly(subj,filtered_filename,startsec,endsec):
     fig.show()
 
 
-def plotWithMatplotlib(subj,filtered_filename,startsec,endsec):
-    simdata = SimData(subj,filtered_filename,startsec,endsec)
+def plotWithMatplotlib(subj,filtered_filename,startsec,endsec,useraw):
+    simdata = SimData(subj,filtered_filename,startsec,endsec,useraw)
 
     fig = plt.figure("DNF time domain explorer for experiment {}, {}".format(subj,filtered_filename))
 
@@ -113,25 +119,35 @@ def plotWithMatplotlib(subj,filtered_filename,startsec,endsec):
     fig.subplots_adjust(hspace=0.5)
     
     fig = plt.figure("DNF frequ domain explorer for subject {}, {}".format(subj,filtered_filename))
+
+    fmax = 2E-11
     
     ax = fig.add_subplot(4,1,1)
     ax.title.set_text('Inner')
     f, P = signal.periodogram(simdata.inner,simdata.fs)
+    ax.set_xlim([0,100])
+    # ax.set_ylim([0,fmax])
     ax.plot(f,P)
 
     ax = fig.add_subplot(4,1,2)
     ax.title.set_text('Outer')
     f, P = signal.periodogram(simdata.outer,simdata.fs)
+    ax.set_xlim([0,100])
+    # ax.set_ylim([0,fmax])
     ax.plot(f,P)
 
     ax = fig.add_subplot(4,1,3)
     ax.title.set_text('Remover')
     f, P = signal.periodogram(simdata.remover,simdata.fs)
+    ax.set_xlim([0,100])
+    # ax.set_ylim([0,fmax])
     ax.plot(f,P)
 
     ax = fig.add_subplot(4,1,4)
     ax.title.set_text('DNF output')
     f, P = signal.periodogram(simdata.dnf,simdata.fs)
+    ax.set_xlim([0,100])
+    # ax.set_ylim([0,fmax])
     ax.plot(f,P)
     
     fig.subplots_adjust(hspace=0.5)
@@ -146,17 +162,20 @@ if __name__ == "__main__":
     endsec = False
     filtered_filename = "dnf.tsv"
     usePlotly = True
+    useRaw = False
 
     helptext = 'usage: {} -p participant -s startsec -e endsec -f noiseredfile.tsv -m -h'.format(sys.argv[0])
 
     try:
         # Gather the arguments
         all_args = sys.argv[1:]
-        opts, arg = getopt.getopt(all_args, 'p:s:e:f:t:m')
+        opts, arg = getopt.getopt(all_args, 'p:s:e:f:t:mr')
         # Iterate over the options and values
         for opt, arg_val in opts:
             if '-p' in opt:
                 subj = int(arg_val)
+            elif 'r' in opt:
+                useRaw = True
             elif '-s' in opt:
                 startsec = int(arg_val)
             elif '-e' in opt:
@@ -175,6 +194,6 @@ if __name__ == "__main__":
         sys.exit(2)
 
     if usePlotly:
-        plotWithPlotly(subj,filtered_filename,startsec,endsec)
+        plotWithPlotly(subj,filtered_filename,startsec,endsec,useRaw)
     else:
-        plotWithMatplotlib(subj,filtered_filename,startsec,endsec)
+        plotWithMatplotlib(subj,filtered_filename,startsec,endsec,useRaw)
