@@ -11,7 +11,7 @@ const float averageNoiseAmplitude = 15; // uV (pre filtering)
 const float standardDevNoiseAmplitude = 5; // uV (for stats)
 
 const double noiseModelBandpassCenter = 50; // Hz
-const double noiseModelBandpassWidth = 90; // Hz
+const double noiseModelBandpassWidth = 70; // Hz
 const double jawclenchEverySec = 15; // sec
 const double jawclenchDuration = 1.5; // sec
 const double jawclenchNoiseBoost = 5; // gain
