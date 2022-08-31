@@ -13,7 +13,7 @@ Dylan DeLosAngeles e , Peter Lillie f , Andrew Hardy f , Rik
 
 # Prerequisites
 
-Install:
+Install https://github.com/berndporr/nmb_eeg with pip:
 
 ```
 pip3 install nmb_eeg
@@ -28,6 +28,6 @@ order lowpass with:
 filter order = 2
 cutoff = 17 Hz
 EEG signal amplitude = 1.5e-6 Volt
-``
+```
 
-Where the EEG amplitude is for the pre-filtered amplitude.
+where the EEG amplitude is for the pre-filtered amplitude.
