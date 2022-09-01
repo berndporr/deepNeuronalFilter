@@ -18,11 +18,11 @@ class SimData:
         self.fs = 500
         self.startsec = startsec
         self.subj = subj
-        a = startsec * self.fs
+        a = int(startsec * self.fs)
         if endsec:
-            b = endsec * self.fs
+            b = int(endsec * self.fs)
         else:
-            b = -self.fs*2
+            b = int(-self.fs*2)
         dnfdata = self.loadFile(filtered_filename)
         self.dnf = dnfdata[a:b,0]
         self.remover = dnfdata[a:b,1]
@@ -177,9 +177,9 @@ if __name__ == "__main__":
             elif 'r' in opt:
                 useRaw = True
             elif '-s' in opt:
-                startsec = int(arg_val)
+                startsec = float(arg_val)
             elif '-e' in opt:
-                endsec = int(arg_val)
+                endsec = float(arg_val)
             elif '-f' in opt:
                 filtered_filename = arg_val
             elif '-m' in opt:

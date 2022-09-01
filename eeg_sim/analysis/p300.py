@@ -67,17 +67,21 @@ if __name__ == "__main__":
     fig = plt.figure("P300 (here: crosscorr with known pure EEG signal)")
 
     ax = fig.add_subplot(1,4,1)
+    ax.set_ylim([0,11])
     plotVEP(subj,"inner.tsv",ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,2)
+    ax.set_ylim([0,11])
     ax.title.set_text('DNF')
     plotVEP(subj,dnf_filename,ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,3)
+    ax.set_ylim([0,11])
     ax.title.set_text('LMS')
     plotVEP(subj,lms_filename,ax,startsec=startsec,fs=fs)
 
     ax = fig.add_subplot(1,4,4)
+    ax.set_ylim([0,11])
     ax.title.set_text('Laplace')
     plotVEP(subj,laplace_filename,ax,startsec=startsec,fs=fs)
 
