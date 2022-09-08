@@ -42,6 +42,8 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems) {
 
 
 void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, const bool showPlots = true) {
+	auto starttime = chrono::high_resolution_clock::now();
+	
 	std::srand(1);
 
 	// file path prefix for the results
@@ -279,7 +281,9 @@ void processOneSubject(const int subjIndex, const char* tasksubdir = nullptr, co
 	weight_file.close();
 #endif
 	if (plots) delete plots;
-	cout << "The program has reached the end of the input file" << endl;
+	auto stoptime = chrono::high_resolution_clock::now();
+	auto time_taken = stoptime - starttime;
+	cout << "It took " << chrono::duration_cast<chrono::seconds>(time_taken).count() << " sec to run the program." << endl;
 }
 
 
