@@ -65,24 +65,13 @@ if __name__ == "__main__":
     b = -1
     title = "Full EEG recording during repetitve jaw clench"
 
-    if len(sys.argv) < 2:
-        print("Specify 'rest' or 'jawclench' to plot the spectrum at rest or during a jaw clench");
-    else:
-        if sys.argv[1] == 'jawclench':
-            ch1 = np.empty(0)
-            for i in jawclenchIntervals:
-                a = int(toplot.Fs * i[0])
-                b = int(toplot.Fs * i[1])
-                print("Using jaw clench: {}sec - {}sec".format(i[0],i[1]))
-                ch1 = np.append(ch1,toplot.ch1[a:b])
-            title = "Jawclench segments"
-            
-        if sys.argv[1] == 'rest':
-            print("Using data from 18sec - 28sec")
-            a = int(toplot.Fs * 42)
-            b = int(toplot.Fs * 53)
-            ch1 = toplot.ch1[a:b]
-            title = "EEG at rest"
+    ch1 = np.empty(0)
+    for i in jawclenchIntervals:
+        a = int(toplot.Fs * i[0])
+        b = int(toplot.Fs * i[1])
+        print("Using jaw clench: {}sec - {}sec".format(i[0],i[1]))
+        ch1 = np.append(ch1,toplot.ch1[a:b])
+    title = "Jawclench segments"
 
     t = np.linspace(0,len(ch1)/toplot.Fs,len(ch1))
 
@@ -96,9 +85,16 @@ if __name__ == "__main__":
     plt.subplot(212)
 
     f, Pxx_den = signal.periodogram(ch1,toplot.Fs,scaling='spectrum')
-    plt.plot(f, np.abs(Pxx_den))
+    plt.semilogy(f, np.abs(Pxx_den))
     plt.xlabel('Freq/Hz')
     plt.ylabel('Log Power (V^2/Hz)')
-    plt.ylim([0,1E-10])
+    plt.ylim([1E-12,1E-10])
     plt.xlim([0,100])
+
+    fc = 50
+    bw = 70
+    b,a = signal.butter(2,[(fc-bw/2)/toplot.Fs*2,(fc+bw/2)/toplot.Fs*2],'band')
+    w, h = signal.freqz(b,a)
+    plt.semilogy(w / (2*np.pi) * toplot.Fs, np.abs(h*5E-12)) # square absorbed
+    
     plt.show()
