@@ -30,7 +30,7 @@ def plotVEP(subj,filename,ax,fs,startsec):
     ax.plot(t,avg)
     ax.set_title(filename)
     ax.set_xlabel("t/s")
-    ax.set_ylabel("P300/uV")
+    ax.set_ylabel("EEG(signal)/uV")
 
 
 # check if we run this as a main program
@@ -62,9 +62,7 @@ if __name__ == "__main__":
         print (helptext)
         sys.exit(2)
 
-    print("P300 without doing P300 because we know the pure EEG signal!")
-
-    fig = plt.figure("P300 (here: crosscorr with known pure EEG signal)")
+    fig = plt.figure("Crosscorr with the known pure EEG signal")
 
     ax = fig.add_subplot(1,4,1)
     ax.set_ylim([0,11])

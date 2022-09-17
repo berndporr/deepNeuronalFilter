@@ -30,13 +30,15 @@ matplotlib or in the browser.
  - Option -m switches over to matplotlib. Default is plotly.
  - Option -e is the second where the plot ends in the timedomain.
 
-## p300.py
-Plots the amlitude of the pure EEG signal. Note that this is still called P300
-for compatibility to the real EEG recordings but here the pure EEG of course
-known and is simply cross-correlated with the signals to determine the pure
-EEG component.
+## pure_eeg_signal_ampl_with_cc.py 
+Plots the amlitude of the pure EEG signal component by cross
+correlating the pure EEG signal with the output of the DNF.
+Note that the cross correlation replaces the P300 from the real EEG experiment 
+because here we know the pure EEG which we generated artificially.
+The cross correlation serves here exactly the same purpose as the P300
+as it's essentially "event related" on a sample by sample basis.
 ```
-./p300.py -p experiment -s startsec -f file -h
+./pure_eeg_signal_ampl_with_cc.py -p experiment -s startsec -f file -h
 ```
 
 ## snr.py
