@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-import p300
+import pure_eeg_signal_ampl_with_cc
 import scipy.signal as signal
 import getopt
 import os
@@ -49,7 +49,7 @@ class SNR:
 
     def calcSNRinner(self):
         NoisePwr,w = self.calcNoisePower(self.inner_filename)
-        vep = p300.calcVEP(self.subj,self.inner_filename,self.startsec,self.fs)
+        vep = pure_eeg_signal_ampl_with_cc.calcVEP(self.subj,self.inner_filename,self.startsec,self.fs)
         SignalPwr = np.max(vep**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
@@ -58,7 +58,7 @@ class SNR:
 
     def calcSNRdnf(self):
         NoisePwr,w = self.calcNoisePower(self.noisered_filename)
-        vep = p300.calcVEP(self.subj,self.noisered_filename,self.startsec,self.fs)
+        vep = pure_eeg_signal_ampl_with_cc.calcVEP(self.subj,self.noisered_filename,self.startsec,self.fs)
         SignalPwr = np.max(vep**2)
         print("Signal Power:",SignalPwr)
         print("NoisePwr:",NoisePwr)
