@@ -1,6 +1,6 @@
 # Deep Neuronal Filter (DNF)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6360675.svg)](https://doi.org/10.5281/zenodo.6360675)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7100537.svg)](https://doi.org/10.5281/zenodo.7100537)
 
 ## Prerequisites Libraries and packages
 
