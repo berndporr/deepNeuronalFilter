@@ -1,6 +1,8 @@
 #ifndef _DNF_H
 #define _DNF_H
 
+#include <boost/circular_buffer.hpp>
+
 #include "dnf/Neuron.h"
 #include "dnf/Layer.h"
 #include "dnf/Net.h"

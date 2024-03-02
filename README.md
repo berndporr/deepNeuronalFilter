@@ -20,7 +20,7 @@ Linux: `sudo apt install libopencv-dev`, Mac: `brew install opencv`
 
 3) Install boost library by running:
 
-Linux: `sudo apt-get install libboost-all-dev`, Mac: is included in opencv
+Linux: `sudo apt-get install libboost-dev`, Mac: is included in opencv
 
 4) And make sure you have `cmake` installed.
 

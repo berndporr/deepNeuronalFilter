@@ -1,22 +1,25 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.8.0)
 
 project(dnf LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 endif()
 
-cmake_policy(SET CMP0048 NEW) # set VERSION in project()
-cmake_policy(SET CMP0042 NEW) # enable MACOSX_RPATH by default
+find_package(Boost REQUIRED)
+
+include_directories(${Boost_INCLUDE_DIRS})
 
 include(GNUInstallDirs)
+
 add_subdirectory(eeg_filter)
 add_subdirectory(eeg_sim)
 add_subdirectory(ecg_filter)
 add_subdirectory(audio_filter)
 add_subdirectory(cvui)
+
 enable_testing ()
 
 if (MSVC)
