@@ -4,15 +4,12 @@
 
 ## Prerequisites Libraries and packages
 
-Installation instructions below are for Ubuntu Linux LTS and MacOS.
-
 1) Install the IIR and FIR filter libraries
 
-Linux: `sudo add-apt-repository ppa:berndporr/dsp`, Mac: `brew tap berndporr/dsp`
+Installation instructions are in these repositories:
 
-Linux: `sudo apt-get install iir1-dev`, Mac: `brew install iir` (https://github.com/berndporr/iir1)
-
-Linux: `sudo apt-get install fir1-dev`, Mac: `brew install fir` (https://github.com/berndporr/fir1)
+ - IIR: https://github.com/berndporr/iir1
+ - FIR: https://github.com/berndporr/fir1
 
 2) Install openCV library by running:
 
