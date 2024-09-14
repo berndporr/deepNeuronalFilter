@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.8.0)
+project(ecg_filter)
+set(CMAKE_CXX_STANDARD 17)
+find_package(iir REQUIRED)
+find_package(fir REQUIRED)
+find_package (Threads)
+include_directories(..)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+add_executable(ecg_noise_removal_demo ecg_noise_removal_demo.cpp)
+target_link_libraries(ecg_noise_removal_demo dnf iir::iir fir ${CMAKE_THREAD_LIBS_INIT})
