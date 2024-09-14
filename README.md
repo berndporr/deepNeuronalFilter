@@ -50,5 +50,3 @@ sudo make install
 
  - eeg_filter: removes noise from real EEG data (release)
  - eeg_sim: removes noise from simulated EEG data (release)
- - ecg_filter: removes EMG noise from ECG (alpha version)
- - audio_filter: removes noise from audio (alpha version)
