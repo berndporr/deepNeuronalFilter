@@ -9,9 +9,8 @@ a = h5py.File('data_test_pmma_laser_strips_fine_step8.mat')
 print(list(a.keys()))
 dset = a['data']
 print(dset.shape)
-print(len(dset[:,sweepNo]))
 a0 = int(t0*fs)
-d = dset[a0:,1000]
+d = dset[a0:,sweepNo]
 t = np.linspace(0,len(d)/fs,len(d))
 plt.plot(t,d)
 plt.xlabel("time/sec")
