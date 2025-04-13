@@ -12,6 +12,12 @@ int main(int argc,char **argv)
 	return EXIT_FAILURE;
     }
 
+    long int sweepNo = 300;
+    if (argc > 2) {
+	sweepNo = atoi(argv[2]);
+    }
+
+    fprintf(stderr,"Loading %s...\n",argv[1]);
     matvar_t *matvar = Mat_VarRead(matfp,datavarname);
 
     if ( NULL == matvar ) {
@@ -20,19 +26,32 @@ int main(int argc,char **argv)
 	return EXIT_FAILURE;
     }
 
-    fprintf(stderr,"rank = %d, dims[0] = %ld, dims[1] = %ld\n",
+    fprintf(stderr,"dimension = %d, dims[0] = %ld, dims[1] = %ld, data type=%d\n",
 	    matvar->rank,
 	    matvar->dims[0],
-	    matvar->dims[1]);
+	    matvar->dims[1],
+	    matvar->data_type);
+
+    if ( MAT_T_DOUBLE != matvar->data_type ) {
+	fprintf(stderr,"Data type needs to be IEEE 754 double precision but is not. See matio.h.\n");
+	return EXIT_FAILURE;
+    }
 
     long int nSweeps = matvar->dims[0];
     long int nSamples = matvar->dims[1];
+
+    if (sweepNo >= nSweeps) {
+	fprintf(stderr,"Requested sweep number is out of range.\n");
+	return EXIT_FAILURE;	
+    }
+
+    fprintf(stderr,"Extracting sweep %ld.\n",sweepNo);
 
     const double *yData = static_cast<const double*>(matvar->data);
     FILE* f = fopen("/tmp/d.dat","wt");
     for(int i=0; i<nSamples; ++i)
     {
-	double d = yData[i*nSweeps];
+	double d = yData[i*nSweeps+sweepNo];
 	fprintf(f,"%f\n",d);
     }
     fclose(f);
