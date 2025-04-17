@@ -12,4 +12,4 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 add_executable(ultrasound_filter ultrasound_filter.cpp dynamicPlots.cpp dynamicPlots.h parameters.h)
-target_link_libraries(ultrasound_filter dnf iir::iir fir cvui ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(ultrasound_filter dnf iir::iir fir cvui ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} matio)
