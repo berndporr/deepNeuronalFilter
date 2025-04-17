@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.9.0)
 
 project(dnf LANGUAGES CXX)
 
@@ -17,6 +17,7 @@ include(GNUInstallDirs)
 add_subdirectory(eeg_filter)
 add_subdirectory(eeg_sim)
 add_subdirectory(cvui)
+add_subdirectory(ultrasonics)
 
 enable_testing ()
 
