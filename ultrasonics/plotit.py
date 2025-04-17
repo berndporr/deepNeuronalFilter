@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 fs = 2.5E9
 t0 = 1.5E-5
-sweepNo = 300
+sweepNo = 500
 a = h5py.File('data_test_pmma_laser_strips_fine_step8.mat')
 print(list(a.keys()))
 dset = a['data']
