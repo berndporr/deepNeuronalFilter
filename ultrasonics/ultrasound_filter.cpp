@@ -43,15 +43,16 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
     const int samplesNoLearning = 3 * fs / highpassCutOff;
 	
     fprintf(stderr,"nTapsDNF = %d\n",nTapsDNF);
-	
+
+    // DNF
     boost::circular_buffer<double> oo_buf(bufferLength);
     boost::circular_buffer<double> io_buf(bufferLength);
     boost::circular_buffer<double> ro_buf(bufferLength);
     boost::circular_buffer<double> f_nno_buf(bufferLength);
-//LMS
+    // LMS
     boost::circular_buffer<double> lms_o_buf(bufferLength);
     boost::circular_buffer<double> lms_r_buf(bufferLength);
-	
+    
     long count = 0;
 	
     //setting up the interactive window and the dynamic plot class
@@ -63,7 +64,9 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
     }
 
     //create files for saving the data and parameters
-    string strSweepNo = std::to_string(sweepNo);
+    char tmp[20];
+    sprintf(tmp,"%06ld",sweepNo);
+    string strSweepNo(tmp);
 
     DNF dnf(NLAYERS,nTapsDNF,fs,ACTIVATION);
 
@@ -72,20 +75,20 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
 		
 // FILES
     fstream dnf_file;
-    dnf_file.open(outpPrefix+"/sweep" + strSweepNo + "/dnf.tsv", fstream::out);
+    dnf_file.open(outpPrefix+"/sweep" + strSweepNo + "_dnf.tsv", fstream::out);
     
     fstream in_file;
-    in_file.open(outpPrefix+"/sweep" + strSweepNo + "/in.tsv", fstream::out);
+    in_file.open(outpPrefix+"/sweep" + strSweepNo + "_in.tsv", fstream::out);
     
     fstream lms_file;
-    lms_file.open(outpPrefix+"/sweep" + strSweepNo + "/lms.tsv", fstream::out);
+    lms_file.open(outpPrefix+"/sweep" + strSweepNo + "_lms.tsv", fstream::out);
     
     fstream wdistance_file;
-    wdistance_file.open(outpPrefix+"/sweep" + strSweepNo + "/weight_distance.tsv", fstream::out);
+    wdistance_file.open(outpPrefix+"/sweep" + strSweepNo + "_weight_distance.tsv", fstream::out);
     
 #ifdef SAVE_WEIGHTS
     fstream weight_file;
-    weight_file.open(outpPrefix+"/sweep" + strSweepNo + "/lWeights.tsv", fstream::out);
+    weight_file.open(outpPrefix+"/sweep" + strSweepNo + "_lWeights.tsv", fstream::out);
 #endif
 	
     //setting up all the filters required
@@ -93,9 +96,11 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
     dnfHP.setup(fs,highpassCutOff);
 	
     Fir1 lms_filter(nTapsDNF);
+
+    long int startindex = (long int)(startTime * fs);
 	
     double m = 0;
-    for(int count=0; count < matloader.getNSamples(); count++) {
+    for(int count = startindex; count < matloader.getNSamples(); count++) {
 	const double v = matloader.getData(sweepNo,count);
 	if ( v > m ) m = v;
     }
@@ -106,7 +111,7 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
     auto starttime = chrono::high_resolution_clock::now();
 
     // let's go
-    for(int count=0; count < matloader.getNSamples(); count++)
+    for(int count = startindex; count < matloader.getNSamples(); count++)
     {
 	const double raw = matloader.getData(sweepNo,count) * gain;
 	const double filtered = dnfHP.filter(raw);
@@ -149,18 +154,19 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
 	in_file << dnf.getDelayedSignal()/gain << endl;
 	dnf_file << dnf.getOutput()/gain << "\t" << dnf.getRemover()/gain << endl;
 	lms_file << lms_output/gain << "\t" << corrLMS/gain << endl;
-	
-	// PUT VARIABLES IN BUFFERS
-	// 1) MAIN SIGNALS
-	oo_buf.push_back(refnoise);
-	io_buf.push_back(dnf.getDelayedSignal());
-	ro_buf.push_back(dnf.getRemover());
-	f_nno_buf.push_back(f_nn);
-	// 2) LMS outputs
-	lms_o_buf.push_back(lms_output);
-	lms_r_buf.push_back(corrLMS);
-	
+
+	// plotting
 	if (plots) {
+	    // PUT VARIABLES IN BUFFERS
+	    // 1) MAIN SIGNALS
+	    oo_buf.push_back(refnoise);
+	    io_buf.push_back(dnf.getDelayedSignal());
+	    ro_buf.push_back(dnf.getRemover());
+	    f_nno_buf.push_back(f_nn);
+	    // 2) LMS outputs
+	    lms_o_buf.push_back(lms_output);
+	    lms_r_buf.push_back(corrLMS);
+	
 	    // PUTTING BUFFERS IN VECTORS FOR PLOTS
 	    // MAIN SIGNALS
 	    std::vector<double> oo_plot(oo_buf.begin(), oo_buf.end());
@@ -206,7 +212,12 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
 
 
 int main(int argc, const char *argv[]) {
-	const long int sweep = atoi(argv[2]);
-	processOneSweep(argv[1],sweep,true);
-	return 0;
+    if (argc < 4) {
+	fprintf(stderr,"Usage: %s matfile sweepnumber wantplots\n",argv[0]);
+	return -1;
+    }
+    long int sweep = atoi(argv[2]);
+    bool doPlot = atoi(argv[3]) > 0;
+    processOneSweep(argv[1],sweep,doPlot);
+    return 0;
 }

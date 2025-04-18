@@ -24,10 +24,6 @@
 
 #include <initializer_list>
 
-//#define CVUI_IMPLEMENTATION
-//#include "cvui.h"
-
-
 using namespace std;
 namespace cv {
     class Mat;
@@ -66,11 +62,11 @@ void dynaPlots::plotMainSignals(std::vector<double> &outer,
 
     int step = 0;
     cvui::sparkline(frame, outer,     graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
-    cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "Outer: raw(b) & filtered(w) & end(gray)");
+    cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "Ref: raw(b) & filtered(w) & end(gray)");
     cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf", outer_min, outer_max);
     step ++;
     cvui::sparkline(frame, inner,     graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
-    cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "inner: raw(b) & filtered(w)");
+    cvui::text(     frame,            graphX, graphY * step + topOffset + graphDY, "signal: raw(b) & filtered(w)");
     cvui::printf(   frame,            graphX, graphY * step + topOffset + graphDY + lineEnter, "min: %+.5lf max: %+.5lf", inner_min, inner_max);
     step ++;
     cvui::sparkline(frame, remover,   graphX, graphY * step + topOffset, graphDX, graphDY, 0xffffff); //white
@@ -91,6 +87,6 @@ void dynaPlots::plotMainSignals(std::vector<double> &outer,
 }
 
 void dynaPlots::plotTitle(std::string title, long count, int duration,const char* fullPath){
-    cvui::printf(frame, gapX,           titleY, "Subject %s -- Sample number: %ld , Duration: %d [min] %d [s], %s",
+    cvui::printf(frame, gapX,           titleY, "Sweep %s -- Sample number: %ld , Duration: %d [min] %d [s], %s",
                  title.c_str(),count, int(duration/60) , duration % 60, fullPath);
 }
