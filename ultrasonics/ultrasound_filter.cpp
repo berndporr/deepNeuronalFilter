@@ -57,7 +57,7 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
 	
     //setting up the interactive window and the dynamic plot class
     auto frame = cv::Mat(cv::Size(plotW, plotH), CV_8UC3);
-    dynaPlots* plots = NULL;
+    dynaPlots* plots = nullptr;
     if (showPlots) {
 	cvui::init(WINDOW, 1);
 	plots = new dynaPlots(frame, plotW, plotH);
@@ -70,9 +70,6 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
 
     DNF dnf(NLAYERS,nTapsDNF,fs,ACTIVATION);
 
-    //adding delay line for the noise
-    boost::circular_buffer<double> innertrigger_delayLine(dnf.getSignalDelaySteps());
-		
 // FILES
     fstream dnf_file;
     dnf_file.open(outpPrefix+"/sweep" + strSweepNo + "_dnf.tsv", fstream::out);
@@ -151,12 +148,12 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
 	}
 	
 	// undo the gain so that the signal is again in volt
-	in_file << dnf.getDelayedSignal()/gain << endl;
+	in_file << dnf.getDelayedSignal()/gain << "\t" << refnoise << endl;
 	dnf_file << dnf.getOutput()/gain << "\t" << dnf.getRemover()/gain << endl;
 	lms_file << lms_output/gain << "\t" << corrLMS/gain << endl;
 
 	// plotting
-	if (plots) {
+	if (nullptr != plots) {
 	    // PUT VARIABLES IN BUFFERS
 	    // 1) MAIN SIGNALS
 	    oo_buf.push_back(refnoise);
@@ -203,7 +200,7 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
 #ifdef SAVE_WEIGHTS
     weight_file.close();
 #endif
-    if (plots) delete plots;
+    if (nullptr != plots) delete plots;
     auto stoptime = chrono::high_resolution_clock::now();
     auto time_taken = stoptime - starttime;
     cout << "It took " << chrono::duration_cast<chrono::seconds>(time_taken).count() << " sec to run the program." << endl;

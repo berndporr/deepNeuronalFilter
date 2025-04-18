@@ -109,14 +109,10 @@ int Neuron::calcOutput(int _layerHasReported){
 	for (int i=0; i<nInputs; i++){
 		sum += inputs[i] * weights[i];
 	}
+	assert(std::isfinite(inputs[i]) && std::isfinite(weights[i]));
 	sum += bias;
-	assert(std::isfinite(sum));
 	output = doActivation(sum);
 	iHaveReported = _layerHasReported;
-	if (output > 0.49 && iHaveReported == 0){
-		//cout << "I'm saturating, " << output << " layer: " << myLayerIndex << " neuron: " << myNeuronIndex << endl;
-		iHaveReported = 1;
-	}
 	assert(std::isfinite(output));
 	return iHaveReported;
 }

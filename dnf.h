@@ -29,10 +29,10 @@ public:
 	    const Neuron::actMethod am = Neuron::Act_Tanh,
 	    const bool debugOutput = false
 		) : noiseDelayLineLength(numTaps),
-			 signalDelayLineLength(noiseDelayLineLength / 2),
-			 signal_delayLine(signalDelayLineLength),
-			 nNeurons(new int[NLAYERS]),
-			 noise_delayLine(new double[noiseDelayLineLength]) {		
+		    signalDelayLineLength(noiseDelayLineLength / 2),
+		    signal_delayLine(signalDelayLineLength),
+		    nNeurons(new int[NLAYERS]),
+		    noise_delayLine(new double[noiseDelayLineLength]()) {		
 		// calc an exp reduction of the numbers always reaching 1
 		double b = exp(log(noiseDelayLineLength)/(NLAYERS-1));
 		for(int i=0;i<NLAYERS;i++) {
@@ -50,12 +50,6 @@ public:
 				fprintf(stderr,"Layer %d has %d neurons. act = %d\n",i,nNeurons[i],am);
 			}
 		}
-	}
-
-	enum ErrorPropagation { Backprop = 0, ModulatedHebb = 1 };
-
-	void setErrorPropagation(const ErrorPropagation e) {
-		errorPropagation = e;
 	}
 
 	/**
@@ -83,15 +77,7 @@ public:
 		
 		// FEEDBACK TO THE NETWORK 
 		NNO->setError(f_nn);
-		switch (errorPropagation) {
-		case Backprop:
-		default:
-			NNO->propErrorBackward();
-			break;
-		case ModulatedHebb:
-			NNO->propModulatedHebb(f_nn);
-			break;
-		}
+		NNO->propErrorBackward();
 		NNO->updateWeights();
 		return f_nn;
 	}
@@ -157,7 +143,6 @@ private:
 	int* nNeurons;
 	double remover = 0;
 	double f_nn = 0;
-	ErrorPropagation errorPropagation = Backprop;
 };
 
 #endif
