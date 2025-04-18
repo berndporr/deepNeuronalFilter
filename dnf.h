@@ -29,10 +29,10 @@ public:
 	    const Neuron::actMethod am = Neuron::Act_Tanh,
 	    const bool debugOutput = false
 		) : noiseDelayLineLength(numTaps),
-			 signalDelayLineLength(noiseDelayLineLength / 2),
-			 signal_delayLine(signalDelayLineLength),
-			 nNeurons(new int[NLAYERS]),
-			 noise_delayLine(new double[noiseDelayLineLength]) {		
+		    signalDelayLineLength(noiseDelayLineLength / 2),
+		    signal_delayLine(signalDelayLineLength),
+		    nNeurons(new int[NLAYERS]),
+		    noise_delayLine(new double[noiseDelayLineLength]()) {		
 		// calc an exp reduction of the numbers always reaching 1
 		double b = exp(log(noiseDelayLineLength)/(NLAYERS-1));
 		for(int i=0;i<NLAYERS;i++) {
