@@ -19,15 +19,14 @@ const double highpassCutOff = 8E6; // Hz
 const int bufferLength = 1000 ;
 
 // dnf learning rate
-const double dnf_learning_rate = 10;
+const double dnf_learning_rate = 0;
 
 // dnf number of layers
 const int NLAYERS = 6;
 
 // LMS learning rates
-const double lms_learning_rate = 0.04;
+const double lms_learning_rate = 0;
 
-const double gain = 1000;
 const double remover_gain = 1;
 
 const int nTapsDNF = fs / highpassCutOff;

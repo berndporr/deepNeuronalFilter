@@ -17,6 +17,7 @@
 #include "dnf.h"
 #include "parameters.h"
 #include "dynamicPlots.h"
+#include "matloader.h"
 
 #define CVUI_IMPLEMENTATION
 #include "cvui.h"
@@ -30,60 +31,11 @@ const int plotW = 1200;
 const int plotH = 720;
 
 
-// taken from http://stackoverflow.com/a/236803/248823
-void split(const std::string &s, char delim, std::vector<std::string> &elems) {
-    std::stringstream ss;
-    ss.str(s);
-    std::string item;
-    while (std::getline(ss, item, delim)) {
-        elems.push_back(item);
-    }
-}
+void processOneSweep(const char* filename, const long int sweepNo, const bool showPlots = false) {
 
+    MatLoader matloader;
+    matloader.load(filename, datavarname);
 
-
-void processOneRecording(const char* filename, const long int sweepNo, const bool showPlots = false) {
-
-    mat_t *matfp = Mat_Open(filename,MAT_ACC_RDONLY);
-    if ( NULL == matfp ) {
-	fprintf(stderr,"Error opening MAT file \"%s\"!\n",filename);
-	return;
-    }
-    
-    fprintf(stderr,"Loading %s...\n",filename);
-    matvar_t *matvar = Mat_VarRead(matfp,datavarname);
-    
-    if ( NULL == matvar ) {
-	fprintf(stderr,"Variable %s not found, or error "
-		"reading MAT file\n",datavarname);
-	return;
-    }
-    
-    fprintf(stderr,"dimension = %d, dims[0] = %ld, dims[1] = %ld, data type=%d\n",
-	    matvar->rank,
-	    matvar->dims[0],
-	    matvar->dims[1],
-	    matvar->data_type);
-    
-    if ( MAT_T_DOUBLE != matvar->data_type ) {
-	fprintf(stderr,"Data type needs to be IEEE 754 double precision but is not. See matio.h.\n");
-	return;
-    }
-    
-    long int nSweeps = matvar->dims[0];
-    long int nSamples = matvar->dims[1];
-    
-    if (sweepNo >= nSweeps) {
-	fprintf(stderr,"Requested sweep number is out of range.\n");
-	return;	
-    }
-    
-    fprintf(stderr,"Extracting sweep %ld.\n",sweepNo);
-
-    const double *yData = static_cast<const double*>(matvar->data);
-    
-    auto starttime = chrono::high_resolution_clock::now();
-	
     std::srand(1);
 
     fprintf(stderr,"Starting DNF on sweep# %ld, filename = %s.\n",sweepNo,filename);
@@ -142,11 +94,21 @@ void processOneRecording(const char* filename, const long int sweepNo, const boo
 	
     Fir1 lms_filter(nTapsDNF);
 	
+    double m = 0;
+    for(int count=0; count < matloader.getNSamples(); count++) {
+	const double v = matloader.getData(sweepNo,count);
+	if ( v > m ) m = v;
+    }
+    const double gain = 1/m;
+
     fprintf(stderr,"gain = %f, remover_gain = %f\n",gain,remover_gain);
 
-    for(int count=0; count<nSamples; count++)
+    auto starttime = chrono::high_resolution_clock::now();
+
+    // let's go
+    for(int count=0; count < matloader.getNSamples(); count++)
     {
-	const double raw = yData[count * nSweeps + sweepNo] * gain;
+	const double raw = matloader.getData(sweepNo,count) * gain;
 	const double filtered = dnfHP.filter(raw);
 	const double refnoise1 = sin(2 * M_PI * ((double)count) * transmitter1freq / fs);
 	const double refnoise2 = sin(2 * M_PI * ((double)count) * transmitter2freq / fs);
@@ -162,7 +124,7 @@ void processOneRecording(const char* filename, const long int sweepNo, const boo
 	
 #ifdef SAVE_WEIGHTS
 	// SAVE WEIGHTS
-	NNO.snapWeights(outpPrefix, "weights", subjIndex);
+	NNO.snapWeights(outpPrefix, "weights", sweepNo);
 #endif
 	wdistance_file << dnf.getNet().getWeightDistance();
 	for(int i=0; i < NLAYERS; i++ ) {
@@ -198,17 +160,17 @@ void processOneRecording(const char* filename, const long int sweepNo, const boo
 	lms_o_buf.push_back(lms_output);
 	lms_r_buf.push_back(corrLMS);
 	
-	// PUTTING BUFFERS IN VECTORS FOR PLOTS
-	// MAIN SIGNALS
-	std::vector<double> oo_plot(oo_buf.begin(), oo_buf.end());
-	std::vector<double> io_plot(io_buf.begin(), io_buf.end());
-	std::vector<double> ro_plot(ro_buf.begin(), ro_buf.end());
-	std::vector<double> f_nno_plot(f_nno_buf.begin(), f_nno_buf.end());
-	// LMS outputs
-	std::vector<double> lms_o_plot(lms_o_buf.begin(), lms_o_buf.end());
-	std::vector<double> lms_r_plot(lms_r_buf.begin(), lms_r_buf.end());
-	
 	if (plots) {
+	    // PUTTING BUFFERS IN VECTORS FOR PLOTS
+	    // MAIN SIGNALS
+	    std::vector<double> oo_plot(oo_buf.begin(), oo_buf.end());
+	    std::vector<double> io_plot(io_buf.begin(), io_buf.end());
+	    std::vector<double> ro_plot(ro_buf.begin(), ro_buf.end());
+	    std::vector<double> f_nno_plot(f_nno_buf.begin(), f_nno_buf.end());
+	    // LMS outputs
+	    std::vector<double> lms_o_plot(lms_o_buf.begin(), lms_o_buf.end());
+	    std::vector<double> lms_r_plot(lms_r_buf.begin(), lms_r_buf.end());
+	
 	    frame = cv::Scalar(60, 60, 60);
 	    if (0 == (count % 10)) {
 		plots->plotMainSignals(oo_plot,
@@ -245,6 +207,6 @@ void processOneRecording(const char* filename, const long int sweepNo, const boo
 
 int main(int argc, const char *argv[]) {
 	const long int sweep = atoi(argv[2]);
-	processOneRecording(argv[1],sweep,true);
+	processOneSweep(argv[1],sweep,true);
 	return 0;
 }

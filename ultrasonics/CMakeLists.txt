@@ -13,3 +13,6 @@ endif()
 
 add_executable(ultrasound_filter ultrasound_filter.cpp dynamicPlots.cpp dynamicPlots.h parameters.h)
 target_link_libraries(ultrasound_filter dnf iir::iir fir cvui ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT} matio)
+
+add_executable(mat2txt mat2txt.cpp)
+target_link_libraries(mat2txt matio)
