@@ -91,7 +91,10 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
     //setting up all the filters required
     Iir::Butterworth::HighPass<filterorder> dnfHP;
     dnfHP.setup(fs,highpassCutOff);
-	
+
+    Iir::Butterworth::LowPass<filterorder> dnfLP;
+    dnfLP.setup(fs,lowpassCutOff);
+
     Fir1 lms_filter(nTapsDNF);
 
     long int startindex = (long int)(startTime * fs);
@@ -112,9 +115,7 @@ void processOneSweep(const char* filename, const long int sweepNo, const bool sh
     {
 	const double raw = matloader.getData(sweepNo,count) * gain;
 	const double filtered = dnfHP.filter(raw);
-	const double refnoise1 = sin(2 * M_PI * ((double)count) * transmitter1freq / fs);
-	const double refnoise2 = sin(2 * M_PI * ((double)count) * transmitter2freq / fs);
-	const double refnoise = refnoise1 + refnoise2;
+	const double refnoise = dnfLP.filter(raw);
 	
 	double f_nn = dnf.filter(filtered,refnoise);
 
