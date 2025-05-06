@@ -3,7 +3,7 @@
 Demo which filters about 50Hz from a noisy ECG.
 This is a minimal example where the reference noise is just
 a 50Hz sine wave and the DNF removes the 50Hz from the
-ECG by using this 50Hz sine. This, of cours,e can also be
+ECG by using this 50Hz sine. This, of course, can also be
 done by a simple LMS FIR filter but this here serves as an example
 code which can then be used for more complex reference signals.
 
