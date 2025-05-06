@@ -13,13 +13,17 @@ Installation instructions are in these repositories:
 
 2) Install the boost library by running:
 
-Linux: `sudo apt-get install libboost-dev`
+```
+sudo apt-get install libboost-dev
+```
 
 3) Make sure you have `cmake` installed.
 
 4) Optionally, install the openCV library by running:
 
-Linux: `sudo apt install libopencv-dev`
+```
+sudo apt install libopencv-dev
+```
 
 OpenCV is used for realtime plotting of the EEG filter but not needed for the DNF library itself.
 
