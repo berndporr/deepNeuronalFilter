@@ -14,7 +14,7 @@
 using namespace std; 
 
 //The nlayers should be an integer of the total number of hidden layers required not including the input layer
-const int NLAYERS = 3;
+const int NLAYERS = 5;
 
 // Number of taps of the delay line
 const int nTapsDNF = 100;
