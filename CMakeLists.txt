@@ -14,9 +14,18 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include(GNUInstallDirs)
 
-add_subdirectory(eeg_filter)
-add_subdirectory(eeg_sim)
-add_subdirectory(cvui)
+find_package(OpenCV)
+
+if(NOT OpenCV_FOUND)
+    message(WARNING "Because OpenCV couldn't be found, only the DNF library itself will be compiled. "
+    "EEG-filter and EEG-sim are disabled as they need openCV for realtime plotting.")
+else()
+    message(STATUS "OpenCV found: ${OpenCV_VERSION}")
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    add_subdirectory(eeg_filter)
+    add_subdirectory(eeg_sim)
+    add_subdirectory(cvui)
+endif()
 
 enable_testing ()
 

@@ -11,15 +11,18 @@ Installation instructions are in these repositories:
  - IIR: https://github.com/berndporr/iir1
  - FIR: https://github.com/berndporr/fir1
 
-2) Install openCV library by running:
+2) Install the boost library by running:
 
-Linux: `sudo apt install libopencv-dev`, Mac: `brew install opencv`
+Linux: `sudo apt-get install libboost-dev`
 
-3) Install boost library by running:
+3) Make sure you have `cmake` installed.
 
-Linux: `sudo apt-get install libboost-dev`, Mac: is included in opencv
+4) Optionally, install the openCV library by running:
 
-4) And make sure you have `cmake` installed.
+Linux: `sudo apt install libopencv-dev`
+
+OpenCV is used for realtime plotting of the EEG filter but not needed for the DNF library itself.
+
 
 ## How to compile
 
@@ -50,3 +53,5 @@ sudo make install
 
  - eeg_filter: removes noise from real EEG data (release)
  - eeg_sim: removes noise from simulated EEG data (release)
+
+both need openCV to be installed as they use it for realtime plotting of the filtering process.
