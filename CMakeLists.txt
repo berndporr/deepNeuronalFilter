@@ -14,6 +14,8 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 include(GNUInstallDirs)
 
+add_subdirectory(ecg_filt_demo)
+
 find_package(OpenCV)
 
 if(NOT OpenCV_FOUND)

@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.10.0)
+project(ecg_filt_demo)
+set(CMAKE_CXX_STANDARD 17)
+include_directories(..)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+add_executable(ecg_filt_demo ecg_filt_demo.cpp)
+target_link_libraries(ecg_filt_demo dnf)
