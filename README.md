@@ -2,6 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7100537.svg)](https://doi.org/10.5281/zenodo.7100537)
 
+[See also the libtorch version of the DNF](https://github.com/berndporr/dnf_torch)
+
 ## Prerequisites Libraries and packages
 
 1) Install the IIR and FIR filter libraries
